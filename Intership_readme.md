@@ -1,40 +1,100 @@
 # intership-backend
-intership-backend
 
-У Windows + Bash:
+Backend-сервіс, побудований за допомогою **FastAPI**
 
-  Інструмент	❌ НЕ ТАК	✅ ПРАВИЛЬНО
-  pytest	    pytest	    python -m pytest
-  uvicorn	    uvicorn	    python -m uvicorn
-  pip	        pip	        python -m pip
+## ⚠️ Windows, VSCode + Bash:
 
-  (де python = .venv/Scripts/python)
+| Інструмент | ❌ НЕ ТАК | ✅ ПРАВИЛЬНО       |
+|------------|------------|--------------------|
+| pytest	   |`pytest`	  |`python -m pytest`  |
+| uvicorn    |`uvicorn`	  |`python -m uvicorn` |
+| pip	       |`pip`	      |`python -m pip`     |
+
+> Де `python` стосується:
+>
+> ```bash
+> .venv/Scripts/python
+> ```
+
+## 📦 Менеджер залежностей
 
 Ініціалізація залежностей із папки .venv для проекту:
+  ```bash
   pip freeze > requirements.txt
+  ```
 Встановлення залежностей із файлу requirements.txt для проекту:
+  ```bash
   pip install -r requirements.txt
+  ```
 
-При проблемах із запуском серверу потрібно ввести наступні команди:
-  source .venv/Scripts/activate
-  (.venv) - має показати це
+При проблемах із запуском серверу потрібно ввести наступні команди (для Windows):
+  ```bash
+  /c/Users/admin/AppData/Local/Programs/Python/Python314/python.exe -m venv venv
+  ```
 
+## 🐍 Активація віртуального середовища (Windows + Bash)
+
+Активація середовища:
+  ```bash
+  source venv/Scripts/activate
+  ```
+  Результат:
+    ```bash
+    (.venv)
+    ```
+
+Перевірка середовища запуску:
+  ```bash
   which python
-  /d/github_projects/intership-backend/.venv/Scripts/python
-  (.venv) - має показати це
+  ```
+  Результат:
+    ```bash
+    /d/github_projects/intership-backend/.venv/Scripts/python
+    (.venv)
+    ```
 
-Запуск бекенда:
+## 🚀 Запуск backend сервера
+
+Альтернативний спосіб запуску сервера для Windows:
+  ```bash
+  "C:\Users\admin\AppData\Local\Programs\Python\Python314\python.exe" app/main.py
+  ```
+
+Встановлення uvicorn для перезапуску сервера при внесення змін в код:
+  ```bash
+  python -m pip install fastapi uvicorn
+  ```
+
+Запуск бекенда якщо uvicorn прописаний у main.py, він запускається як модуль, а не як файл:
+  ```bash
+  python -m app.main
+  ```
+
+Альтернативний спосіб запуску якщо uvicorn не прописаний у main.py:
+  ```bash
   uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
-Якщо не спрацює, то запускати напряму: 
+  ```
+
+Якщо не спрацює, то можна запустити напряму, але бажано все прописувати у main.py:
+  ```bash
   python -m uvicorn app.main:app --reload
+  ```
+
+## 🧪 Тестування
 
 Для тестів потрібна бібліотека httpx
+  ```bash
   pip install httpx
   pip show httpx
+  ```
 
 Команда для запуску тестів для Windows:
+  ```bash
   PYTHONPATH=. .venv/Scripts/python -m pytest tests/
+  ```
 
-  альтернативні варіанти запустку тестів для UNIX систем:
-    pytest --rootdir=. tests/
-    pytest tests/
+Альтернативні варіанти запустку тестів для UNIX систем:
+  ```bash
+  pytest --rootdir=. tests/
+  pytest tests/
+  ```

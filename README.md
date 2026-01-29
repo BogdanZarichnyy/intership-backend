@@ -1,18 +1,14 @@
 # intership-backend
 
-Backend service built with **FastAPI**.
+Backend service built with **FastAPI**
 
----
+## ⚠️ Windows, VSCode + Bash:
 
-## ⚠️ Important note for Windows + Bash users
-
-On **Windows when using Bash (Git Bash / VS Code Bash)**, global executables may not work as expected. Always prefer running tools via Python.
-
-| Tool    | ❌ Incorrect | ✅ Correct |
-|--------|-------------|-----------|
-| pytest | `pytest`    | `python -m pytest` |
-| uvicorn | `uvicorn` | `python -m uvicorn` |
-| pip    | `pip`       | `python -m pip` |
+| Tool | ❌ NOT THIS | ✅ CORRECTLY |
+|------------|------------|--------------------|
+| pytest	   |`pytest`	  |`python -m pytest`  |
+| uvicorn    |`uvicorn`	  |`python -m uvicorn` |
+| pip	       |`pip`	      |`python -m pip`     |
 
 > Where `python` refers to:
 >
@@ -20,108 +16,94 @@ On **Windows when using Bash (Git Bash / VS Code Bash)**, global executables may
 > .venv/Scripts/python
 > ```
 
----
+## 📦 Dependency Manager
 
-## 📦 Dependency management
+### Save dependencies from .venv to requirements.txt:
+  ```bash
+  pip freeze > requirements.txt
+  ```
 
-### Save dependencies
+### Install dependencies from requirements.txt:
+  ```bash
+  pip install -r requirements.txt
+  ```
 
-```bash
-python -m pip freeze > requirements.txt
-```
+### Troubleshooting server startup issues (Windows):
 
-### Install dependencies
+If you have problems running the server, enter the following commands:
+  ```bash
+  /c/Users/admin/AppData/Local/Programs/Python/Python314/python.exe -m venv .venv
+  ```
 
-```bash
-python -m pip install -r requirements.txt
-```
+## 🐍 Virtual Environment Activation (Windows + Bash)
 
----
+### Activate the environment:
+  ```bash
+  source .venv/Scripts/activate
+  ```
+  
+  Result:
+    ```bash
+    (.venv)
+    ```
 
-## 🐍 Virtual environment activation (Windows + Bash)
+### Verify the Python environment:
+  ```bash
+  which python
+  ```
+  
+  Result:
+    ```bash
+    /d/github_projects/intership-backend/.venv/Scripts/python
+    (.venv)
+    ```
 
-If you have problems starting the server, make sure the virtual environment is active.
+## 🚀 Run Backend Server
 
-```bash
-source .venv/Scripts/activate
-```
+### Alternative way to run the server (Windows):
+  ```bash
+  "C:\Users\admin\AppData\Local\Programs\Python\Python314\python.exe" app/main.py
+  ```
 
-You should see:
+### Install FastAPI and uvicorn for server restart on code changes:
+  ```bash
+  python -m pip install fastapi uvicorn
+  ```
 
-```text
-(.venv)
-```
+### Run the backend if uvicorn is configured in main.py (run as a module, not as a file):
+  ```bash
+  python -m app.main
+  ```
 
-Verify Python path:
+### Alternative 1 - If uvicorn is NOT configured in main.py:
+  ```bash
+  uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
+  ```
 
-```bash
-which python
-```
+### Alternative 2 - Direct uvicorn run (less preferred):
 
-Expected output:
-
-```text
-/d/github_projects/intership-backend/.venv/Scripts/python
-```
-
----
-
-## 🚀 Run backend server
-
-Preferred way:
-
-```bash
-python -m uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
-```
-
-Alternative (may fail on Windows + Bash):
-
-```bash
-uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
-```
-
----
+If the above doesn't work, you can run it directly, but it's better to configure it in main.py:
+  ```bash
+  python -m uvicorn app.main:app --reload
+  ```
 
 ## 🧪 Testing
 
-### Required dependency
+### Install required dependency:
 
-Tests require **httpx**:
+Tests require the **httpx** library:
+  ```bash
+  pip install httpx
+  pip show httpx
+  ```
 
-```bash
-python -m pip install httpx
-python -m pip show httpx
-```
+### Run tests (Windows):
+  ```bash
+  PYTHONPATH=. .venv/Scripts/python -m pytest tests/
+  ```
 
-### Run tests (Windows)
-
-```bash
-PYTHONPATH=. .venv/Scripts/python -m pytest tests/
-```
-
-### Alternative (Unix-like systems)
-
-```bash
-pytest --rootdir=. tests/
-pytest tests/
-```
-
----
-
-## ✅ Health check
-
-After starting the server, open:
-
-```text
-http://localhost:8000/
-```
-
-Expected response:
-
-```json
-{
-  "status_code": 200,
-  "detail": "ok",
-  "result": "working"
-}
-```
+### Alternative methods (Unix-like systems):
+  ```bash
+  pytest --rootdir=. tests/
+  pytest tests/
+  ```
