@@ -1,11 +1,6 @@
 from fastapi import FastAPI
+from app.routers.health import router as healthRouter
 
 app = FastAPI(title="Internship Backend")
 
-@app.get("/")
-async def healthСheck():
-  return {
-    "status_code": 200,
-    "detail": "ok",
-    "result": "working"
-  }
+app.include_router(healthRouter)
