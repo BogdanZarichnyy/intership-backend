@@ -53,6 +53,26 @@ Backend-сервіс, побудований за допомогою **FastAPI**
     (.venv)
     ```
 
+## Встановлення dotenv для приватних змінних
+  ```bash
+  python -m pip install python-dotenv
+  ```
+
+Якщо будуть помилки при запуску то потрібно повторно активувати середовище і перевстановити dotenv:
+  ```bash
+  source venv\Scripts\activate
+  python -m pip install --force-reinstall python-dotenv
+  ```
+
+Перевіряєм середовище запуску:
+  ```bash
+  python -c "import dotenv; print(dotenv.__file__)"
+  ```
+Результат має вигладати так:
+  ```bash
+  ...\intership-backend\venv\Lib\site-packages\dotenv\__init__.py
+  ```
+
 ## 🚀 Запуск backend сервера
 
 Альтернативний спосіб запуску сервера для Windows:
