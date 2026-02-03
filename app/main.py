@@ -1,16 +1,24 @@
 from fastapi import FastAPI
-from app.routers.health import router as healthRouter
-from app.config import settings
 import uvicorn
 
-app = FastAPI(title="Internship Backend")
+from app.routers.health import router as healthRouter
+from app.core.middleware import setup_middlewares
+from app.core.config import settings
 
-app.include_router(healthRouter)
+def create_app() -> FastAPI: # Використовуємо factory pattern, щоб було легше тестувати
+  app = FastAPI(title="Internship Backend")
+
+  setup_middlewares(app)
+  app.include_router(healthRouter)
+
+  return app
+
+app = create_app()
 
 if __name__ == "__main__":
   uvicorn.run(
     "app.main:app",
-      host=settings.host,
-      port=settings.port,
+    host=settings.host,
+    port=settings.port,
     reload=True
   )
