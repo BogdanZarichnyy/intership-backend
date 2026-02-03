@@ -3,7 +3,7 @@ import uvicorn
 
 from app.routers.health import router as healthRouter
 from app.core.middleware import setup_middlewares
-from app.core.config import settings
+from app.config import settings
 
 def create_app() -> FastAPI: # Використовуємо factory pattern, щоб було легше тестувати
   app = FastAPI(title="Internship Backend")
