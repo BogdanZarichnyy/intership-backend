@@ -29,7 +29,7 @@ Backend-сервіс, побудований за допомогою **FastAPI**
 
 При проблемах із запуском серверу потрібно ввести наступні команди (для Windows):
   ```bash
-  /c/Users/admin/AppData/Local/Programs/Python/Python314/python.exe -m venv venv
+  /C/Users/admin/AppData/Local/Programs/Python/Python314/python.exe -m venv venv
   ```
 
 ## 🐍 Активація віртуального середовища (Windows + Bash)
@@ -117,4 +117,42 @@ Backend-сервіс, побудований за допомогою **FastAPI**
   ```bash
   pytest --rootdir=. tests/
   pytest tests/
+  ```
+
+## 🧪 Конфігурація Docker
+
+Збираємо контейнер docker:
+  ```bash
+  docker build --no-cache -t internship-backend .
+  ```
+
+Запускаємо контейнер docker:
+  ```bash
+  docker run -d -p 8000:8000 internship-backend
+  ```
+Якщо додлаємо нову бібліотеку чи сервіс в проект, потрібно оновити всі залежності:
+  ```bash
+  pip freeze > requirements.txt
+  pip install -r requirements.txt
+  ```
+
+І знову зібрати контейнер наново без кешу:
+  ```bash
+  docker build --no-cache -t internship-backend .
+  ```
+
+Збірка з docker compose:
+  ```bash
+  docker compose up --build
+  ```
+
+А коли Docker "глючить":
+  ```bash
+  docker compose build --no-cache
+  ```
+
+Запус терміналу контейнера в Docker:
+  ```bash
+  docker ps
+  docker exec -it [ID_CONTAINER] sh
   ```

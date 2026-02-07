@@ -1,13 +1,10 @@
 from fastapi.testclient import TestClient
-from fastapi import FastAPI
-from app.routers.health import router  # без імпорту app.main
-
-app = FastAPI()
-app.include_router(router)
-
-client = TestClient(app)
+from app.main import create_app
 
 def test_health_check():
+  app = create_app()
+  client = TestClient(app)
+
   response = client.get("/")
   assert response.status_code == 200
   assert response.json() == {
