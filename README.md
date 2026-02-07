@@ -104,26 +104,6 @@ Alternative test commands for UNIX-like systems:
   pytest tests/
   ```
 
-## Install `dotenv` for private variables
-  ```bash
-  python -m pip install python-dotenv
-  ```
-
-If there are errors while running, reactivate the environment and reinstall `dotenv`:
-  ```bash
-  source venv\Scripts\activate
-  python -m pip install --force-reinstall python-dotenv
-  ```
-
-Check the runtime environment:
-  ```bash
-  python -c "import dotenv; print(dotenv.__file__)"
-  ```
-The output should look like this:
-  ```bash
-  ...\intership-backend\venv\Lib\site-packages\dotenv\__init__.py
-  ```
-
 ## 🧪 Docker Configuration
 
 Build the Docker container:
