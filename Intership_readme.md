@@ -29,7 +29,7 @@ Backend-сервіс, побудований за допомогою **FastAPI**
 
 При проблемах із запуском серверу потрібно ввести наступні команди (для Windows):
   ```bash
-  /C/Users/admin/AppData/Local/Programs/Python/Python314/python.exe -m venv venv
+  "/c/Users/admin/AppData/Local/Programs/Python/Python312/python.exe" -m venv .venv
   ```
 
 ## 🐍 Активація віртуального середовища (Windows + Bash)
@@ -60,7 +60,7 @@ Backend-сервіс, побудований за допомогою **FastAPI**
 
 Якщо будуть помилки при запуску то потрібно повторно активувати середовище і перевстановити dotenv:
   ```bash
-  source venv\Scripts\activate
+  source venv/Scripts/activate
   python -m pip install --force-reinstall python-dotenv
   ```
 
@@ -108,9 +108,21 @@ Backend-сервіс, побудований за допомогою **FastAPI**
   pip show httpx
   ```
 
+Для тестування в контейнері докера:
+  ```bash
+  docker compose run --rm -w /app backend pytest tests/ --disable-warnings
+  ```
+
+Для Windows
+  ```bash
+  docker compose run --rm -v //d/github_projects/intership-backend:/app -w /app backend pytest tests/ --disable-warnings
+  ```
+
 Команда для запуску тестів для Windows:
   ```bash
+  PYTHONPATH=. .venv/Scripts/python -m pytest --disable-warnings
   PYTHONPATH=. .venv/Scripts/python -m pytest tests/
+  PYTHONPATH=. pytest tests/
   ```
 
 Альтернативні варіанти запустку тестів для UNIX систем:
@@ -155,4 +167,20 @@ Backend-сервіс, побудований за допомогою **FastAPI**
   ```bash
   docker ps
   docker exec -it [ID_CONTAINER] sh
+  ```
+
+Запус композера Docker:
+  ```bash
+  docker compose down -v
+  docker compose build --no-cache
+  docker compose up
+  ```
+
+  ```bash
+  docker compose build --no-cache && docker compose up
+  ```
+
+Після внесення змін у код бекенду, можна перезбирати/перезапускати його окремо без перезапуску образів баз даних:
+  ```bash
+  docker compose up --build
   ```
