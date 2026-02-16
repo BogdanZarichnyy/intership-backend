@@ -142,3 +142,12 @@ Open a shell in the Docker container:
   docker ps
   docker exec -it [ID_CONTAINER] sh
   ```
+
+## Running migrations:
+  ```bash
+  uvicorn app.main:app --reload # stopped backend
+  python -m alembic revision --autogenerate -m "create users table" # creating migration
+  python -m alembic upgrade head # writing migration to database for Windows
+  alembic upgrade head # writing migration to database for UNIX
+  uvicorn app.main:app --reload # starting backend
+  ```
