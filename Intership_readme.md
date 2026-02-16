@@ -112,16 +112,6 @@ Backend-сервіс, побудований за допомогою **FastAPI**
   pip show httpx
   ```
 
-Для тестування в контейнері докера:
-  ```bash
-  docker compose run --rm -w /app backend pytest tests/ --disable-warnings
-  ```
-
-Для Windows
-  ```bash
-  docker compose run --rm -v //d/github_projects/intership-backend:/app -w /app backend pytest tests/ --disable-warnings
-  ```
-
 Команда для запуску тестів для Windows:
   ```bash
   PYTHONPATH=. .venv/Scripts/python -m pytest --disable-warnings
@@ -131,8 +121,27 @@ Backend-сервіс, побудований за допомогою **FastAPI**
 
 Альтернативні варіанти запустку тестів для UNIX систем:
   ```bash
+  python -m pytest tests/
+  python -m pytest -v
   pytest --rootdir=. tests/
   pytest tests/
+  ```
+
+Запуск тестів в середині контейнера докера:
+  спочатку в терміналі докера вводимо:
+  ```bash
+  cd /d/github_projects/intership-backend
+  docker compose exec backend /bin/sh
+  docker compose exec backend /bin/bash
+  ```
+  таким чином активується shell бекенду, і тоді запускаємо тести:
+  ```bash
+  pytest tests/
+  ```
+  для Windows
+  ```bash
+  cd "D:\github_projects\intership-backend"
+  docker compose exec backend sh -c "export PYTHONPATH=/app && pytest tests/"
   ```
 
 ## 🧪 Конфігурація Docker
@@ -196,4 +205,10 @@ Backend-сервіс, побудований за допомогою **FastAPI**
   python -m alembic upgrade head  # запис міграції в БД для Windows
   alembic upgrade head  # запис міграції в БД для UNIX
   uvicorn app.main:app --reload  # старт бекенду
+  ```
+
+
+Структура папок проекту:
+  ```bash
+  tree /F /A > structure.txt
   ```

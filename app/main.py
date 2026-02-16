@@ -12,6 +12,7 @@ from alembic import command
 from alembic.config import Config
 
 from app.routers.health import router as healthRouter
+from app.routers.user import router as userRouter
 from app.core.middleware import setup_middlewares
 from app.config import settings
 
@@ -99,6 +100,7 @@ def create_app() -> FastAPI: # Використовуємо factory pattern, щ�
 
   setup_middlewares(app)
   app.include_router(healthRouter)
+  app.include_router(userRouter, prefix="/users")
 
   return app
 
