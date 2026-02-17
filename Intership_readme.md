@@ -1,6 +1,7 @@
 # intership-backend
 
 Backend-сервіс, побудований за допомогою **FastAPI**
+http://localhost:8000/docs
 
 ## ⚠️ Windows, VSCode + Bash:
 

@@ -7,11 +7,11 @@ import logging
 from logging.handlers import RotatingFileHandler
 import os
 
-from concurrent.futures import ThreadPoolExecutor
 from alembic import command
 from alembic.config import Config
 
 from app.routers.health import router as healthRouter
+from app.routers.auth import router as authRouter
 from app.routers.user import router as userRouter
 from app.core.middleware import setup_middlewares
 from app.config import settings
@@ -99,7 +99,10 @@ def create_app() -> FastAPI: # Використовуємо factory pattern, щ�
   app = FastAPI(title="Internship Backend", lifespan=lifespan)
 
   setup_middlewares(app)
+
+  # Роутери
   app.include_router(healthRouter)
+  app.include_router(authRouter, prefix="/auth")
   app.include_router(userRouter, prefix="/users")
 
   return app

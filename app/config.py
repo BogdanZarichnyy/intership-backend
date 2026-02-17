@@ -17,6 +17,20 @@ class Settings(BaseSettings):
   redis_host: str = "redis"
   redis_port: int = 6379
 
+  # JWT (ДОДАЙ ЦЕ)
+  secret_key: str
+  algorithm: str = "HS256"
+  access_token_expire_minutes: int = 30  # Час життя access токена в хвилинах
+  refresh_token_expire_days: int = 7  # Час життя refresh токена в днях
+
+  # Auth0
+  auth0_domain: str
+  auth0_audience: str
+  auth0_client_id: str
+  auth0_client_secret: str
+  auth0_secret: str
+  auth0_redirect_uri: str
+
   model_config = SettingsConfigDict(
     env_file=".env",
     env_prefix=""

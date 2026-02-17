@@ -68,6 +68,12 @@ class UserService:
       )
       raise
 
+  async def get_user_by_email(self, email: str) -> User | None:
+    result = await self.db.execute(
+      select(User).where(User.email == email)
+    )
+    return result.scalar_one_or_none()
+
   async def create_new_user(
     self,
     user_data: SignUpRequest
