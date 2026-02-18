@@ -2,8 +2,9 @@ from fastapi import APIRouter, Depends, HTTPException, status, Request
 from fastapi.responses import RedirectResponse
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from sqlalchemy.ext.asyncio import AsyncSession
+import httpx
 
-from app.schemas.user import SignInRequest, SignUpRequest
+from app.schemas.user import SignInRequest
 from app.services.user import UserService
 from app.core.security import (
   verify_password,
@@ -15,7 +16,7 @@ from app.db.postgres import get_db
 from app.core.auth0 import decode_auth0_token
 from app.config import settings
 
-router = APIRouter(prefix="/auth", tags=["auth"])
+router = APIRouter(tags=["auth"])
 security = HTTPBearer()
 
 @router.post("/login")
@@ -50,7 +51,7 @@ async def auth0_logout():
   Редірект на Auth0 logout URL і повернення на фронтенд.
   """
   logout_url = (
-    f"https://{settings.auth0_domain}/v2/logout?"
+    # f"https://{settings.auth0_domain}/v2/logout?"
     f"client_id={settings.auth0_client_id}&returnTo={settings.auth0_redirect_uri}"
   )
   return RedirectResponse(url=logout_url)
@@ -96,35 +97,58 @@ async def refresh_token(
 
 @router.get("/callback")
 async def auth0_callback(request: Request, db: AsyncSession = Depends(get_db)):
+
   """
-  Обробляє редірект після логіну через Auth0.
-  Отримує token як query параметр, створює користувача у БД, якщо його немає,
-  і видає локальний access_token для бекенду.
+  OAuth2 callback:
+  1. Отримуємо code від Auth0
+  2. Обмінюємо його на токени через /oauth/token
+  3. Беремо id_token → дістаємо email
+  4. Створюємо/знаходимо користувача
+  5. Видаємо локальний JWT і редіректимо на фронтенд
   """
+
   print(request.query_params)  # Дебаг для перевірки отриманих параметрів
-  token = request.query_params.get("token")
-  if not token:
-    raise HTTPException(status_code=400, detail="Token not provided by Auth0")
-  try:
-    payload = decode_auth0_token(token)
-  except Exception as e:
-    raise HTTPException(status_code=401, detail=f"Invalid Auth0 token: {str(e)}")
-  email = payload.get("email")
+  print(request.query_params.get("code"))  # Дебаг для перевірки отримання коду авторизації
+  print(request.query_params.get("state"))  # Дебаг для перевірки отримання state параметра
+  print(request.query_params.get("token"))  # Дебаг для перевірки отримання state параметра
+
+  code = request.query_params.get("code")
+  if not code:
+    raise HTTPException(status_code=400, detail="Missing code from Auth0")
+  token_url = f"https://{settings.auth0_domain}/oauth/token"
+  payload = {
+    "grant_type": "authorization_code",
+    "client_id": settings.auth0_client_id,
+    "client_secret": settings.auth0_client_secret,
+    "code": code,
+    "redirect_uri": settings.auth0_redirect_uri,
+  }
+  async with httpx.AsyncClient() as client:
+    response = await client.post(token_url, json=payload)
+  if response.status_code != 200:
+    raise HTTPException(
+      status_code=response.status_code,
+      detail=f"Auth0 token exchange failed: {response.text}"
+    )
+  token_data = response.json()
+  id_token = token_data.get("id_token")
+  if not id_token:
+    raise HTTPException(status_code=400, detail="id_token not returned by Auth0")
+  auth0_payload = decode_auth0_token(id_token)
+  email = auth0_payload.get("email")
   if not email:
-    raise HTTPException(status_code=400, detail="Auth0 token does not contain email")
+    raise HTTPException(status_code=400, detail="Email not found in id_token")
   user_service = UserService(db)
   user = await user_service.get_user_by_email(email)
   if not user:
-    # Динамічне створення користувача
-    user = await user_service.create_new_user(
-      user_data={
-        "email": email,
-        "username": email.split("@")[0],
-        "password": None  # пароль не потрібен для Auth0 користувачів
-      }
-    )
-  # Створюємо локальний access_token для бекенду
-  access_token = create_access_token({"sub": str(user.id), "email": user.email})
-  # Редіректимо на фронтенд SPA, передаємо токен у query параметрі
-  redirect_url = f"${settings.auth0_redirect_uri}?access_token={access_token}"
+    user = await user_service.create_new_user({
+      "email": email,
+      "username": email.split("@")[0],
+      "password": None
+    })
+  local_access_token = create_access_token({
+    "sub": str(user.id),
+    "email": user.email
+  })
+  redirect_url = f"{settings.auth0_redirect_uri}?access_token={local_access_token}"
   return RedirectResponse(url=redirect_url)

@@ -12,10 +12,7 @@ from app.core.dependencies import get_current_user
 
 __all__ = ["UserService"] # Для тестування
 
-router = APIRouter(
-  prefix="/users",
-  tags=["users"]
-)
+router = APIRouter(tags=["users"])
 
 def get_user_service(
   db: AsyncSession = Depends(get_db)
@@ -25,7 +22,7 @@ def get_user_service(
 @router.get(
   "/me",
   response_model=UserDetailResponse,
-  summary="Отримати поточного користувача"
+  summary="Current User Info",
 )
 async def get_me(current_user = Depends(get_current_user)):
   """Повертає дані поточного користувача на основі access token."""
