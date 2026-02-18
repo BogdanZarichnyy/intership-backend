@@ -3,9 +3,7 @@ from fastapi import FastAPI
 import asyncio
 import uvicorn
 
-import logging
-from logging.handlers import RotatingFileHandler
-import os
+from app.core.logger import logger
 
 from alembic import command
 from alembic.config import Config
@@ -18,26 +16,6 @@ from app.config import settings
 
 from app.db.postgres import engine
 from app.db.redis import redis_client
-
-# --- Логування ---
-os.makedirs("logs", exist_ok=True)
-
-logger = logging.getLogger("app")
-logger.setLevel(logging.INFO)
-
-formatter = logging.Formatter("%(asctime)s [%(levelname)s] %(name)s: %(message)s")
-
-# Консоль
-console_handler = logging.StreamHandler()
-console_handler.setFormatter(formatter)
-logger.addHandler(console_handler)
-
-# Файл з ротацією
-file_handler = RotatingFileHandler("logs/app.log", maxBytes=5_000_000, backupCount=5)
-file_handler.setFormatter(formatter)
-logger.addHandler(file_handler)
-
-logger.info("Logger initialized")
 
 # --- Параметри повторних спроб ---
 MAX_RETRIES = 5
@@ -72,21 +50,11 @@ async def wait_for_redis():
   logger.error("Cannot connect to Redis")
   raise RuntimeError("Cannot connect to Redis")
 
-# --- Автоматичне застосування міграцій ---
-async def run_migrations():
-  loop = asyncio.get_event_loop()
-  alembic_cfg = Config("alembic.ini")
-
-  # Виконуємо синхронний виклик у окремому потоці
-  await loop.run_in_executor(None, lambda: command.upgrade(alembic_cfg, "head"))
-  logger.info("Database migrations applied successfully")
-
 @asynccontextmanager
 async def lifespan(app: FastAPI):
   # startup
   await wait_for_postgres()
   await wait_for_redis()
-  await run_migrations()
   yield
 
   # shutdown
