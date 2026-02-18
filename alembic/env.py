@@ -1,4 +1,6 @@
 import asyncio
+import os
+import re
 from logging.config import fileConfig
 
 from sqlalchemy import pool
@@ -10,17 +12,39 @@ from alembic import context
 from app.config import settings
 from app.db.postgres import Base
 
-# import models
+# import models so metadata is registered
 from app.models.user import User
 
 config = context.config
 
+# set database url
 config.set_main_option("sqlalchemy.url", settings.database_url)
 
+# logging
 if config.config_file_name is not None:
-  fileConfig(config.config_file_name)
+    fileConfig(config.config_file_name)
 
 target_metadata = Base.metadata
+
+# --- custom revision id generator ---
+def get_next_revision_id() -> str:
+  versions_dir = os.path.join(os.path.dirname(__file__), "versions")
+  if not os.path.exists(versions_dir):
+    return "0001"
+  revisions = []
+  for filename in os.listdir(versions_dir):
+    match = re.match(r"^(\d{4})_", filename)
+    if match:
+      revisions.append(int(match.group(1)))
+  next_rev = max(revisions, default=0) + 1
+  return f"{next_rev:04d}"
+
+
+# expose to alembic context
+def process_revision_directives(context, revision, directives):
+  if getattr(config.cmd_opts, "autogenerate", False):
+    script = directives[0]
+    script.rev_id = get_next_revision_id()
 
 def run_migrations_offline():
   context.configure(
@@ -28,17 +52,17 @@ def run_migrations_offline():
     target_metadata=target_metadata,
     literal_binds=True,
     dialect_opts={"paramstyle": "named"},
+    process_revision_directives=process_revision_directives,
   )
-
   with context.begin_transaction():
     context.run_migrations()
 
 def do_run_migrations(connection: Connection):
   context.configure(
     connection=connection,
-    target_metadata=target_metadata
+    target_metadata=target_metadata,
+    process_revision_directives=process_revision_directives,
   )
-
   with context.begin_transaction():
     context.run_migrations()
 
@@ -48,10 +72,8 @@ async def run_migrations_online():
     prefix="sqlalchemy.",
     poolclass=pool.NullPool,
   )
-
   async with connectable.connect() as connection:
     await connection.run_sync(do_run_migrations)
-
   await connectable.dispose()
 
 if context.is_offline_mode():
