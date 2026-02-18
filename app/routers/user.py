@@ -11,10 +11,7 @@ from app.services.user import UserService
 
 __all__ = ["UserService"] # Для тестування
 
-router = APIRouter(
-  prefix="/users",
-  tags=["users"]
-)
+router = APIRouter(tags=["users"])
 
 def get_user_service(
   db: AsyncSession = Depends(get_db)
