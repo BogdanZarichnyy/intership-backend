@@ -138,12 +138,10 @@ class UserService:
     update_data: UserUpdate
   ) -> UserDetailResponse:
     try:
-      if update_data.email is not None:
-        user.email = update_data.email
+      # дозволено змінювати тільки username
       if update_data.username is not None:
         user.username = update_data.username
-      if update_data.is_active is not None:
-        user.is_active = update_data.is_active
+      # дозволено змінювати тільки password, для цього потрібно вказати поточний пароль для підтвердження
       if update_data.new_password:
         user.hashed_password = hash_password(
           update_data.new_password
@@ -167,11 +165,10 @@ class UserService:
     user: User
   ) -> None:
     try:
-      user_id = user.id
       await self.db.delete(user)
       await self.db.commit()
       logger.info(
-        f"User deleted id={user_id}"
+        f"User deleted id={user.id}"
       )
     except Exception as e:
       await self.db.rollback()

@@ -32,9 +32,7 @@ class SignUpRequest(BaseModel):
 
 class UserUpdate(BaseModel):
   """Схема для оновлення користувача"""
-  email: Optional[EmailStr] = None
   username: Optional[str] = None
-  is_active: Optional[bool] = None
   current_password: Optional[str] = None  # поточний пароль для підтвердження
   new_password: Optional[str] = None      # новий пароль, який користувач хоче встановити
 
