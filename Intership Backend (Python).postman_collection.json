@@ -1,0 +1,334 @@
+{
+  "info": {
+    "_postman_id": "99e5a938-96ee-4e7f-9308-fc0bedb7a464",
+    "name": "Intership Backend (Python)",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "24134261"
+  },
+  "item": [
+    {
+      "name": "User",
+      "item": [
+        {
+          "name": "All users",
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:8000/users?limit=10&offset=0",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8000",
+              "path": [
+                "users"
+              ],
+              "query": [
+                {
+                  "key": "limit",
+                  "value": "10"
+                },
+                {
+                  "key": "offset",
+                  "value": "0"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "User Registration - Local",
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"email\": \"test@test.email\",\r\n    \"username\": \"Test\",\r\n    \"password\": \"123\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://localhost:8000/users",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8000",
+              "path": [
+                "users"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Current user",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{jwt_token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:8000/users/me",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8000",
+              "path": [
+                "users",
+                "me"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "User by ID",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{jwt_token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:8000/users/830bd717-2f58-4c7c-96d4-5e63b76d42fe",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8000",
+              "path": [
+                "users",
+                "830bd717-2f58-4c7c-96d4-5e63b76d42fe"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "User Edit Details",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{jwt_token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "PUT",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"email\": \"test@test.email\",\r\n    \"username\": \"Test\",\r\n    \"current_password\": \"1234\",\r\n    \"new_password\": \"123\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://localhost:8000/users/f67c47da-1f1e-4b07-a781-a0f1b362bfcb",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8000",
+              "path": [
+                "users",
+                "f67c47da-1f1e-4b07-a781-a0f1b362bfcb"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "User Delete",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{jwt_token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:8000/users/f67c47da-1f1e-4b07-a781-a0f1b362bfcb",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8000",
+              "path": [
+                "users",
+                "f67c47da-1f1e-4b07-a781-a0f1b362bfcb"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Authorization",
+      "item": [
+        {
+          "name": "User registration - auth0",
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"access_token\": \"eyJhbGciOiJkaXIiLCJlbmMiOiJBMjU2R0NNIiwiaXNzIjoiaHR0cHM6Ly9kZXYtamExeXFjcGZ3Mm9kdGZocC5ldS5hdXRoMC5jb20vIn0..SmYLep55jfPYJocs._qUufoUx16GzkboI8v_j2mZGzcBz6JBt0nxuKM-IuyvjnRDVzciXcLH2QQdZXPyQsTxma3wJgK6PpH4sPPCf486v-wQCrZVqz7keSyRvOfHTEF4DrUbpDgueAmltcqfqiHym7dF3SzupIxIe4JrwQE1uxoqQWiVfDwzIcpBU-a_17S8K-e8x5BuXIvvD61zER87KpqwWrMZDomrhONP8bnHnrVCFYagzgOz-FsOLjyPRX5AA-X1ZkgzAalf80oBkp-_sPd4pEQpek-I-2tPaCzp2xN5salqMK7rbuDb_X5q2xOYvLjSRjqbTrn-7vrBXaF3RTNZBuh-PLIymRViU1GXPkxtkW8g.Y53JLBnTc-JVcsx1rQjQoA\",\r\n    \"id_token\": \"eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6IlNGWkpLNHVsMHI3cDBCdG9TelVIMyJ9.eyJnaXZlbl9uYW1lIjoiMSIsImZhbWlseV9uYW1lIjoiMSIsIm5pY2tuYW1lIjoia3VydGthbmF2YXRpIiwibmFtZSI6IjEgMSIsInBpY3R1cmUiOiJodHRwczovL2xoMy5nb29nbGV1c2VyY29udGVudC5jb20vYS9BQ2c4b2NLMWViZWdIUUlLNDZxN3J4YW1iUlB0OG1hMmFuUGtnbjBwRFNBSFo1TTBBZWdQT1E9czk2LWMiLCJ1cGRhdGVkX2F0IjoiMjAyNi0wMi0xOFQyMjo0MzoxMS4wODlaIiwiZW1haWwiOiJrdXJ0a2FuYXZhdGlAZ21haWwuY29tIiwiZW1haWxfdmVyaWZpZWQiOnRydWUsImlzcyI6Imh0dHBzOi8vZGV2LWphMXlxY3BmdzJvZHRmaHAuZXUuYXV0aDAuY29tLyIsImF1ZCI6InBER3dvaEVNbTFReVloMXpKZUdqNk1wRnFnSUt2aTFXIiwic3ViIjoiZ29vZ2xlLW9hdXRoMnwxMDcxOTUwNTAzMDkzOTA2NDY3NDIiLCJpYXQiOjE3NzE2MTIxMTIsImV4cCI6MTc3MTY0ODExMiwic2lkIjoiSU0wcWtxYzBWUzNDS05RSGY2Zk54U0ZudjMtVGNpd0wiLCJub25jZSI6IlExTnlOa2s1VTJzeU0xWTNOa2hoWldNMlUxUnZXRTlzWVZvdGMzUXRNRVYwVGk1YVRWQTNiMVIxYXc9PSJ9.LTKOURXswNSENwTktknwPH1V1o_cr6Ls2yZk03fOnTh7sswz6Kj--MR9hLRbsR1VgxpHLH_e1i_4b_XUkGmQtSZOvhwz_ZIqpF0aj7NGAHkWojLhsWk9VvvRoTzLOFYrmgnFKBOxgz7hn0QLhDPQTPFsusXl2cIXNEM4hcpR4xJhUgGERGev_nhH9ADRy6fW5p6ieQRGDklZksS17cKmrTpTGlKE9ziuiD5yXjoFtXya7bwXQQfRUFNEFEFTlNxNhgxMD1IHkKBevJ7DkpE_v-4dRDjfPVUwdrKeFTcxQgrbWxQjfWxYyHiHmL_dSHUXH4QBuCsDk5_bIJizvfwhfQ\",\r\n    \"scope\": \"openid profile email\",\r\n    \"expires_in\": 86400,\r\n    \"token_type\": \"Bearer\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://localhost:8000/auth/callback",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8000",
+              "path": [
+                "auth",
+                "callback"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "User login",
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"email\": \"test@test.email\",\r\n    \"password\": \"123\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://localhost:8000/auth/login",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8000",
+              "path": [
+                "auth",
+                "login"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Send refresh token & get access token",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{jwt_token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://localhost:8000/auth/refresh",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8000",
+              "path": [
+                "auth",
+                "refresh"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Health",
+      "request": {
+        "auth": {
+          "type": "noauth"
+        },
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "http://localhost:8000",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "8000"
+        }
+      },
+      "response": []
+    }
+  ]
+}
