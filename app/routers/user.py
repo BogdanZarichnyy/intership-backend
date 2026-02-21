@@ -134,5 +134,5 @@ async def delete_user(
       status_code=status.HTTP_404_NOT_FOUND,
       detail="User not found"
     )
-  deleted_user = await service.delete_user(user_model)
-  return deleted_user
+  await service.delete_user(user_model)
+  return 

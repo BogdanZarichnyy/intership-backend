@@ -167,11 +167,10 @@ class UserService:
     user: User
   ) -> None:
     try:
-      user_id = user.id
       await self.db.delete(user)
       await self.db.commit()
       logger.info(
-        f"User deleted id={user_id}"
+        f"User deleted id={user.id}"
       )
     except Exception as e:
       await self.db.rollback()
