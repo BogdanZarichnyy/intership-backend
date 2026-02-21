@@ -1,3 +1,4 @@
+from uuid import UUID
 from fastapi import APIRouter, Depends, HTTPException, status, Query
 from sqlalchemy.ext.asyncio import AsyncSession
 from app.schemas.user import (
@@ -8,6 +9,9 @@ from app.schemas.user import (
 )
 from app.db.postgres import get_db
 from app.services.user import UserService
+from app.core.security import (
+  verify_password
+)
 
 __all__ = ["UserService"] # Для тестування
 
@@ -34,7 +38,7 @@ async def get_all_users(
   response_model=UserDetailResponse
 )
 async def get_user_by_id(
-  user_id: int,
+  user_id: UUID,
   service: UserService = Depends(get_user_service)
 ):
   user = await service.get_user_by_id(user_id)
@@ -61,27 +65,39 @@ async def create_new_user(
   response_model=UserDetailResponse
 )
 async def update_user(
-  user_id: int,
+  user_id: UUID,
   update_data: UserUpdate,
   service: UserService = Depends(get_user_service)
 ):
+  # Витягуємо ORM-модель користувача, щоб мати можливість оновлювати її
   user_model = await service.get_user_by_id(user_id)
   if not user_model:
     raise HTTPException(
       status_code=status.HTTP_404_NOT_FOUND,
       detail="User not found"
     )
-  return await service.update_user_details(
-    user_model,
-    update_data
-  )
+  # Перевірка поточного пароля при зміні пароля
+  if update_data.new_password:
+    if not update_data.current_password:
+      raise HTTPException(
+        status_code=status.HTTP_400_BAD_REQUEST,
+        detail="Current password must be provided to set a new password"
+      )
+    if not verify_password(update_data.current_password, user_model.hashed_password):
+      raise HTTPException(
+        status_code=status.HTTP_401_UNAUTHORIZED,
+        detail="Current password is incorrect"
+      )
+  # Фінальне оновлення в БД через сервіс
+  updated_user = await service.update_user_details(user_model, update_data)
+  return updated_user  # FastAPI автоматично конвертує у UserDetailResponse
 
 @router.delete(
   "/{user_id}",
   status_code=status.HTTP_204_NO_CONTENT
 )
 async def delete_user(
-  user_id: int,
+  user_id: UUID,
   service: UserService = Depends(get_user_service)
 ):
   user_model = await service.get_user_by_id(user_id)
@@ -90,4 +106,5 @@ async def delete_user(
       status_code=status.HTTP_404_NOT_FOUND,
       detail="User not found"
     )
-  await service.delete_user(user_model)
+  deleted_user = await service.delete_user(user_model)
+  return deleted_user
