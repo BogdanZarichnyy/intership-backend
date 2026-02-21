@@ -28,9 +28,26 @@ class User(Base):
     nullable=False
   )
 
-  hashed_password: Mapped[str] = mapped_column(
+  # nullable=True — бо Auth0 users не мають password
+  hashed_password: Mapped[str | None] = mapped_column(
     String(255),
-    nullable=False
+    nullable=True
+  )
+
+  # Providers (наприклад local, auth0, google, github, etc) - параметр для розмежування користувачів, які реєструються або локально, або через різні провайдери
+  provider: Mapped[str] = mapped_column(
+    String(50),
+    nullable=False,
+    default="local",
+    index=True
+  )
+
+  # Provider user id (наприклад auth0_id, github_id, google_id, etc) - унікальний ідентифікатор користувача від провайдера, який допомагає зв'язати локального користувача з його обліковим записом у провайдера
+  provider_id: Mapped[str | None] = mapped_column(
+    String(255),
+    unique=True,
+    nullable=True,
+    index=True
   )
 
   is_active: Mapped[bool] = mapped_column(

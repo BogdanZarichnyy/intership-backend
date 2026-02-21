@@ -14,8 +14,9 @@ services:
         condition: service_started
     env_file:
       - .env
-    volumes:
-      - .:/app
+    # прибираємо volumes, щоб не перекривати start.sh
+    # volumes:
+    #   - .:/app
     command: ./start.sh
 
   postgres:

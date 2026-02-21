@@ -1,3 +1,4 @@
+from uuid import UUID
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select, func
 from fastapi import HTTPException, status
@@ -18,6 +19,7 @@ class UserService:
   def __init__(self, db: AsyncSession):
     self.db = db
 
+  # Отримуємо список користувачів з пагінацією
   async def get_all_users(
     self,
     limit: int = 10,
@@ -49,10 +51,11 @@ class UserService:
       logger.error(f"Failed to fetch users list: {e}")
       raise
 
+  # Пошук користувача за ID
   async def get_user_by_id(
     self,
-    user_id: int
-  ) -> UserDetailResponse | None:
+    user_id: UUID
+  ) -> User | None:
     try:
       result = await self.db.execute(
         select(User).where(User.id == user_id)
@@ -61,19 +64,28 @@ class UserService:
       if not user:
         return None
       logger.info(f"Fetched user id={user_id}")
-      return UserDetailResponse.model_validate(user)
+      return user # повертаємо ORM-модель, а не Pydantic-схему, щоб мати можливість оновлювати її в інших методах
     except Exception as e:
       logger.error(
         f"Failed to fetch user id={user_id}: {e}"
       )
       raise
 
+  # Пошук користувача за provider_id (для Auth0, Google, GitHub і т.д.)
+  async def get_user_by_provider_id(self, provider_id: str) -> User | None:
+    result = await self.db.execute(
+      select(User).where(User.provider_id == provider_id)
+    )
+    return result.scalar_one_or_none()
+
+  # Пошук користувача за email
   async def get_user_by_email(self, email: str) -> User | None:
     result = await self.db.execute(
       select(User).where(User.email == email)
     )
     return result.scalar_one_or_none()
 
+  # Створення нового користувача
   async def create_new_user(
     self,
     user_data: SignUpRequest
@@ -95,14 +107,15 @@ class UserService:
             "email": user_data.email
           }
         )
-      # Створення нового користувача
-      hashed_password = hash_password(
-        user_data.password
-      )
+      # Хешуємо пароль лише якщо він є
+      hashed_password = hash_password(user_data.password) if user_data.password else None
+      # Створюємо нового користувача в БД
       user = User(
         email=user_data.email,
         username=user_data.username,
-        hashed_password=hashed_password
+        hashed_password=hashed_password,
+        provider=user_data.provider or "local", # За замовчуванням "local" згідно моделі, якщо не вказаний інший провайдер
+        provider_id=user_data.provider_id
       )
       self.db.add(user)
       await self.db.commit()
@@ -118,6 +131,7 @@ class UserService:
       )
       raise
 
+  # Оновлення деталей користувача
   async def update_user_details(
     self,
     user: User,
@@ -130,9 +144,9 @@ class UserService:
         user.username = update_data.username
       if update_data.is_active is not None:
         user.is_active = update_data.is_active
-      if update_data.password:
+      if update_data.new_password:
         user.hashed_password = hash_password(
-          update_data.password
+          update_data.new_password
         )
       await self.db.commit()
       await self.db.refresh(user)
@@ -147,6 +161,7 @@ class UserService:
       )
       raise
 
+  # Видалення існуючого користувача
   async def delete_user(
     self,
     user: User

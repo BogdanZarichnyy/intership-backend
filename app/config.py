@@ -18,18 +18,20 @@ class Settings(BaseSettings):
   redis_port: int = 6379
 
   # JWT
-  secret_key: str
-  algorithm: str = "HS256"
+  jwt_secret_key: str
+  jwt_algorithm: str = "HS256"
   access_token_expire_minutes: int = 30  # Час життя access токена в хвилинах
   refresh_token_expire_days: int = 7  # Час життя refresh токена в днях
 
   # Auth0
+  auth0_algorithm: str = "RS256" # Auth0 завжди RS256, але його можна змінити на сайті сервісу
   auth0_domain: str
   auth0_audience: str
   auth0_client_id: str
   auth0_client_secret: str
   # auth0_secret: str
   auth0_redirect_uri: str
+  frontend_redirect_url: str
 
   model_config = SettingsConfigDict(
     env_file=".env",

@@ -22,8 +22,8 @@ def create_access_token(data: dict) -> str:
   })
   return jwt.encode(
     to_encode,
-    settings.secret_key,
-    algorithm=settings.algorithm
+    settings.jwt_secret_key,
+    algorithm=settings.jwt_algorithm
   )
 
 def create_refresh_token(data: dict) -> str:
@@ -37,16 +37,16 @@ def create_refresh_token(data: dict) -> str:
   })
   return jwt.encode(
     to_encode,
-    settings.secret_key,
-    algorithm=settings.algorithm
+    settings.jwt_secret_key,
+    algorithm=settings.jwt_algorithm
   )
 
 def decode_token(token: str) -> dict:
   try:
     payload = jwt.decode(
       token,
-      settings.secret_key,
-      algorithms=[settings.algorithm]
+      settings.jwt_secret_key,
+      algorithms=[settings.jwt_algorithm]
     )
     return payload
   except JWTError:

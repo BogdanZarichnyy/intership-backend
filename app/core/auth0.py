@@ -3,8 +3,6 @@ from jose import jwt
 from jose.exceptions import JWTError
 from app.config import settings
 
-ALGORITHMS = ["RS256"]  # Auth0 завжди RS256
-
 def get_auth0_jwks():
   """Отримати JWKS (публічні ключі) від Auth0"""
   url = f"https://{settings.auth0_domain}/.well-known/jwks.json"
@@ -32,8 +30,8 @@ def decode_auth0_token(token: str):
   payload = jwt.decode(
     token,
     rsa_key,
-    algorithms=ALGORITHMS,
-    audience=settings.auth0_audience if settings.auth0_audience else None,
+    algorithms=settings.auth0_algorithm,
+    audience=settings.auth0_client_id,
     issuer=f"https://{settings.auth0_domain}/"
   )
   return payload
