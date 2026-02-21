@@ -163,7 +163,6 @@ async def auth0_callback(
     Створюємо або знаходимо користувача в локальній БД.
     Видаємо локальний JWT і редіректимо на фронтенд.
   """
-  print(data)  # Дебаг для перевірки отриманих даних від фронтенду
   id_token = data.get("id_token")
   if not id_token:
       raise HTTPException(
@@ -191,7 +190,6 @@ async def auth0_callback(
       status_code=403,
       detail="Email not verified"
     )
-  print(email)  # Дебаг для перевірки отриманого email з токена
   # Шукаємо користувача: спочатку за provider_id, потім за email
   user_service = UserService(db)
   user = await user_service.get_user_by_provider_id(provider_id)

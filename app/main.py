@@ -5,9 +5,6 @@ import uvicorn
 
 from app.core.logger import logger
 
-from alembic import command
-from alembic.config import Config
-
 from app.routers.health import router as healthRouter
 from app.routers.auth import router as authRouter
 from app.routers.user import router as userRouter
