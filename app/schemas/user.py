@@ -1,10 +1,11 @@
+from uuid import UUID
 from pydantic import BaseModel, EmailStr, Field
 from datetime import datetime
-from typing import List, Optional
+from typing import List
 
 class UserSchema(BaseModel):
   """Схема для читання користувача (відповідь API)"""
-  id: int
+  id: UUID
   email: EmailStr
   username: str
   is_active: bool
@@ -27,10 +28,10 @@ class SignUpRequest(BaseModel):
 
 class UserUpdate(BaseModel):
   """Схема для оновлення користувача (CRUD)"""
-  email: Optional[EmailStr] = None
-  username: Optional[str] = None
-  password: Optional[str] = None
-  is_active: Optional[bool] = None
+  email: EmailStr | None = None
+  username: str | None = None
+  password: str | None = None
+  is_active: str | None = None
 
 class UsersListResponse(BaseModel):
   """Відповідь API зі списком користувачів"""
