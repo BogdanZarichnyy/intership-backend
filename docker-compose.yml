@@ -16,7 +16,7 @@ services:
       - .env
     volumes:
       - .:/app
-    command: uvicorn app.main:app --host ${HOST} --port ${PORT} --reload
+    command: ./start.sh
 
   postgres:
     image: postgres:16

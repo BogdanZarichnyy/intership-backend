@@ -36,6 +36,7 @@ Backend-сервіс, побудований за допомогою **FastAPI**
 
 Активація середовища:
   ```bash
+  python -m venv venv
   source venv/Scripts/activate
   ```
   Результат:
@@ -60,8 +61,10 @@ Backend-сервіс, побудований за допомогою **FastAPI**
 
 Якщо будуть помилки при запуску то потрібно повторно активувати середовище і перевстановити dotenv:
   ```bash
+  pip install --upgrade pip
   source venv/Scripts/activate
   python -m pip install --force-reinstall python-dotenv
+  python.exe -m pip install --upgrade pip
   ```
 
 Перевіряєм середовище запуску:
@@ -88,6 +91,7 @@ Backend-сервіс, побудований за допомогою **FastAPI**
 Запуск бекенда якщо uvicorn прописаний у main.py, він запускається як модуль, а не як файл:
   ```bash
   python -m app.main
+  uvicorn app.main:app --reload
   ```
 
 Альтернативний спосіб запуску якщо uvicorn не прописаний у main.py:
@@ -183,4 +187,13 @@ Backend-сервіс, побудований за допомогою **FastAPI**
 Після внесення змін у код бекенду, можна перезбирати/перезапускати його окремо без перезапуску образів баз даних:
   ```bash
   docker compose up --build
+  ```
+
+## Запуск міграцій:
+  ```bash
+  uvicorn app.main:app --reload  # зупинений бекенд
+  python -m alembic revision --autogenerate -m "create users table"  # створення міграції
+  python -m alembic upgrade head  # запис міграції в БД для Windows
+  alembic upgrade head  # запис міграції в БД для UNIX
+  uvicorn app.main:app --reload  # старт бекенду
   ```
