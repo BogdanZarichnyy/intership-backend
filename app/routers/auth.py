@@ -165,10 +165,10 @@ async def auth0_callback(
   """
   id_token = data.get("id_token")
   if not id_token:
-      raise HTTPException(
-          status_code=400,
-          detail="Missing id_token"
-      )
+    raise HTTPException(
+      status_code=400,
+      detail="Missing id_token"
+    )
   # Декодуємо Auth0 token після верифікації сигнатури і отримуємо payload з email
   try:
     auth0_payload = decode_auth0_token(id_token)

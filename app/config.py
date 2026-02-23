@@ -4,8 +4,8 @@ class Settings(BaseSettings):
   host: str = "0.0.0.0"
   port: int = 8000
 
-  cors_origins: list[str] = ["http://localhost:3000"]
-  
+  cors_origins: list[str] = ["http://localhost:5173"]
+
   # PostgreSQL
   postgres_host: str = "postgres"
   postgres_port: int = 5432
