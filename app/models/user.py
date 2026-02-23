@@ -1,6 +1,6 @@
 import uuid
 from sqlalchemy import String, Boolean, DateTime, func
-from sqlalchemy.orm import Mapped, mapped_column
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 from sqlalchemy.dialects.postgresql import UUID
 
 from app.db.postgres import Base
@@ -64,4 +64,10 @@ class User(Base):
     DateTime,
     server_default=func.now(),
     onupdate=func.now()
+  )
+
+  companies = relationship(
+    "Company",
+    back_populates="owner",
+    cascade="all, delete-orphan"
   )

@@ -8,12 +8,15 @@ from sqlalchemy.engine import Connection
 from sqlalchemy.ext.asyncio import async_engine_from_config
 
 from alembic import context
+from alembic.autogenerate import renderers
+from sqlalchemy.dialects.postgresql import UUID
 
 from app.config import settings
 from app.db.postgres import Base
 
 # import models so metadata is registered
 from app.models.user import User
+from app.models.company import Company
 
 config = context.config
 
@@ -45,6 +48,12 @@ def process_revision_directives(context, revision, directives):
   if getattr(config.cmd_opts, "autogenerate", False):
     script = directives[0]
     script.rev_id = get_next_revision_id()
+
+# --- Custom UUID renderer ---
+@renderers.dispatch_for(UUID)
+def render_uuid(type_, autogen_context):
+    # Завжди додавати as_uuid=True
+    return "sa.UUID(as_uuid=True)"
 
 def run_migrations_offline():
   context.configure(

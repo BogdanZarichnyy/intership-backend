@@ -8,6 +8,7 @@ from app.core.logger import logger
 from app.routers.health import router as healthRouter
 from app.routers.auth import router as authRouter
 from app.routers.user import router as userRouter
+from app.routers.company import router as companyRouter
 from app.core.middleware import setup_middlewares
 from app.config import settings
 
@@ -65,6 +66,7 @@ def create_app() -> FastAPI: # Використовуємо factory pattern, щ�
   app.include_router(healthRouter)
   app.include_router(authRouter, prefix="/auth")
   app.include_router(userRouter, prefix="/users")
+  app.include_router(companyRouter, prefix="/companies")
 
   return app
 

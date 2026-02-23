@@ -1,5 +1,5 @@
 from uuid import UUID
-from pydantic import BaseModel, EmailStr, Field
+from pydantic import BaseModel, EmailStr, Field, ConfigDict
 from datetime import datetime
 from typing import List
 
@@ -32,6 +32,7 @@ class SignUpRequest(BaseModel):
 
 class UserUpdate(BaseModel):
   """Схема для оновлення користувача"""
+  model_config = ConfigDict(extra="forbid")
   username: str | None = None
   current_password: str | None = None  # поточний пароль для підтвердження
   new_password: str | None = None     # новий пароль, який користувач хоче встановити
