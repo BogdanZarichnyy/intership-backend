@@ -34,7 +34,7 @@ class UserUpdate(BaseModel):
   """Схема для оновлення користувача"""
   email: EmailStr | None = None
   username: str | None = None
-  is_active: str | None = None
+  is_active: bool | None = True
   current_password: str | None = None  # поточний пароль для підтвердження
   new_password: str | None = None     # новий пароль, який користувач хоче встановити
 
