@@ -1,7 +1,7 @@
 from uuid import UUID
 from pydantic import BaseModel, EmailStr, Field
 from datetime import datetime
-from typing import List, Optional
+from typing import List
 
 class UserSchema(BaseModel):
   """Схема для читання користувача (відповідь API)"""
@@ -9,7 +9,7 @@ class UserSchema(BaseModel):
   email: EmailStr
   username: str
   provider: str
-  provider_id: Optional[str] = None
+  provider_id: str | None = None
   is_active: bool
   created_at: datetime
   updated_at: datetime
@@ -37,6 +37,7 @@ class UserUpdate(BaseModel):
   is_active: str | None = None
   current_password: str | None = None  # поточний пароль для підтвердження
   new_password: str | None = None     # новий пароль, який користувач хоче встановити
+
 
 class UsersListResponse(BaseModel):
   """Відповідь API зі списком користувачів"""
