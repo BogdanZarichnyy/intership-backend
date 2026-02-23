@@ -5,7 +5,7 @@ from typing import List, Optional
 
 class UserSchema(BaseModel):
   """Схема для читання користувача (відповідь API)"""
-  id: UUID  # <- змінили на UUID
+  id: UUID
   email: EmailStr
   username: str
   provider: str
@@ -27,16 +27,16 @@ class SignUpRequest(BaseModel):
   email: EmailStr
   username: str = Field(min_length=3, max_length=100)
   password: str = Field(min_length=6)
-  provider: Optional[str] = None
-  provider_id: Optional[str] = None
+  provider: str | None = None
+  provider_id: str | None = None
 
 class UserUpdate(BaseModel):
   """Схема для оновлення користувача"""
-  email: Optional[EmailStr] = None
-  username: Optional[str] = None
-  is_active: Optional[bool] = None
-  current_password: Optional[str] = None  # поточний пароль для підтвердження
-  new_password: Optional[str] = None      # новий пароль, який користувач хоче встановити
+  email: EmailStr | None = None
+  username: str | None = None
+  is_active: str | None = None
+  current_password: str | None = None  # поточний пароль для підтвердження
+  new_password: str | None = None     # новий пароль, який користувач хоче встановити
 
 class UsersListResponse(BaseModel):
   """Відповідь API зі списком користувачів"""

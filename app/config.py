@@ -6,6 +6,10 @@ class Settings(BaseSettings):
 
   cors_origins: list[str] = ["http://localhost:3000"]
   
+  # Start DB
+  max_retries: int = 5  # кількість спроб підключення до БД
+  retry_delay: int = 2  # секунди
+  
   # PostgreSQL
   postgres_host: str = "postgres"
   postgres_port: int = 5432
