@@ -1,60 +1,70 @@
 import asyncio
 import os
 import re
-from logging.config import fileConfig
+import uuid
 
-from sqlalchemy import pool
+from logging.config import fileConfig
+# from sqlalchemy import pool, Column, String, DateTime, Boolean, text
+from sqlalchemy import pool, text
 from sqlalchemy.engine import Connection
 from sqlalchemy.ext.asyncio import async_engine_from_config
-
-from alembic import context
-from alembic.autogenerate import renderers
 from sqlalchemy.dialects.postgresql import UUID
+from alembic import context
+# from alembic.autogenerate import renderers
 
 from app.config import settings
 from app.db.postgres import Base
-
-# import models so metadata is registered
 from app.models.user import User
 from app.models.company import Company
+from app.models.company_member import CompanyMember
+from app.models.company_invitation import CompanyInvitation
 
 config = context.config
-
-# set database url
 config.set_main_option("sqlalchemy.url", settings.database_url)
 
-# logging
 if config.config_file_name is not None:
-    fileConfig(config.config_file_name)
+  fileConfig(config.config_file_name)
 
 target_metadata = Base.metadata
 
-# --- custom revision id generator ---
+# --- Auto-increment revision id ---
 def get_next_revision_id() -> str:
   versions_dir = os.path.join(os.path.dirname(__file__), "versions")
   if not os.path.exists(versions_dir):
     return "0001"
-  revisions = []
-  for filename in os.listdir(versions_dir):
-    match = re.match(r"^(\d{4})_", filename)
-    if match:
-      revisions.append(int(match.group(1)))
+  revisions = [
+    int(re.match(r"^(\d{4})_", f).group(1))
+    for f in os.listdir(versions_dir)
+    if re.match(r"^(\d{4})_", f)
+  ]
   next_rev = max(revisions, default=0) + 1
   return f"{next_rev:04d}"
 
-
-# expose to alembic context
 def process_revision_directives(context, revision, directives):
   if getattr(config.cmd_opts, "autogenerate", False):
     script = directives[0]
     script.rev_id = get_next_revision_id()
 
-# --- Custom UUID renderer ---
-@renderers.dispatch_for(UUID)
-def render_uuid(type_, autogen_context):
-    # Завжди додавати as_uuid=True
-    return "sa.UUID(as_uuid=True)"
+# @renderers.dispatch_for(Column, replace=True) #--- UUID renderer for Alembic ---
+# def render_column(autogen_context, sa_column, autogen_kw):
+#     rendered = autogen_context.impl.render_column(
+#       autogen_context, sa_column, autogen_kw
+#     )
+#     if isinstance(sa_column.type, UUID):
+#       rendered = rendered.replace("sa.UUID()", "sa.UUID(as_uuid=True)")
+#       if sa_column.default is not None:
+#         # додати default uuid.uuid4() у рядку створення колонки
+#         rendered = rendered.replace(
+#           f"{sa_column.name}", 
+#           f"{sa_column.name}, default=uuid.uuid4"
+#         )
+#     return rendered
 
+# @renderers.dispatch_for(UUID) # у моделях обов'язково прописуємо default=uuid.uuid4
+# def render_uuid(type_, autogen_context):
+#   return "sa.UUID(as_uuid=True)"
+
+# --- Offline migrations ---
 def run_migrations_offline():
   context.configure(
     url=settings.database_url,
@@ -62,14 +72,18 @@ def run_migrations_offline():
     literal_binds=True,
     dialect_opts={"paramstyle": "named"},
     process_revision_directives=process_revision_directives,
+    compare_type=True,
   )
   with context.begin_transaction():
     context.run_migrations()
 
+# --- Online migrations ---
 def do_run_migrations(connection: Connection):
   context.configure(
     connection=connection,
     target_metadata=target_metadata,
+    compare_type=True,
+    render_as_batch=True,
     process_revision_directives=process_revision_directives,
   )
   with context.begin_transaction():

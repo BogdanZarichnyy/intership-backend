@@ -34,6 +34,25 @@ services:
     volumes:
       - postgres_data:/var/lib/postgresql/data
 
+  # postgres_for_tests:
+  #   image: postgres:16
+  #   container_name: test_postgres
+  #   restart: always
+  #   environment:
+  #     POSTGRES_DB: internship_test_db
+  #     POSTGRES_USER: test_user
+  #     POSTGRES_PASSWORD: test_password
+  #   ports:
+  #     - "5433:5432"   # Тестова БД на окремому порту
+  #   volumes:
+  #     - postgres_for_tests_data:/var/lib/postgresql/data
+  #     - ./docker-entrypoint-initdb.d/:/docker-entrypoint-initdb.d/
+  #   healthcheck:
+  #     test: ["CMD-SHELL", "pg_isready -U test_user -d internship_test_db"]
+  #     interval: 5s
+  #     retries: 5
+  #     timeout: 5s
+
   redis:
     image: redis:7
     container_name: redis
@@ -43,3 +62,4 @@ services:
 
 volumes:
   postgres_data:
+  # postgres_for_tests_data:

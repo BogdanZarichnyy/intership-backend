@@ -27,7 +27,7 @@ class CompanyUpdateRequest(BaseModel):
   model_config = ConfigDict(extra="forbid")
   name: str | None = Field(default=None, min_length=1, max_length=255)
   description: str | None = None
-  is_visible: bool | None = None
+  is_visible: bool = True
 
 class CompaniesListResponse(BaseModel):
   """Відповідь API зі списком компаній"""
@@ -41,7 +41,7 @@ class CompanyDetailResponse(CompanySchema):
 class CompanyWithOwnerSchema(BaseModel):
   id: UUID
   name: str
-  description: str | None
+  description: str | None = None
   is_visible: bool
   created_at: datetime
   updated_at: datetime

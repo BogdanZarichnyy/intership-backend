@@ -5,6 +5,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.security import decode_token
 from app.core.auth0 import decode_auth0_token
+from app.services.company_invitation import CompanyInvitationService
 from app.services.user import UserService
 from app.db.postgres import get_db
 
@@ -53,3 +54,8 @@ async def get_current_user(
         detail="Token missing email claim"
       )
     return user
+
+def get_invitation_service(
+  db: AsyncSession = Depends(get_db)
+):
+  return CompanyInvitationService(db)
