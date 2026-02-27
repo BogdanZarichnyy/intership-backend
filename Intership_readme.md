@@ -202,14 +202,14 @@ http://localhost:8000/docs
 ## Запуск міграцій:
   ```bash
   uvicorn app.main:app --reload  # зупинений бекенд
-  python -m alembic revision --autogenerate -m "create users table"  # створення міграції
+  python -m alembic revision --autogenerate -m "create users tables"  # створення міграції
   python -m alembic upgrade head  # запис міграції в БД для Windows
   alembic upgrade head  # запис міграції в БД для UNIX
   uvicorn app.main:app --reload  # старт бекенду
   ```
 
 
-Структура папок проекту:
+## Структура папок проекту:
   ```bash
   tree /F /A > structure.txt
   ```
