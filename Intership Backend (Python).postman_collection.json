@@ -1,6 +1,6 @@
 {
   "info": {
-    "_postman_id": "99e5a938-96ee-4e7f-9308-fc0bedb7a464",
+    "_postman_id": "41744ba0-1277-47f3-a7e0-962226006d27",
     "name": "Intership Backend (Python)",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
     "_exporter_id": "24134261"
@@ -10,10 +10,17 @@
       "name": "User",
       "item": [
         {
-          "name": "All users",
+          "name": "All Users",
           "request": {
             "auth": {
-              "type": "noauth"
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{jwt_token}}",
+                  "type": "string"
+                }
+              ]
             },
             "method": "GET",
             "header": [],
@@ -42,7 +49,7 @@
           "response": []
         },
         {
-          "name": "User Registration - Local",
+          "name": "User Registration - Local Provider",
           "request": {
             "auth": {
               "type": "noauth"
@@ -51,7 +58,7 @@
             "header": [],
             "body": {
               "mode": "raw",
-              "raw": "{\r\n    \"email\": \"test@test.email\",\r\n    \"username\": \"Test\",\r\n    \"password\": \"123\"\r\n}",
+              "raw": "{\r\n    \"email\": \"keyvin@test.email\",\r\n    \"username\": \"Key Vin\",\r\n    \"password\": \"123\"\r\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -73,7 +80,7 @@
           "response": []
         },
         {
-          "name": "Current user",
+          "name": "Current User",
           "request": {
             "auth": {
               "type": "bearer",
@@ -207,7 +214,101 @@
       "name": "Authorization",
       "item": [
         {
-          "name": "User registration - auth0",
+          "name": "User Authorization on Auth0 Service - get id_token",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  ""
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "// Зберігаємо токени після успішного логіну\r",
+                  "if (pm.response.code === 200) {\r",
+                  "    const jsonData = pm.response.json();\r",
+                  "    pm.collectionVariables.set(\"auth0_access_token\", jsonData.auth0_access_token);\r",
+                  "    pm.collectionVariables.set(\"auth0_id_token\", jsonData.auth0_id_token);\r",
+                  "}"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "formdata",
+              "formdata": []
+            },
+            "url": {
+              "raw": "https://dev-ja1yqcpfw2odtfhp.eu.auth0.com/oauth/token",
+              "protocol": "https",
+              "host": [
+                "dev-ja1yqcpfw2odtfhp",
+                "eu",
+                "auth0",
+                "com"
+              ],
+              "path": [
+                "oauth",
+                "token"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "User Authorization with Auth0 id_token on callback",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "// зберігаємо токен після успішного логіну\r",
+                  "if (pm.response.code === 200) {\r",
+                  "    const jsonData = pm.response.json();\r",
+                  "    pm.collectionVariables.set(\"jwt_token\", jsonData.access_token);\r",
+                  "    pm.collectionVariables.set(\"refresh_token\", jsonData.refresh_token);\r",
+                  "    console.log(\"Token updated:\", jsonData.access_token);\r",
+                  "    console.log(\"Refresh Token updated:\", jsonData.refresh_token);\r",
+                  "}"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            },
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  "// Зберігаємо токени, які повернув сервіс auth0\r",
+                  "if (pm.response.code === 200) {\r",
+                  "    const data = pm.response.json();\r",
+                  "    pm.collectionVariables.get(\"auth0_access_token\", data.auth0_access_token);\r",
+                  "    pm.collectionVariables.get(\"auth0_id_token\", data.auth0_id_token);\r",
+                  "}"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
           "request": {
             "auth": {
               "type": "noauth"
@@ -216,7 +317,7 @@
             "header": [],
             "body": {
               "mode": "raw",
-              "raw": "{\r\n    \"access_token\": \"eyJhbGciOiJkaXIiLCJlbmMiOiJBMjU2R0NNIiwiaXNzIjoiaHR0cHM6Ly9kZXYtamExeXFjcGZ3Mm9kdGZocC5ldS5hdXRoMC5jb20vIn0..SmYLep55jfPYJocs._qUufoUx16GzkboI8v_j2mZGzcBz6JBt0nxuKM-IuyvjnRDVzciXcLH2QQdZXPyQsTxma3wJgK6PpH4sPPCf486v-wQCrZVqz7keSyRvOfHTEF4DrUbpDgueAmltcqfqiHym7dF3SzupIxIe4JrwQE1uxoqQWiVfDwzIcpBU-a_17S8K-e8x5BuXIvvD61zER87KpqwWrMZDomrhONP8bnHnrVCFYagzgOz-FsOLjyPRX5AA-X1ZkgzAalf80oBkp-_sPd4pEQpek-I-2tPaCzp2xN5salqMK7rbuDb_X5q2xOYvLjSRjqbTrn-7vrBXaF3RTNZBuh-PLIymRViU1GXPkxtkW8g.Y53JLBnTc-JVcsx1rQjQoA\",\r\n    \"id_token\": \"eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6IlNGWkpLNHVsMHI3cDBCdG9TelVIMyJ9.eyJnaXZlbl9uYW1lIjoiMSIsImZhbWlseV9uYW1lIjoiMSIsIm5pY2tuYW1lIjoia3VydGthbmF2YXRpIiwibmFtZSI6IjEgMSIsInBpY3R1cmUiOiJodHRwczovL2xoMy5nb29nbGV1c2VyY29udGVudC5jb20vYS9BQ2c4b2NLMWViZWdIUUlLNDZxN3J4YW1iUlB0OG1hMmFuUGtnbjBwRFNBSFo1TTBBZWdQT1E9czk2LWMiLCJ1cGRhdGVkX2F0IjoiMjAyNi0wMi0xOFQyMjo0MzoxMS4wODlaIiwiZW1haWwiOiJrdXJ0a2FuYXZhdGlAZ21haWwuY29tIiwiZW1haWxfdmVyaWZpZWQiOnRydWUsImlzcyI6Imh0dHBzOi8vZGV2LWphMXlxY3BmdzJvZHRmaHAuZXUuYXV0aDAuY29tLyIsImF1ZCI6InBER3dvaEVNbTFReVloMXpKZUdqNk1wRnFnSUt2aTFXIiwic3ViIjoiZ29vZ2xlLW9hdXRoMnwxMDcxOTUwNTAzMDkzOTA2NDY3NDIiLCJpYXQiOjE3NzE2MTIxMTIsImV4cCI6MTc3MTY0ODExMiwic2lkIjoiSU0wcWtxYzBWUzNDS05RSGY2Zk54U0ZudjMtVGNpd0wiLCJub25jZSI6IlExTnlOa2s1VTJzeU0xWTNOa2hoWldNMlUxUnZXRTlzWVZvdGMzUXRNRVYwVGk1YVRWQTNiMVIxYXc9PSJ9.LTKOURXswNSENwTktknwPH1V1o_cr6Ls2yZk03fOnTh7sswz6Kj--MR9hLRbsR1VgxpHLH_e1i_4b_XUkGmQtSZOvhwz_ZIqpF0aj7NGAHkWojLhsWk9VvvRoTzLOFYrmgnFKBOxgz7hn0QLhDPQTPFsusXl2cIXNEM4hcpR4xJhUgGERGev_nhH9ADRy6fW5p6ieQRGDklZksS17cKmrTpTGlKE9ziuiD5yXjoFtXya7bwXQQfRUFNEFEFTlNxNhgxMD1IHkKBevJ7DkpE_v-4dRDjfPVUwdrKeFTcxQgrbWxQjfWxYyHiHmL_dSHUXH4QBuCsDk5_bIJizvfwhfQ\",\r\n    \"scope\": \"openid profile email\",\r\n    \"expires_in\": 86400,\r\n    \"token_type\": \"Bearer\"\r\n}",
+              "raw": "{\r\n  \"access_token\": \"{{auth0_access_token}}\",\r\n  \"id_token\": \"{{auth0_id_token}}\"\r\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -240,6 +341,26 @@
         },
         {
           "name": "User login",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "// зберігаємо токен після успішного логіну\r",
+                  "if (pm.response.code === 200) {\r",
+                  "    const jsonData = pm.response.json();\r",
+                  "    pm.collectionVariables.set(\"jwt_token\", jsonData.access_token);\r",
+                  "    pm.collectionVariables.set(\"refresh_token\", jsonData.refresh_token);\r",
+                  "    console.log(\"Token updated:\", jsonData.access_token);\r",
+                  "    console.log(\"Refresh Token updated:\", jsonData.refresh_token);\r",
+                  "}"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
           "request": {
             "auth": {
               "type": "noauth"
@@ -278,7 +399,7 @@
               "bearer": [
                 {
                   "key": "token",
-                  "value": "{{jwt_token}}",
+                  "value": "{{refresh_token}}",
                   "type": "string"
                 }
               ]
@@ -312,7 +433,193 @@
       ]
     },
     {
-      "name": "Health",
+      "name": "Company",
+      "item": [
+        {
+          "name": "All Companies",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{jwt_token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:8000/companies?limit=10&offset=0",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8000",
+              "path": [
+                "companies"
+              ],
+              "query": [
+                {
+                  "key": "limit",
+                  "value": "10"
+                },
+                {
+                  "key": "offset",
+                  "value": "0"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Create Company",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{jwt_token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"name\": \"Test company 6\",\r\n  \"description\": \"test 6 application for intership\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://localhost:8000/companies/",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8000",
+              "path": [
+                "companies",
+                ""
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Company by ID",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{jwt_token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:8000/companies/07b93522-14e9-45b5-aaf8-d6212037f7e6",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8000",
+              "path": [
+                "companies",
+                "07b93522-14e9-45b5-aaf8-d6212037f7e6"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Company Edit Details",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{jwt_token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "PUT",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"is_visible\": true\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://localhost:8000/companies/07b93522-14e9-45b5-aaf8-d6212037f7e6",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8000",
+              "path": [
+                "companies",
+                "07b93522-14e9-45b5-aaf8-d6212037f7e6"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Delete Company",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{jwt_token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:8000/companies/07b93522-14e9-45b5-aaf8-d6212037f7e6",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8000",
+              "path": [
+                "companies",
+                "07b93522-14e9-45b5-aaf8-d6212037f7e6"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Company Members",
+      "item": []
+    },
+    {
+      "name": "Check Health Server",
       "request": {
         "auth": {
           "type": "noauth"
@@ -329,6 +636,48 @@
         }
       },
       "response": []
+    }
+  ],
+  "event": [
+    {
+      "listen": "prerequest",
+      "script": {
+        "type": "text/javascript",
+        "packages": {},
+        "requests": {},
+        "exec": [
+          ""
+        ]
+      }
+    },
+    {
+      "listen": "test",
+      "script": {
+        "type": "text/javascript",
+        "packages": {},
+        "requests": {},
+        "exec": [
+          ""
+        ]
+      }
+    }
+  ],
+  "variable": [
+    {
+      "key": "jwt_token",
+      "value": ""
+    },
+    {
+      "key": "refresh_token",
+      "value": ""
+    },
+    {
+      "key": "auth0_access_token",
+      "value": ""
+    },
+    {
+      "key": "auth0_id_token",
+      "value": ""
     }
   ]
 }
