@@ -3,7 +3,7 @@ from uuid import UUID
 
 from app.core.dependencies import get_current_user
 from app.schemas.user import UserDetailResponse
-from app.schemas.company_member import CompanyMembersResponse
+from app.schemas.company_member import CompanyMemberResponse
 from app.services.company_member import CompanyMemberService
 from app.db.postgres import get_db
 from app.repositories.company_member import CompanyMemberRepository
@@ -50,7 +50,7 @@ async def leave_company_by_member(
 # Отримати всіх учасників компанії
 @router.get(
   "/{company_id}/members", 
-  response_model=list[CompanyMembersResponse]
+  response_model=list[CompanyMemberResponse]
 )
 async def get_members_of_company(
   company_id: UUID,
