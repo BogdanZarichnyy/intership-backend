@@ -7,12 +7,18 @@ from app.core.security import decode_token
 from app.core.auth0 import decode_auth0_token
 from app.services.user import UserService
 from app.db.postgres import get_db
+from app.repositories.user import UserRepository
 
 security = HTTPBearer()
 
+def get_user_service(
+  db: AsyncSession = Depends(get_db)
+) -> UserService:
+  return UserService(UserRepository(db))
+
 async def get_current_user(
   credentials: HTTPAuthorizationCredentials = Depends(security),
-  db: AsyncSession = Depends(get_db)
+  db: AsyncSession = Depends(get_user_service)
 ):
   token = credentials.credentials
   user_service = UserService(db)
