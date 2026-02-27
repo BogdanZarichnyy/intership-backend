@@ -23,8 +23,7 @@ router = APIRouter(tags=["users"])
 def get_user_service(
   db: AsyncSession = Depends(get_db)
 ) -> UserService:
-  repo = UserRepository(db)
-  return UserService(repo)
+  return UserService(UserRepository(db))
 
 @router.get(
   "/me",
