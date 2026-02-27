@@ -1,4 +1,5 @@
 from uuid import UUID
+from sqlalchemy.exc import IntegrityError
 from app.models.user import User
 from app.schemas.user import (
   UserSchema,
@@ -11,6 +12,7 @@ from app.core.security import hash_password, verify_password
 from app.repositories.user import UserRepository
 from app.core.exceptions import (
   ExistsEmail,
+  ExistsUsername,
   InvalidPassword,
   MissingCurrentPassword,
 )
@@ -64,12 +66,6 @@ class UserService:
       self,
       user_data: SignUpRequest
   ) -> UserDetailResponse:
-    existing_user = await self.repo.get_user_by_email(
-      user_data.email
-    )
-    if existing_user:
-      logger.warning(f"User creation failed. Email exists: {user_data.email}")
-      raise ExistsEmail(user_data.email)
     hashed_password = (
       hash_password(user_data.password)
       if user_data.password
@@ -82,7 +78,18 @@ class UserService:
       provider=user_data.provider or "local",
       provider_id=user_data.provider_id
     )
-    user = await self.repo.create_user(user)
+    try:
+      user = await self.repo.create_user(user)
+    except IntegrityError as e:
+      # Обробка унікальних ключів
+      if "users_username_key" in str(e.orig):
+        logger.warning(f"User creation failed. Username exists: {user_data.username}")
+        raise ExistsUsername(user_data.username)
+      if "users_email_key" in str(e.orig):
+        logger.warning(f"User creation failed. Email exists: {user_data.email}")
+        raise ExistsEmail(user_data.email)
+      # Інші помилки піднімаємо далі
+      raise
     logger.info(f"User created id={user.id}")
     return UserDetailResponse.model_validate(user)
 

@@ -16,6 +16,13 @@ class ExistsEmail(HTTPException):
       status_code=status.HTTP_409_CONFLICT,
       detail=detail
     )
+    
+class ExistsUsername(HTTPException):
+  def __init__(self, username: str):
+    super().__init__(
+      status_code=409,
+      detail=f"Username '{username}' already exists."
+    )
 
 class InvalidPassword(HTTPException):
   """Raised when provided password is incorrect"""
