@@ -15,7 +15,6 @@ from app.core.exceptions import (
   MissingCurrentPassword,
 )
 from app.core.logger import logger
-from app.middleware.logger_middleware import request_id_var, current_user_id_var
 
 class UserService:
 
@@ -29,10 +28,7 @@ class UserService:
   ) -> UsersListResponse:
     users = await self.repo.get_all_user(limit, offset)
     total = await self.repo.count()
-    logger.bind(
-      request_id=request_id_var.get(), 
-      user_id=current_user_id_var.get()
-    ).info(f"Fetched users list limit={limit} offset={offset}")
+    logger.info(f"Fetched users list limit={limit} offset={offset}")
     return UsersListResponse(
       users=[
         UserSchema.model_validate(user)
@@ -47,30 +43,21 @@ class UserService:
   ) -> User | None:
     user = await self.repo.get_user_by_id(user_id)
     if user:
-      logger.bind(
-        request_id=request_id_var.get(), 
-        user_id=current_user_id_var.get()
-      ).info(f"Fetched user id={user_id}")
+      logger.info(f"Fetched user id={user_id}")
     return user
 
   async def get_user_by_email(
     self,
     email: str
   ) -> User | None:
-    logger.bind(
-      request_id=request_id_var.get(), 
-      user_id=current_user_id_var.get()
-    ).info(f"Fetched user email={email}")
+    logger.info(f"Fetched user email={email}")
     return await self.repo.get_user_by_email(email)
 
   async def get_user_by_provider_id(
     self,
     provider_id: str
   ) -> User | None:
-    logger.bind(
-      request_id=request_id_var.get(), 
-      user_id=current_user_id_var.get()
-    ).info(f"Fetched user provider_id={provider_id}")
+    logger.info(f"Fetched user provider_id={provider_id}")
     return await self.repo.get_user_by_provider_id(provider_id)
 
   async def create_new_user(
@@ -81,10 +68,7 @@ class UserService:
       user_data.email
     )
     if existing_user:
-      logger.bind(
-        request_id=request_id_var.get(), 
-        user_id=current_user_id_var.get()
-      ).warning(f"User creation failed. Email exists: {user_data.email}")
+      logger.warning(f"User creation failed. Email exists: {user_data.email}")
       raise ExistsEmail(user_data.email)
     hashed_password = (
       hash_password(user_data.password)
@@ -99,10 +83,7 @@ class UserService:
       provider_id=user_data.provider_id
     )
     user = await self.repo.create_user(user)
-    logger.bind(
-      request_id=request_id_var.get(), 
-      user_id=current_user_id_var.get()
-    ).info(f"User created id={user.id}")
+    logger.info(f"User created id={user.id}")
     return UserDetailResponse.model_validate(user)
 
   async def update_user_details(
@@ -114,28 +95,19 @@ class UserService:
       user.username = update_data.username
     if update_data.new_password:
       if not update_data.current_password:
-        logger.bind(
-          request_id=request_id_var.get(), 
-          user_id=current_user_id_var.get()
-        ).warning("Current password must be provided")
+        logger.warning("Current password must be provided")
         raise MissingCurrentPassword()
       if not verify_password(
         update_data.current_password,
         user.hashed_password
       ):
-        logger.bind(
-          request_id=request_id_var.get(), 
-          user_id=current_user_id_var.get()
-        ).warning("Current password is incorrect")
+        logger.warning("Current password is incorrect")
         raise InvalidPassword()
       user.hashed_password = hash_password(
         update_data.new_password
       )
     user = await self.repo.update_user_details(user)
-    logger.bind(
-      request_id=request_id_var.get(), 
-      user_id=current_user_id_var.get()
-    ).info(f"User updated id={user.id}")
+    logger.info(f"User updated id={user.id}")
     return UserDetailResponse.model_validate(user)
 
   async def delete_user(
@@ -143,7 +115,4 @@ class UserService:
     user: User
   ) -> None:
     await self.repo.delete_user(user)
-    logger.bind(
-      request_id=request_id_var.get(), 
-      user_id=current_user_id_var.get()
-    ).info(f"User deleted id={user.id}")
+    logger.info(f"User deleted id={user.id}")

@@ -215,8 +215,15 @@ http://localhost:8000/docs
   uvicorn app.main:app --reload  # старт бекенду
   ```
 
-
-Структура папок проекту:
+## Структура папок проекту:
   ```bash
   tree /F /A > structure.txt
+  ```
+
+## Регулярка для VSCode для пошуку і заміни мусору на прикладі логера
+  ``` поле "search" vscode [Use Regular Expression]
+  logger\.bind\((.|\n)*?\)\.
+  ```
+  ```полу "replace" замінює на
+  logger.
   ```

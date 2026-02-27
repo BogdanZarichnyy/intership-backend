@@ -9,6 +9,8 @@ from app.services.company_invitation import CompanyInvitationService
 from app.services.user import UserService
 from app.db.postgres import get_db
 
+from app.core.log_context import current_user_id_var
+
 security = HTTPBearer()
 
 async def get_current_user(
@@ -32,6 +34,7 @@ async def get_current_user(
         status_code=status.HTTP_404_NOT_FOUND,
         detail="User not found"
     )
+    current_user_id_var.set(str(user.id))  # ← додаємо це для логування
     return user
   # Якщо локальний JWT не пройшов, пробуємо Auth0
   except Exception:
@@ -53,6 +56,7 @@ async def get_current_user(
         status_code=status.HTTP_400_BAD_REQUEST,
         detail="Token missing email claim"
       )
+    current_user_id_var.set(str(user.id))  # ← додаємо це для логування
     return user
 
 def get_invitation_service(
