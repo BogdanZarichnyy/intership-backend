@@ -207,8 +207,7 @@ Backend-сервіс, побудований за допомогою **FastAPI**
   uvicorn app.main:app --reload  # старт бекенду
   ```
 
-
-Структура папок проекту:
+## Структура папок проекту:
   ```bash
   tree /F /A > structure.txt
   ```
