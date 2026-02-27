@@ -202,14 +202,14 @@ http://localhost:8000/docs
 ## Запуск міграцій:
   ```bash
   uvicorn app.main:app --reload  # зупинений бекенд
-  python -m alembic revision --autogenerate -m "create users table"  # створення міграції
-  python -m alembic revision --autogenerate -m "add provider auth0"  # створення міграції
-  python -m alembic revision --autogenerate -m "create companies table"  # створення міграції
+  python -m alembic revision --autogenerate -m "create users tables"  # створення міграції
   python -m alembic upgrade head  # запис міграції в БД для Windows
   alembic upgrade head  # запис міграції в БД для UNIX
+  alembic -x db_url=postgresql+asyncpg://postgres:postgres@localhost:5433/internship_test_db upgrade head # для тестової БД
+  SELECT typname FROM pg_type WHERE typtype = 'e'; # подивитись всі enum типи
+  DROP TYPE invitationstatus;  # видалення старих/недійсних enum типів, "invitationstatus" назва enum типу
   uvicorn app.main:app --reload  # старт бекенду
   ```
-
 
 Структура папок проекту:
   ```bash
