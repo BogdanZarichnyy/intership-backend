@@ -12,13 +12,14 @@ from app.schemas.company import (
 )
 
 from app.repositories.company import CompanyRepository
-from app.core.logger import logger
 from app.core.exceptions import (
   CompanyNotFound,
   CompanyForbidden,
   CompanyUpdateForbidden,
   CompanyDeleteForbidden
 )
+from app.core.logger import logger
+from app.middleware.logger_middleware import request_id_var, current_user_id_var
 
 class CompanyService:
 
@@ -38,9 +39,10 @@ class CompanyService:
       offset
     )
     total = await self.repo.count_visible_companies()
-    logger.info(
-      f"Fetched visible companies limit={limit} offset={offset}"
-    )
+    logger.bind(
+      request_id=request_id_var.get(), 
+      user_id=current_user_id_var.get()
+    ).info(f"Fetched visible companies limit={limit} offset={offset}")
     return CompaniesListResponse(
       companies=[
         CompanySchema.model_validate(c)
@@ -58,21 +60,24 @@ class CompanyService:
       company_id
     )
     if not company:
-      logger.warning(
-        f"Company not found id={company_id}"
-      )
+      logger.bind(
+        request_id=request_id_var.get(), 
+        user_id=current_user_id_var.get()
+      ).warning(f"Company not found id={company_id}")
       raise CompanyNotFound()
     if (
       company.owner_id != current_user.id
       and not company.is_visible
     ):
-      logger.warning(
-        f"User {current_user.id} tried to access hidden company {company_id}"
-      )
+      logger.bind(
+        request_id=request_id_var.get(), 
+        user_id=current_user_id_var.get()
+      ).warning(f"User tried to access hidden company {company_id}")
       raise CompanyForbidden()
-    logger.info(
-      f"Fetched company id={company_id}"
-    )
+    logger.bind(
+      request_id=request_id_var.get(), 
+      user_id=current_user_id_var.get()
+    ).info(f"Fetched company id={company_id}")
     return company
 
   async def create_company(
@@ -89,9 +94,10 @@ class CompanyService:
     company = await self.repo.create_company(
       company
     )
-    logger.info(
-      f"Company created id={company.id}"
-    )
+    logger.bind(
+      request_id=request_id_var.get(), 
+      user_id=current_user_id_var.get()
+    ).info(f"Company created id={company.id}")
     return CompanyDetailResponse.model_validate(
       company
     )
@@ -103,6 +109,10 @@ class CompanyService:
     update_data: CompanyUpdateRequest
   ) -> CompanyDetailResponse:
     if company.owner_id != current_user.id:
+      logger.bind(
+        request_id=request_id_var.get(), 
+        user_id=current_user_id_var.get()
+      ).warning(f"Only owner can update company id={company.id}")
       raise CompanyUpdateForbidden()
     if update_data.name is not None:
       company.name = update_data.name
@@ -111,9 +121,10 @@ class CompanyService:
     if update_data.is_visible is not None:
       company.is_visible = update_data.is_visible
     company = await self.repo.update_company(company)
-    logger.info(
-      f"Company updated id={company.id}"
-    )
+    logger.bind(
+      request_id=request_id_var.get(), 
+      user_id=current_user_id_var.get()
+    ).info(f"Company updated id={company.id}")
     return CompanyDetailResponse.model_validate(
       company
     )
@@ -124,8 +135,13 @@ class CompanyService:
     current_user: User
   ) -> None:
     if company.owner_id != current_user.id:
+      logger.bind(
+        request_id=request_id_var.get(), 
+        user_id=current_user_id_var.get()
+      ).warning(f"Only owner can delete company id={company.id}")
       raise CompanyDeleteForbidden()
     await self.repo.delete_company(company)
-    logger.info(
-      f"Company deleted id={company.id}"
-    )
+    logger.bind(
+      request_id=request_id_var.get(), 
+      user_id=current_user_id_var.get()
+    ).info(f"Company deleted id={company.id}")

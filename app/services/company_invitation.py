@@ -10,10 +10,12 @@ from app.repositories.company import CompanyRepository
 from app.core.exceptions import (
   InvitationNotFound, 
   InvitationAlreadyProcessed, 
-  InvitationForbidden, 
-  CompanyNotFound
+  CompanyNotFound,
+  InvitationForbidden
 )
+from app.core.exceptions import CompanyOwnerOnly
 from app.core.logger import logger
+from app.middleware.logger_middleware import request_id_var, current_user_id_var
 
 class CompanyInvitationService:
   def __init__(self, db: AsyncSession):
@@ -28,7 +30,6 @@ class CompanyInvitationService:
     current_user: User, 
     target_user_id: UUID
   ):
-    logger.info(f"User {current_user.id} creates invitation/request to company {company.id}")
     if current_user.id == company.owner_id:
       # Власник запрошує користувача, якщо ініціатор owner company → invite
       invitation = await self.invitation_repo.create_invitation(
@@ -36,6 +37,10 @@ class CompanyInvitationService:
         invited_user_id=target_user_id,
         invited_by=current_user.id
       )
+      logger.bind(
+        request_id=request_id_var.get(), 
+        user_id=current_user_id_var.get()
+      ).info(f"Owner of company id={company.id} creates invitation to user {current_user.id}")
     else: # Користувач створює запит на приєднання
       # якщо ініціатор user → request
       invitation = await self.invitation_repo.create_invitation(
@@ -43,8 +48,15 @@ class CompanyInvitationService:
         invited_user_id=current_user.id,
         invited_by=current_user.id
       )
+      logger.bind(
+        request_id=request_id_var.get(), 
+        user_id=current_user_id_var.get()
+      ).info(f"User creates request to company id={company.id}")
     await self.db.commit()
-    logger.info(f"Invitation {invitation.id} created by user {current_user.id}")
+    logger.bind(
+      request_id=request_id_var.get(), 
+      user_id=current_user_id_var.get()
+    ).info(f"Invitation/request id={invitation.id} created by user {current_user.id}")
     return invitation
   
   # 1. USER → список своїх membership requests
@@ -54,6 +66,10 @@ class CompanyInvitationService:
     limit,
     offset
   ):
+    logger.bind(
+      request_id=request_id_var.get(), 
+      user_id=current_user_id_var.get()
+    ).info(f"Owner fetched all members of himself company limit={limit} offset={offset}")
     return await self.invitation_repo.get_user_requests(
       user_id,
       limit,
@@ -67,6 +83,10 @@ class CompanyInvitationService:
     limit,
     offset
   ):
+    logger.bind(
+      request_id=request_id_var.get(), 
+      user_id=current_user_id_var.get()
+    ).info(f"User fetched all requests to youself of companies limit={limit} offset={offset}")
     return await self.invitation_repo.get_user_received_invitations(
       user_id,
       limit,
@@ -83,9 +103,17 @@ class CompanyInvitationService:
   ):
     company = await self.company_repo.get_company_by_id(company_id)
     if not company:
+      logger.bind(
+        request_id=request_id_var.get(), 
+        user_id=current_user_id_var.get()
+      ).warning(f"Company not found id={company_id}")
       raise CompanyNotFound("Company not found")
     if company.owner_id != current_user.id:
-      raise InvitationForbidden()
+      logger.bind(
+        request_id=request_id_var.get(), 
+        user_id=current_user_id_var.get()
+      ).warning(f"User is not owner of company id={current_user.id}")
+      raise CompanyOwnerOnly("Only owners can see invited users")
     return await self.invitation_repo.get_company_invited_users(
       company_id,
       current_user.id,
@@ -103,9 +131,17 @@ class CompanyInvitationService:
   ):
     company = await self.company_repo.get_company_by_id(company_id)
     if not company:
+      logger.bind(
+        request_id=request_id_var.get(), 
+        user_id=current_user_id_var.get()
+      ).warning(f"Company not found id={company_id}")
       raise CompanyNotFound("Company not found")
     if company.owner_id != current_user.id:
-      raise InvitationForbidden()
+      logger.bind(
+        request_id=request_id_var.get(), 
+        user_id=current_user_id_var.get()
+      ).warning(f"User is not owner of company id={current_user.id}")
+      raise CompanyOwnerOnly("Only owners can see pending membership requests")
     return await self.invitation_repo.get_company_membership_requests(
       company_id,
       current_user.id,
@@ -120,19 +156,39 @@ class CompanyInvitationService:
   ) -> CompanyInvitation:
     invitation = await self.invitation_repo.get_invitation_by_id(invitation_id)
     if not invitation:
+      logger.bind(
+        request_id=request_id_var.get(), 
+        user_id=current_user_id_var.get()
+      ).warning(f"Invitation id={invitation_id} not found")
       raise InvitationNotFound()
     if invitation.status != InvitationStatus.pending:
+      logger.bind(
+        request_id=request_id_var.get(), 
+        user_id=current_user_id_var.get()
+      ).warning(f"Invitation already processed")
       raise InvitationAlreadyProcessed()
     company = await self.company_repo.get_company_by_id(invitation.company_id)
     if not company:
+      logger.bind(
+        request_id=request_id_var.get(), 
+        user_id=current_user_id_var.get()
+      ).warning(f"Company not found id={invitation.company_id}")
       raise CompanyNotFound("Company not found")
     # owner invite → accept user
     if invitation.invited_by == company.owner_id:
       if invitation.invited_user_id != current_user.id:
+        logger.bind(
+          request_id=request_id_var.get(), 
+          user_id=current_user_id_var.get()
+        ).warning("Not your invitation")
         raise InvitationForbidden("Not your invitation")
     # user request → owner accept
     else:
       if company.owner_id != current_user.id:
+        logger.bind(
+          request_id=request_id_var.get(), 
+          user_id=current_user_id_var.get()
+        ).warning("Only owner can accept requests for invitations")
         raise InvitationForbidden("Only owner can accept requests for invitations")
     # Update status via repository
     await self.invitation_repo.update_status(invitation, InvitationStatus.accepted)
@@ -142,7 +198,10 @@ class CompanyInvitationService:
       invitation.invited_user_id
     )
     await self.db.commit()
-    logger.info(f"Invitation {invitation.id} accepted by user {current_user.id}")
+    logger.bind(
+      request_id=request_id_var.get(), 
+      user_id=current_user_id_var.get()
+    ).info(f"Invitation {invitation.id} accepted by user {current_user.id}")
     return invitation
   
   async def decline_invitation(
@@ -152,13 +211,25 @@ class CompanyInvitationService:
   ) -> CompanyInvitation:
     invitation = await self.invitation_repo.get_invitation_by_id(invitation_id)
     if not invitation:
+      logger.bind(
+        request_id=request_id_var.get(), 
+        user_id=current_user_id_var.get()
+      ).warning(f"Invitation id={invitation_id} not found")
       raise InvitationNotFound()
     company = await self.company_repo.get_company_by_id(invitation.company_id)
     if not company:
+      logger.bind(
+        request_id=request_id_var.get(), 
+        user_id=current_user_id_var.get()
+      ).warning(f"Company not found id={invitation.company_id}")
       raise CompanyNotFound("Company not found")
     # owner invite → accept user
     if invitation.invited_by == company.owner_id:
       if invitation.invited_user_id != current_user.id:
+        logger.bind(
+          request_id=request_id_var.get(), 
+          user_id=current_user_id_var.get()
+        ).warning("Not your invitation")
         raise InvitationForbidden("Not your invitation")
     # user request → owner accept
     else:
@@ -167,7 +238,10 @@ class CompanyInvitationService:
     # Update status via repository
     await self.invitation_repo.update_status(invitation, InvitationStatus.declined)
     await self.db.commit()
-    logger.info(f"Invitation {invitation.id} declined by user {current_user.id}")
+    logger.bind(
+      request_id=request_id_var.get(), 
+      user_id=current_user_id_var.get()
+    ).info(f"Invitation {invitation.id} declined by user {current_user.id}")
     return invitation
 
   async def cancel_invitation(
@@ -177,16 +251,31 @@ class CompanyInvitationService:
   ) -> CompanyInvitation:
     invitation = await self.invitation_repo.get_invitation_by_id(invitation_id)
     if not invitation:
+      logger.bind(
+        request_id=request_id_var.get(), 
+        user_id=current_user_id_var.get()
+      ).warning(f"Invitation id={invitation_id} not found")
       raise InvitationNotFound()
     company = await self.company_repo.get_company_by_id(invitation.company_id)
     if not company:
+      logger.bind(
+        request_id=request_id_var.get(), 
+        user_id=current_user_id_var.get()
+      ).warning(f"Company not found id={invitation.company_id}")
       raise CompanyNotFound("Company not found")
     is_owner = company.owner_id == current_user.id
     is_target_user = invitation.invited_user_id == current_user.id
     if not is_owner and not is_target_user:
+      logger.bind(
+        request_id=request_id_var.get(), 
+        user_id=current_user_id_var.get()
+      ).warning("Not allowed to cancel this invitation")
       raise InvitationForbidden("Not allowed to cancel this invitation")
     # Update status via repository
     await self.invitation_repo.update_status(invitation, InvitationStatus.cancelled)
     await self.db.commit()
-    logger.info(f"Invitation {invitation.id} cancelled by user {current_user.id}")
+    logger.bind(
+      request_id=request_id_var.get(), 
+      user_id=current_user_id_var.get()
+    ).info(f"Invitation {invitation.id} cancelled by user {current_user.id}")
     return invitation
