@@ -43,7 +43,4 @@ class UsersListResponse(BaseModel):
 
 class UserDetailResponse(UserSchema):
   """Відповідь API з детальною інформацією про користувача з ролями та компаніями"""
-  # Список компаній, де користувач є власником
-  owned_company_ids: list[UUID] = []
-  # Список компаній, де користувач є учасником
-  member_company_ids: list[UUID] = []
+  pass
