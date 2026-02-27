@@ -37,19 +37,19 @@ class UserRepository:
 
   async def get_user_by_email(
     self,
-    username: str
+    email: str
   ) -> User | None:
     result = await self.db.execute(
-      select(User).where(User.username == username)
+      select(User).where(User.email == email)
     )
     return result.scalar_one_or_none()
   
   async def get_user_by_username(
     self,
-    email: str
+    username: str
   ) -> User | None:
     result = await self.db.execute(
-      select(User).where(User.email == email)
+      select(User).where(User.username == username)
     )
     return result.scalar_one_or_none()
 
