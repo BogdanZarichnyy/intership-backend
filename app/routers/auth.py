@@ -32,14 +32,21 @@ from app.core.exceptions import (
   EmailNotVerified,
   EmailNotFoundInToken,
 )
+from app.repositories.user import UserRepository
 
 router = APIRouter(tags=["auth"])
 security = HTTPBearer()
 
+def get_user_service(
+  db: AsyncSession = Depends(get_db)
+) -> UserService:
+  return UserService(UserRepository(db))
+
 @router.post("/login")
 async def login(
   data: SignInRequest,
-  db: AsyncSession = Depends(get_db)
+  # db: AsyncSession = Depends(get_db)
+  db: AsyncSession = Depends(get_user_service)
 ):
   user_service = UserService(db)
   user = await user_service.get_user_by_email(data.email)
@@ -93,7 +100,8 @@ async def logout(
 @router.post("/refresh")
 async def refresh_token(
   credentials: HTTPAuthorizationCredentials = Depends(security),
-  db: AsyncSession = Depends(get_db)
+  # db: AsyncSession = Depends(get_db)
+  db: AsyncSession = Depends(get_user_service)
 ):
   """
   Приймає refresh token і повертає новий access token.
@@ -128,7 +136,8 @@ async def refresh_token(
 @router.post("/callback")
 async def auth0_callback(
   data: dict = Body(...),
-  db: AsyncSession = Depends(get_db)
+  # db: AsyncSession = Depends(get_db)
+  db: AsyncSession = Depends(get_user_service)
 ):
   """
   Frontend передає нам JSON з токенами від Auth0 після успішної авторизації користувача.:
