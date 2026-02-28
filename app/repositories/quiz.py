@@ -52,7 +52,7 @@ class QuizRepository:
     self, 
     quiz: Quiz
   ):
-    await self.db.commit()
+    await self.db.flush()
     await self.db.refresh(quiz)
     return quiz
 
