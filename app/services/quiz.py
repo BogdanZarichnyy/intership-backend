@@ -54,7 +54,7 @@ class QuizService:
     self, 
     quiz_id: UUID
   ):
-    """Збільшення лічильника частоти проходження тесту"""
+    """Збільшення лічильника частоти проходження тесту для всіх користувачів"""
     quiz = await self.quiz_repo.get_quiz_by_id(quiz_id)
     if not quiz:
       logger.warning(f"Tried to record participation for non-existent quiz {quiz_id}")

@@ -50,7 +50,7 @@ async def list_quizzes(
   result = await service.get_quizzes(company_id, limit, offset)
   return QuizListResponse(quizzes=result["quizzes"], total=result["total"])
 
-# Деталі одного тесту + збільшення participation_count
+# Деталі одного тесту
 @router.get(
   "/detail/{quiz_id}", 
   response_model=QuizSchema
@@ -60,10 +60,7 @@ async def get_quiz(
   current_user: UserDetailResponse = Depends(get_current_user),
   service: QuizService = Depends(get_quiz_service)
 ):
-  return await service.get_quiz(quiz_id) # Отримуємо лічильник (число)
-  # Отримуємо тест і збільшуємо лічильник
-  # quiz = await service.record_participation(quiz_id)
-  # return quiz # Поки під питання чи потріюно лічильник змінювати при перегляді тесту !!!
+  return await service.get_quiz(quiz_id)
 
 # Оновлення тесту
 @router.put(
@@ -90,7 +87,7 @@ async def delete_quiz(
   await service.delete_quiz(quiz_id, current_user.id)
   return {"detail": "Quiz deleted successfully"}
 
-# Запис на проходження тесту (інкремент participation_count - змінюємо лічильник активності)
+# Запис на проходження тесту,якщо буде потрібно (інкремент participation_count - змінюємо лічильник активності)
 @router.post(
   "/detail/{quiz_id}/participate", 
   response_model=dict
