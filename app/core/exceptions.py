@@ -17,6 +17,13 @@ class ExistsEmail(HTTPException):
       detail=detail
     )
 
+class ExistsUsername(HTTPException):
+  def __init__(self, username: str):
+    super().__init__(
+      status_code=409,
+      detail=f"Username '{username}' already exists."
+    )
+
 class InvalidPassword(HTTPException):
   """Raised when provided password is incorrect"""
   def __init__(
@@ -141,6 +148,38 @@ class EmailNotFoundInToken(HTTPException):
     super().__init__(
       status_code=status.HTTP_400_BAD_REQUEST,
       detail=detail
+    )
+
+# Company
+class CompanyNotFound(HTTPException):
+  def __init__(self):
+    super().__init__(
+      status_code=status.HTTP_404_NOT_FOUND,
+      detail="Company not found"
+    )
+
+class CompanyForbidden(HTTPException):
+  def __init__(
+    self,
+    detail: str = "Not enough permissions to access this company"
+  ):
+    super().__init__(
+      status_code=status.HTTP_403_FORBIDDEN,
+      detail=detail
+    )
+
+class CompanyUpdateForbidden(HTTPException):
+  def __init__(self):
+    super().__init__(
+      status_code=status.HTTP_403_FORBIDDEN,
+      detail="Only owner can update company"
+    )
+
+class CompanyDeleteForbidden(HTTPException):
+  def __init__(self):
+    super().__init__(
+      status_code=status.HTTP_403_FORBIDDEN,
+      detail="Only owner can delete company"
     )
 
 # Company

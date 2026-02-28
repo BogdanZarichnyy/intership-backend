@@ -45,7 +45,6 @@ def get_user_service(
 @router.post("/login")
 async def login(
   data: SignInRequest,
-  # db: AsyncSession = Depends(get_db)
   db: AsyncSession = Depends(get_user_service)
 ):
   user_service = UserService(db)
@@ -100,7 +99,6 @@ async def logout(
 @router.post("/refresh")
 async def refresh_token(
   credentials: HTTPAuthorizationCredentials = Depends(security),
-  # db: AsyncSession = Depends(get_db)
   db: AsyncSession = Depends(get_user_service)
 ):
   """
@@ -136,7 +134,6 @@ async def refresh_token(
 @router.post("/callback")
 async def auth0_callback(
   data: dict = Body(...),
-  # db: AsyncSession = Depends(get_db)
   db: AsyncSession = Depends(get_user_service)
 ):
   """

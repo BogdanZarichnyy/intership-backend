@@ -9,6 +9,8 @@ from app.services.user import UserService
 from app.db.postgres import get_db
 from app.repositories.user import UserRepository
 
+from app.core.log_context import current_user_id_var
+
 security = HTTPBearer()
 
 def get_user_service(
@@ -18,7 +20,6 @@ def get_user_service(
 
 async def get_current_user(
   credentials: HTTPAuthorizationCredentials = Depends(security),
-  # db: AsyncSession = Depends(get_db)
   db: AsyncSession = Depends(get_user_service)
 ):
   token = credentials.credentials
@@ -38,6 +39,7 @@ async def get_current_user(
         status_code=status.HTTP_404_NOT_FOUND,
         detail="User not found"
     )
+    current_user_id_var.set(str(user.id))  # ← додаємо це для логування
     return user
   # Якщо локальний JWT не пройшов, пробуємо Auth0
   except Exception:
@@ -59,4 +61,5 @@ async def get_current_user(
         status_code=status.HTTP_400_BAD_REQUEST,
         detail="Token missing email claim"
       )
+    current_user_id_var.set(str(user.id))  # ← додаємо це для логування
     return user
