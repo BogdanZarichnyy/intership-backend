@@ -21,8 +21,7 @@ router = APIRouter(tags=["companies"])
 def get_company_service(
   db: AsyncSession = Depends(get_db)
 ) -> CompanyService:
-  repo = CompanyRepository(db)
-  return CompanyService(db)
+  return CompanyService(CompanyRepository(db))
 
 # Отримати список компаній
 @router.get(
