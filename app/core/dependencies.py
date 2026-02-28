@@ -8,14 +8,19 @@ from app.core.auth0 import decode_auth0_token
 from app.services.company_invitation import CompanyInvitationService
 from app.services.user import UserService
 from app.db.postgres import get_db
-
+from app.repositories.user import UserRepository
 from app.core.log_context import current_user_id_var
 
 security = HTTPBearer()
 
+def get_user_service(
+  db: AsyncSession = Depends(get_db)
+) -> UserService:
+  return UserService(UserRepository(db))
+
 async def get_current_user(
   credentials: HTTPAuthorizationCredentials = Depends(security),
-  db: AsyncSession = Depends(get_db)
+  db: AsyncSession = Depends(get_user_service)
 ):
   token = credentials.credentials
   user_service = UserService(db)
@@ -60,6 +65,6 @@ async def get_current_user(
     return user
 
 def get_invitation_service(
-  db: AsyncSession = Depends(get_db)
+  db: AsyncSession = Depends(get_user_service)
 ):
   return CompanyInvitationService(db)

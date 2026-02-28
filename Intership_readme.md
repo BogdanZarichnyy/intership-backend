@@ -215,9 +215,11 @@ http://localhost:8000/docs
   uvicorn app.main:app --reload  # старт бекенду
   ```
 
-## Структура папок проекту:
+ ## Структура папок проекту:
   ```bash
   tree /F /A > structure.txt
+  source venv/Scripts/activate
+  python -m app.main
   ```
 
 ## Регулярка для VSCode для пошуку і заміни мусору на прикладі логера
