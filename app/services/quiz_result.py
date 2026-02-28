@@ -1,16 +1,16 @@
 from uuid import UUID
 
 from app.repositories.quiz_result import QuizResultRepository
-from app.repositories.quiz import QuizRepository
 from app.schemas.quiz_result import QuizAttemptRequest, QuizAttemptResponse, UserQuizStatsResponse
+from app.services.quiz import QuizService
 from app.models.quiz_result import QuizResult
 from app.core.exceptions import BusinessError
 from app.core.logger import logger
 
 class QuizResultService:
-  def __init__(self, result_repo: QuizResultRepository, quiz_repo: QuizRepository):
+  def __init__(self, result_repo: QuizResultRepository, quiz_service: QuizService):
     self.result_repo = result_repo
-    self.quiz_repo = quiz_repo
+    self.quiz_service = quiz_service
 
   async def attempt_quiz(
     self, 
@@ -19,9 +19,11 @@ class QuizResultService:
     company_id: UUID, 
     answers: QuizAttemptRequest
   ) -> QuizAttemptResponse:
-    quiz = await self.quiz_repo.get_quiz_by_id(quiz_id)
+    quiz = await self.quiz_service.get_quiz(quiz_id)
     if not quiz:
       raise BusinessError("Quiz not found")
+    # Збільшуємо лічильник участі перед обчисленням результатів
+    await self.quiz_service.record_participation(quiz_id)  # або виклик через сервіс, якщо він там є
     total_questions = len(quiz.questions)
     correct_answers = 0
     # перевірка відповідей

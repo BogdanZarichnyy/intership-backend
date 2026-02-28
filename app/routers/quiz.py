@@ -89,19 +89,3 @@ async def delete_quiz(
 ):
   await service.delete_quiz(quiz_id, current_user.id)
   return {"detail": "Quiz deleted successfully"}
-
-# Запис на проходження тесту (інкремент participation_count - змінюємо лічильник активності)
-@router.post(
-  "/detail/{quiz_id}/participate", 
-  response_model=dict
-)
-async def participate_quiz(
-  quiz_id: UUID,
-  current_user: UserDetailResponse = Depends(get_current_user),
-  service: QuizService = Depends(get_quiz_service)
-):
-  new_count = await service.record_participation(quiz_id)
-  return {
-    "quiz_id": quiz_id, 
-    "new_participation_count": new_count
-  }

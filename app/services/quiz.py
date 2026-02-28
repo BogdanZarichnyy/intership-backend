@@ -61,9 +61,9 @@ class QuizService:
       raise BusinessError("Quiz not found")
     quiz.participation_count += 1
     await self.quiz_repo.update_quiz(quiz)
+    await self.quiz_repo.db.commit()
     logger.info(f"Quiz {quiz_id} participation incremented to {quiz.participation_count}")
     return quiz.participation_count # Отримуємо лічильник (число)
-    # return quiz # повертаємо повний об’єкт з оновленим participation_count - під питанням як повертати дані, все залежить від логіки на фронті !!!
 
   async def get_quizzes(
     self, 
@@ -117,6 +117,7 @@ class QuizService:
         questions.append(question)
       quiz.questions = questions
     quiz = await self.quiz_repo.update_quiz(quiz)
+    await self.quiz_repo.db.commit()
     logger.info(f"Updated quiz {quiz.id} for company {quiz.company_id} by user {user_id}")
     return quiz
 
