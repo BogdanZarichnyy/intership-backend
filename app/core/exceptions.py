@@ -228,3 +228,13 @@ class InvitationForbidden(HTTPException):
       status_code=status.HTTP_403_FORBIDDEN, 
       detail=detail
     )
+
+# Quizzes
+class BusinessError(Exception):
+  """
+  Використовується для помилок бізнес-логіки, які не прив'язані до HTTP статусу.
+  Наприклад, перевірка структури тесту: мінімум 2 питання, правильні відповіді тощо.
+  """
+  def __init__(self, detail: str):
+    self.detail = detail
+    super().__init__(detail)
