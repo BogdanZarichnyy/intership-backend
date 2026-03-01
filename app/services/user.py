@@ -11,6 +11,7 @@ from app.schemas.user import (
 from app.core.security import hash_password, verify_password
 from app.repositories.user import UserRepository
 from app.core.exceptions import (
+  UserNotFound,
   ExistsEmail,
   ExistsUsername,
   InvalidPassword,
@@ -44,8 +45,9 @@ class UserService:
     user_id: UUID
   ) -> User | None:
     user = await self.repo.get_user_by_id(user_id)
-    if user:
-      logger.info(f"Fetched user id={user_id}")
+    if not user:
+      raise UserNotFound()
+    logger.info(f"Fetched user id={user_id}")
     return user
 
   async def get_user_by_email(
@@ -105,10 +107,18 @@ class UserService:
     user: User,
     update_data: UserUpdate
   ) -> UserDetailResponse:
+    # --- Username ---
     if update_data.username is not None:
-      user.username = update_data.username
-    if update_data.new_password:
-      if not update_data.current_password:
+      # якщо username реально змінюється
+      if update_data.username != user.username:
+        existing_user = await self.repo.get_user_by_username(update_data.username)
+        if existing_user:
+          logger.warning(f"Username already exists: {update_data.username}")
+          raise ExistsUsername(update_data.username)
+        user.username = update_data.username
+    # --- Password ---
+    if update_data.new_password is not None:
+      if update_data.current_password is None:
         logger.warning("Current password must be provided")
         raise MissingCurrentPassword()
       if not verify_password(
@@ -117,9 +127,7 @@ class UserService:
       ):
         logger.warning("Current password is incorrect")
         raise InvalidPassword()
-      user.hashed_password = hash_password(
-        update_data.new_password
-      )
+      user.hashed_password = hash_password(update_data.new_password)
     user = await self.repo.update_user_details(user)
     logger.info(f"User updated id={user.id}")
     return UserDetailResponse.model_validate(user)

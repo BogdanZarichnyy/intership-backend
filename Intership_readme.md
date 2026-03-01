@@ -210,4 +210,6 @@ Backend-сервіс, побудований за допомогою **FastAPI**
 ## Структура папок проекту:
   ```bash
   tree /F /A > structure.txt
+  source venv/Scripts/activate
+  python -m app.main
   ```

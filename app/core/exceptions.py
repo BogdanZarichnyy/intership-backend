@@ -1,80 +1,52 @@
-from fastapi import HTTPException, status
+# Base domain exception
+class BusinessError(Exception):
+  """Base class for domain/business errors"""
+  pass
 
 # Users
-class ExistsEmail(HTTPException):
-  """Raised when trying to create a user with an existing email"""
-  def __init__(
-    self,
-    email: str | None = None
-  ):
-    detail = (
+class ExistsEmail(BusinessError):
+  def __init__(self, email: str | None = None):
+    self.email = email
+    self.detail = (
       f"User with email '{email}' already exists"
       if email else
       "User with this email already exists"
     )
-    super().__init__(
-      status_code=status.HTTP_409_CONFLICT,
-      detail=detail
-    )
-    
-class ExistsUsername(HTTPException):
+    super().__init__(self.detail)
+
+
+class ExistsUsername(BusinessError):
   def __init__(self, username: str):
-    super().__init__(
-      status_code=409,
-      detail=f"Username '{username}' already exists."
-    )
+    self.username = username
+    self.detail = f"Username '{username}' already exists."
+    super().__init__(self.detail)
 
-class InvalidPassword(HTTPException):
-  """Raised when provided password is incorrect"""
-  def __init__(
-    self,
-    detail: str = "Current password is incorrect"
-  ):
-    super().__init__(
-      status_code=status.HTTP_401_UNAUTHORIZED,
-      detail=detail
-    )
 
-class MissingCurrentPassword(HTTPException):
-  """Raised when current password is required but not provided"""
-  def __init__(
-    self,
-    detail: str = "Current password must be provided"
-  ):
-    super().__init__(
-      status_code=status.HTTP_400_BAD_REQUEST,
-      detail=detail
-    )
+class InvalidPassword(BusinessError):
+  def __init__(self, detail: str = "Current password is incorrect"):
+    self.detail = detail
+    super().__init__(self.detail)
 
-class MissingNewPassword(HTTPException):
-  """Raised when new password is required but not provided"""
-  def __init__(
-    self,
-    detail: str = "New password must be provided"
-  ):
-    super().__init__(
-      status_code=status.HTTP_400_BAD_REQUEST,
-      detail=detail
-    )
 
-class UserNotFound(HTTPException):
-  """Raised when user does not exist"""
-  def __init__(
-    self,
-    detail: str = "User not found"
-  ):
-    super().__init__(
-      status_code=status.HTTP_404_NOT_FOUND,
-      detail=detail
-    )
+class MissingCurrentPassword(BusinessError):
+  def __init__(self, detail: str = "Current password must be provided"):
+    self.detail = detail
+    super().__init__(self.detail)
 
-class ForbiddenAction(HTTPException):
-  """Raised when user tries to access forbidden resource"""
-  def __init__(
-    self,
-    detail: str = "Not authorized to perform this action"
-  ):
-    super().__init__(
-      status_code=status.HTTP_403_FORBIDDEN,
-      detail=detail
-    )
+
+class MissingNewPassword(BusinessError):
+  def __init__(self, detail: str = "New password must be provided"):
+    self.detail = detail
+    super().__init__(self.detail)
+
+
+class UserNotFound(BusinessError):
+  def __init__(self, detail: str = "User not found"):
+    self.detail = detail
+    super().__init__(self.detail)
+
+
+class ForbiddenAction(BusinessError):
+  def __init__(self, detail: str = "Not authorized to perform this action"):
+    self.detail = detail
+    super().__init__(self.detail)
