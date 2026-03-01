@@ -33,7 +33,7 @@ class UserUpdate(BaseModel):
   model_config = ConfigDict(extra="forbid")
   username: str | None = None
   current_password: str | None = None  # поточний пароль для підтвердження
-  new_password: str | None = None     # новий пароль, який користувач хоче встановити
+  new_password: str | None = None      # новий пароль, який користувач хоче встановити
 
 class UsersListResponse(BaseModel):
   """Відповідь API зі списком користувачів"""
