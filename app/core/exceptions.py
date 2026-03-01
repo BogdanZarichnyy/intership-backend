@@ -1,151 +1,102 @@
-from fastapi import HTTPException, status
+class BusinessError(Exception):
+  """Base class for domain/business errors"""
+  pass
 
+# =======================
 # Users
-class ExistsEmail(HTTPException):
-  """Raised when trying to create a user with an existing email"""
-  def __init__(
-    self,
-    email: str | None = None
-  ):
-    detail = (
+# =======================
+
+class ExistsEmail(BusinessError):
+  def __init__(self, email: str | None = None):
+    self.email = email
+    self.detail = (
       f"User with email '{email}' already exists"
       if email else
       "User with this email already exists"
     )
-    super().__init__(
-      status_code=status.HTTP_409_CONFLICT,
-      detail=detail
-    )
+    super().__init__(self.detail)
 
-class ExistsUsername(HTTPException):
+class ExistsUsername(BusinessError):
   def __init__(self, username: str):
-    super().__init__(
-      status_code=409,
-      detail=f"Username '{username}' already exists."
-    )
+    self.username = username
+    self.detail = f"Username '{username}' already exists."
+    super().__init__(self.detail)
 
-class InvalidPassword(HTTPException):
-  """Raised when provided password is incorrect"""
-  def __init__(
-    self,
-    detail: str = "Current password is incorrect"
-  ):
-    super().__init__(
-      status_code=status.HTTP_401_UNAUTHORIZED,
-      detail=detail
-    )
+class InvalidPassword(BusinessError):
+  def __init__(self, detail: str = "Current password is incorrect"):
+    self.detail = detail
+    super().__init__(self.detail)
 
-class MissingCurrentPassword(HTTPException):
-  """Raised when current password is required but not provided"""
-  def __init__(
-    self,
-    detail: str = "Current password must be provided"
-  ):
-    super().__init__(
-      status_code=status.HTTP_400_BAD_REQUEST,
-      detail=detail
-    )
+class MissingCurrentPassword(BusinessError):
+  def __init__(self, detail: str = "Current password must be provided"):
+    self.detail = detail
+    super().__init__(self.detail)
 
-class MissingNewPassword(HTTPException):
-  """Raised when new password is required but not provided"""
-  def __init__(
-    self,
-    detail: str = "New password must be provided"
-  ):
-    super().__init__(
-      status_code=status.HTTP_400_BAD_REQUEST,
-      detail=detail
-    )
+class MissingNewPassword(BusinessError):
+  def __init__(self, detail: str = "New password must be provided"):
+    self.detail = detail
+    super().__init__(self.detail)
 
-class UserNotFound(HTTPException):
-  """Raised when user does not exist"""
-  def __init__(
-    self,
-    detail: str = "User not found"
-  ):
-    super().__init__(
-      status_code=status.HTTP_404_NOT_FOUND,
-      detail=detail
-    )
+class UserNotFound(BusinessError):
+  def __init__(self, detail: str = "User not found"):
+    self.detail = detail
+    super().__init__(self.detail)
 
-class ForbiddenAction(HTTPException):
-  """Raised when user tries to access forbidden resource"""
-  def __init__(
-    self,
-    detail: str = "Not authorized to perform this action"
-  ):
-    super().__init__(
-      status_code=status.HTTP_403_FORBIDDEN,
-      detail=detail
-    )
+class ForbiddenAction(BusinessError):
+  def __init__(self, detail: str = "Not authorized to perform this action"):
+    self.detail = detail
+    super().__init__(self.detail)
 
+# =======================
 # Authorization
-class InvalidCredentials(HTTPException):
+# =======================
+
+class InvalidCredentials(BusinessError):
   def __init__(self, detail: str = "Invalid credentials"):
-    super().__init__(
-      status_code=status.HTTP_401_UNAUTHORIZED,
-      detail=detail
-    )
+    self.detail = detail
+    super().__init__(self.detail)
 
-class InvalidToken(HTTPException):
+class InvalidToken(BusinessError):
   def __init__(self, detail: str = "Invalid token"):
-    super().__init__(
-      status_code=status.HTTP_401_UNAUTHORIZED,
-      detail=detail
-    )
+    self.detail = detail
+    super().__init__(self.detail)
 
-class InvalidTokenType(HTTPException):
+class InvalidTokenType(BusinessError):
   def __init__(self, detail: str = "Invalid token type"):
-    super().__init__(
-      status_code=status.HTTP_401_UNAUTHORIZED,
-      detail=detail
-    )
+    self.detail = detail
+    super().__init__(self.detail)
 
-class InvalidTokenPayload(HTTPException):
+class InvalidTokenPayload(BusinessError):
   def __init__(self, detail: str = "Invalid token payload"):
-    super().__init__(
-      status_code=status.HTTP_401_UNAUTHORIZED,
-      detail=detail
-    )
+    self.detail = detail
+    super().__init__(self.detail)
 
-class UserDisabled(HTTPException):
+class UserDisabled(BusinessError):
   def __init__(self, detail: str = "User account is disabled"):
-    super().__init__(
-      status_code=status.HTTP_403_FORBIDDEN,
-      detail=detail
-    )
+    self.detail = detail
+    super().__init__(self.detail)
 
-class AuthProviderUnknown(HTTPException):
+class AuthProviderUnknown(BusinessError):
   def __init__(self, detail: str = "Unknown provider"):
-    super().__init__(
-      status_code=status.HTTP_400_BAD_REQUEST,
-      detail=detail
-    )
+    self.detail = detail
+    super().__init__(self.detail)
 
-class MissingIdToken(HTTPException):
+class MissingIdToken(BusinessError):
   def __init__(self, detail: str = "Missing id_token"):
-    super().__init__(
-      status_code=status.HTTP_400_BAD_REQUEST,
-      detail=detail
-    )
+    self.detail = detail
+    super().__init__(self.detail)
 
-class InvalidAuth0Token(HTTPException):
+class InvalidAuth0Token(BusinessError):
   def __init__(self, detail: str = "Invalid Auth0 token"):
-    super().__init__(
-      status_code=status.HTTP_401_UNAUTHORIZED,
-      detail=detail
-    )
+    self.detail = detail
+    super().__init__(self.detail)
 
-class EmailNotVerified(HTTPException):
+class EmailNotVerified(BusinessError):
   def __init__(self, detail: str = "Email not verified"):
-    super().__init__(
-      status_code=status.HTTP_403_FORBIDDEN,
-      detail=detail
-    )
+    self.detail = detail
+    super().__init__(self.detail)
 
-class EmailNotFoundInToken(HTTPException):
+class EmailNotFoundInToken(BusinessError):
   def __init__(self, detail: str = "Email not found in token"):
-    super().__init__(
-      status_code=status.HTTP_400_BAD_REQUEST,
-      detail=detail
-    )
+    self.detail = detail
+    super().__init__(self.detail)

@@ -14,9 +14,9 @@ from app.middleware.logger_middleware import RequestLoggingMiddleware
 from app.middleware.exception_handler import (
   http_exception_handler,
   validation_exception_handler,
-  business_error_handler,
-  BusinessError
+  business_error_handler
 )
+from app.core.exceptions import BusinessError
 from fastapi.exceptions import RequestValidationError
 from starlette.exceptions import HTTPException as StarletteHTTPException
 
