@@ -1,7 +1,9 @@
 import pytest
-from app.db.redis import redis_client
+import redis.asyncio as redis
 
 @pytest.mark.asyncio
 async def test_redis_connection():
-  pong = await redis_client.ping()
+  client = redis.Redis(host="localhost", port=6379)
+  pong = await client.ping()
   assert pong is True
+  await client.close()

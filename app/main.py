@@ -6,11 +6,28 @@ import uvicorn
 from app.core.logger import logger
 
 from app.routers.health import router as healthRouter
-from app.core.middleware import setup_middlewares
+from app.routers.user import router as userRouter
+
+from app.middleware.cors import setup_middlewares
+from app.middleware.logger_middleware import RequestLoggingMiddleware
+from app.middleware.exception_handler import (
+  http_exception_handler,
+  validation_exception_handler,
+  business_error_handler,
+)
+from app.core.exceptions import BusinessError
+from fastapi.exceptions import RequestValidationError
+from starlette.exceptions import HTTPException as StarletteHTTPException
+
 from app.config import settings
 
 from app.db.postgres import engine
 from app.db.redis import redis_client
+
+def setup_exception_handlers(app: FastAPI):
+  app.add_exception_handler(StarletteHTTPException, http_exception_handler)
+  app.add_exception_handler(RequestValidationError, validation_exception_handler)
+  app.add_exception_handler(BusinessError, business_error_handler)
 
 async def wait_for_postgres():
   retries = 0
@@ -58,7 +75,12 @@ def create_app() -> FastAPI: # Використовуємо factory pattern, щ�
   app = FastAPI(title="Internship Backend", lifespan=lifespan)
 
   setup_middlewares(app)
+  setup_exception_handlers(app)  # <- підключаємо глобальні хендлери
+  app.add_middleware(RequestLoggingMiddleware) # <- підключаємо middleware для логування запитів
+
+  # Роутери
   app.include_router(healthRouter)
+  app.include_router(userRouter, prefix="/users")
 
   return app
 
