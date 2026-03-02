@@ -1,6 +1,6 @@
 from uuid import UUID
 from sqlalchemy.ext.asyncio import AsyncSession
-
+from app.schemas.company_invitation import InvitationResponse
 from app.models.company import Company
 from app.models.user import User
 from app.models.company_invitation import InvitationStatus, CompanyInvitation
@@ -27,11 +27,15 @@ class CompanyInvitationService:
   # Створення invite/request на приєднання до компанії
   # ==================================================
   async def company_join_initialization(
-    self, 
-    company: Company, 
-    current_user: User, 
-    user_id: UUID
+    self,
+    company_id: UUID,
+    user_id: UUID,
+    current_user: User
   ):
+    company: Company = await self.company_repo.get_company_by_id(company_id)
+    if not company:
+      logger.warning(f"Company not found id={company_id}")
+      raise CompanyNotFound("Company not found")
     # Перевірка - хто із авторизованих користувачів ініціює приєднання до компанії
     if current_user.id == company.owner_id:
       # Якщо ініціатор власник компанії (owner company), тоді він запрошує користувача → invite
@@ -122,7 +126,7 @@ class CompanyInvitationService:
     self,
     invitation_id: UUID,
     current_user: User
-  ) -> CompanyInvitation:
+  ) -> InvitationResponse:
     invitation = await self.invitation_repo.get_invitation_by_id(invitation_id)
     if not invitation:
       logger.warning(f"Invitation id={invitation_id} not found")
@@ -134,32 +138,50 @@ class CompanyInvitationService:
     if not company:
       logger.warning(f"Company not found id={invitation.company_id}")
       raise CompanyNotFound("Company not found")
-    # owner invite → accept user
-    if invitation.invited_by == company.owner_id:
-      if invitation.invited_user_id != current_user.id:
-        logger.warning("Not your invitation")
-        raise InvitationForbidden("Not your invitation")
-    # user request → owner accept
+    # Логіка підтвердження:
+    # 1) Власник компанії
+    if current_user.id == company.owner_id:
+      # Власник може підтверджувати всі заявки, які надійшли в його компанію
+      allowed = True
+    # 2) Користувач, який подав заявку
+    elif current_user.id == invitation.invited_user_id:
+      # Користувач може підтвердити лише свої власні заявки
+      # Перевіряємо, що ініціатором не був власник компанії або інший користувач
+      if invitation.invited_by == company.owner_id:
+        # Немає права підтверджувати запрошення від власника (invite)
+        allowed = False
+      else:
+        allowed = True
     else:
-      if company.owner_id != current_user.id:
-        logger.warning("Only owner can accept requests for invitations")
-        raise InvitationForbidden("Only owner can accept requests for invitations")
-    # Змінюємо статус заявки - підтверджуємо приєднання до компанії
+      allowed = False
+    if not allowed:
+      logger.warning(f"User {current_user.id} cannot accept this invitation {invitation.id}")
+      raise InvitationForbidden("You are not allowed to accept this invitation")
+    # Змінюємо статус заявки на accepted
     await self.invitation_repo.update_status(invitation, InvitationStatus.accepted)
-    # Додаємо користувача в члени компанії
+    # Додаємо користувача в члени компанії, якщо це ще не зроблено
     await self.member_repo.add_member(invitation.company_id, invitation.invited_user_id)
     await self.db.commit()
+    await self.db.refresh(invitation)
     logger.info(f"Invitation {invitation.id} accepted by user {current_user.id}")
-    return invitation
-  
+    return InvitationResponse(
+      id=invitation.id,
+      company_id=invitation.company_id,
+      invited_user_id=invitation.invited_user_id,
+      invited_by=invitation.invited_by,
+      status=invitation.status,
+      created_at=invitation.created_at,
+      updated_at=invitation.updated_at
+    )
+
   # ===================================================================================
-  # Власник компанії відхилив запит на приєднання до компанії →  invite/request decline
+  # Власник компанії відхилив запит на приєднання → invite/request decline
   # ===================================================================================
   async def decline_invitation(
     self,
     invitation_id: UUID,
     current_user: User
-  ) -> CompanyInvitation:
+  ) -> InvitationResponse:
     invitation = await self.invitation_repo.get_invitation_by_id(invitation_id)
     if not invitation:
       logger.warning(f"Invitation id={invitation_id} not found")
@@ -168,29 +190,32 @@ class CompanyInvitationService:
     if not company:
       logger.warning(f"Company not found id={invitation.company_id}")
       raise CompanyNotFound("Company not found")
-    # owner invite → accept user
-    if invitation.invited_by == company.owner_id:
-      if invitation.invited_user_id != current_user.id:
-        logger.warning("Not your invitation")
-        raise InvitationForbidden("Not your invitation")
-    # user request → owner accept
-    else:
-      if company.owner_id != current_user.id:
-        raise InvitationForbidden("Only owner can decline requests for invitations")
-    # Змінюємо статус заявки
+    # Відхиляти може тільки власник компанії
+    if company.owner_id != current_user.id:
+      logger.warning("Only owner can decline invitations or requests")
+      raise InvitationForbidden("Only owner can decline invitations or requests")
     await self.invitation_repo.update_status(invitation, InvitationStatus.declined)
     await self.db.commit()
-    logger.info(f"Invitation {invitation.id} declined by user {current_user.id}")
-    return invitation
+    await self.db.refresh(invitation)
+    logger.info(f"Invitation {invitation.id} declined by owner {current_user.id}")
+    return InvitationResponse(
+      id=invitation.id,
+      company_id=invitation.company_id,
+      invited_user_id=invitation.invited_user_id,
+      invited_by=invitation.invited_by,
+      status=invitation.status,
+      created_at=invitation.created_at,
+      updated_at=invitation.updated_at
+    )
 
   # =============================================================================
-  # Користувач сам відмінив свій запит на приєднання до компанії → request cancel
+  # Користувач сам відмінив свій запит → request cancel
   # =============================================================================
   async def cancel_invitation(
     self, 
     invitation_id: UUID, 
     current_user: User
-  ) -> CompanyInvitation:
+  ) -> InvitationResponse:
     invitation = await self.invitation_repo.get_invitation_by_id(invitation_id)
     if not invitation:
       logger.warning(f"Invitation id={invitation_id} not found")
@@ -199,13 +224,20 @@ class CompanyInvitationService:
     if not company:
       logger.warning(f"Company not found id={invitation.company_id}")
       raise CompanyNotFound("Company not found")
-    is_owner = company.owner_id == current_user.id
-    is_target_user = invitation.invited_user_id == current_user.id
-    if not is_owner and not is_target_user:
-      logger.warning("Not allowed to cancel this invitation")
-      raise InvitationForbidden("Not allowed to cancel this invitation")
-    # Змінюємо статус заявки
+    # Скасувати може тільки користувач, який подав заявку
+    if invitation.invited_user_id != current_user.id:
+      logger.warning("Only the requesting user can cancel their invitation")
+      raise InvitationForbidden("Only the requesting user can cancel their invitation")
     await self.invitation_repo.update_status(invitation, InvitationStatus.cancelled)
     await self.db.commit()
+    await self.db.refresh(invitation)
     logger.info(f"Invitation {invitation.id} cancelled by user {current_user.id}")
-    return invitation
+    return InvitationResponse(
+      id=invitation.id,
+      company_id=invitation.company_id,
+      invited_user_id=invitation.invited_user_id,
+      invited_by=invitation.invited_by,
+      status=invitation.status,
+      created_at=invitation.created_at,
+      updated_at=invitation.updated_at
+    )
