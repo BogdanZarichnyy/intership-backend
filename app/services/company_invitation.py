@@ -159,8 +159,16 @@ class CompanyInvitationService:
       raise InvitationForbidden("You are not allowed to accept this invitation")
     # Змінюємо статус заявки на accepted
     await self.invitation_repo.update_status(invitation, InvitationStatus.accepted)
-    # Додаємо користувача в члени компанії, якщо це ще не зроблено
-    await self.member_repo.add_member(invitation.company_id, invitation.invited_user_id)
+    # Перевіряємо чи користувач вже є членом компанії, оскільки заявок на вступ може бути декілька - тобто: 
+    # заявку може кинути як і власник компанії користувачу, так і сам користувач в компанію. Також потрібно 
+    # врахувати момент що старі по часу заявки можна відхиляти, а нові можна підтверджувати на вступ. Таким 
+    # чином у нас буде історія заявок на вступ, з різними часовими мітками та часом обробки цих заявок.
+    existing_member = await self.member_repo.get_member_of_company(invitation.company_id, invitation.invited_user_id)
+    if existing_member:
+      logger.info(f"User {invitation.invited_user_id} is already a member of company {invitation.company_id}")
+    else:
+      # Додаємо користувача в члени компанії якщо такого запису ще немає в таблиці
+      await self.member_repo.add_member(invitation.company_id, invitation.invited_user_id)
     await self.db.commit()
     await self.db.refresh(invitation)
     logger.info(f"Invitation {invitation.id} accepted by user {current_user.id}")
