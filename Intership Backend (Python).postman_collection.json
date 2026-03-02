@@ -728,7 +728,7 @@
       "name": "Company Invitations",
       "item": [
         {
-          "name": "Create Invitation",
+          "name": "Create Invitation to join in company",
           "request": {
             "auth": {
               "type": "bearer",
@@ -752,7 +752,7 @@
               }
             },
             "url": {
-              "raw": "http://localhost:8000/company-invitations/a5bb832d-46d7-4d10-9cd1-c415caf33db1/6ec75114-3ccb-4196-a47a-40e767844d15",
+              "raw": "http://localhost:8000/company-invitations/a5bb832d-46d7-4d10-9cd1-c415caf33db1/8c20832f-a345-4f58-8795-325f9858171f",
               "protocol": "http",
               "host": [
                 "localhost"
@@ -761,7 +761,7 @@
               "path": [
                 "company-invitations",
                 "a5bb832d-46d7-4d10-9cd1-c415caf33db1",
-                "6ec75114-3ccb-4196-a47a-40e767844d15"
+                "8c20832f-a345-4f58-8795-325f9858171f"
               ]
             }
           },
@@ -907,7 +907,7 @@
             "method": "PATCH",
             "header": [],
             "url": {
-              "raw": "http://localhost:8000/company-invitations/af8773bb-00eb-44bb-9752-8f112b354590/accept",
+              "raw": "http://localhost:8000/company-invitations/d5469ad0-051e-4692-90fc-786f0cf6e828/accept",
               "protocol": "http",
               "host": [
                 "localhost"
@@ -915,7 +915,7 @@
               "port": "8000",
               "path": [
                 "company-invitations",
-                "af8773bb-00eb-44bb-9752-8f112b354590",
+                "d5469ad0-051e-4692-90fc-786f0cf6e828",
                 "accept"
               ]
             }
@@ -997,6 +997,155 @@
                 "company-invitations",
                 "bbc53598-8f39-439d-97c5-367911b61253",
                 "cancel"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Roles of Members in Company",
+      "item": [
+        {
+          "name": "All Admins in Company",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{jwt_token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:8000/company-role/a5bb832d-46d7-4d10-9cd1-c415caf33db1",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8000",
+              "path": [
+                "company-role",
+                "a5bb832d-46d7-4d10-9cd1-c415caf33db1"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Assign User as Administrator",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{jwt_token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "PATCH",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://localhost:8000/company-role/a5bb832d-46d7-4d10-9cd1-c415caf33db1/admin/8ba956a1-4ad0-4d4c-b4c2-dc3a31675c8d",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8000",
+              "path": [
+                "company-role",
+                "a5bb832d-46d7-4d10-9cd1-c415caf33db1",
+                "admin",
+                "8ba956a1-4ad0-4d4c-b4c2-dc3a31675c8d"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Assign User as Member",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{jwt_token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "PATCH",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://localhost:8000/company-role/a5bb832d-46d7-4d10-9cd1-c415caf33db1/member/8ba956a1-4ad0-4d4c-b4c2-dc3a31675c8d",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8000",
+              "path": [
+                "company-role",
+                "a5bb832d-46d7-4d10-9cd1-c415caf33db1",
+                "member",
+                "8ba956a1-4ad0-4d4c-b4c2-dc3a31675c8d"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Remove Administrator of Company",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{jwt_token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:8000/company-role/a5bb832d-46d7-4d10-9cd1-c415caf33db1/remove/8ba956a1-4ad0-4d4c-b4c2-dc3a31675c8d",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8000",
+              "path": [
+                "company-role",
+                "a5bb832d-46d7-4d10-9cd1-c415caf33db1",
+                "remove",
+                "8ba956a1-4ad0-4d4c-b4c2-dc3a31675c8d"
               ]
             }
           },
