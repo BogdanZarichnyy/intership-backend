@@ -6,6 +6,7 @@ class CompanyMemberBase(BaseModel):
   company_id: UUID
   member_id: UUID
 
-class CompanyMembersResponse(CompanyMemberBase):
+class CompanyMemberResponse(CompanyMemberBase):
   created_at: datetime
+
   model_config = ConfigDict(from_attributes=True)

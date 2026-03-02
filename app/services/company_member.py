@@ -2,6 +2,7 @@ from uuid import UUID
 from app.repositories.company_member import CompanyMemberRepository
 from app.schemas.user import UserDetailResponse
 from app.core.exceptions import CompanyOwnerOnly, CompanyMembershipForbidden
+from app.schemas.company_member import CompanyMemberResponse
 
 from app.core.logger import logger
 
@@ -18,9 +19,10 @@ class CompanyMemberService:
     company_id: UUID, 
     limit: int = 100, 
     offset: int = 0
-  ):
-    logger.info(f"Fetched members of company list company {company_id} limit={limit} offset={offset}")
-    return await self.repository.get_all_members_for_current_company(company_id, limit, offset)
+  ) -> list[CompanyMemberResponse]:
+    members = await self.repository.get_all_members_for_current_company(company_id, limit, offset)
+    logger.info(f"Fetched members of company {company_id}, limit={limit}, offset={offset}")
+    return [CompanyMemberResponse.model_validate(member) for member in members]
 
   # ===================================================================================
   # Власник компанії видаляє члена
