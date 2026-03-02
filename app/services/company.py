@@ -33,17 +33,11 @@ class CompanyService:
     limit: int,
     offset: int,
   ) -> CompaniesListResponse:
-    companies = await self.repo.get_all_visible_companies(
-      limit,
-      offset
-    )
+    companies = await self.repo.get_all_visible_companies(limit, offset)
     total = await self.repo.count_visible_companies()
     logger.info(f"Fetched visible companies limit={limit} offset={offset}")
     return CompaniesListResponse(
-      companies=[
-        CompanySchema.model_validate(c)
-        for c in companies
-      ],
+      companies=[CompanySchema.model_validate(c) for c in companies],
       total=total
     )
 
@@ -52,16 +46,11 @@ class CompanyService:
     company_id: UUID,
     current_user: User
   ) -> Company:
-    company = await self.repo.get_company_by_id(
-      company_id
-    )
+    company = await self.repo.get_company_by_id(company_id)
     if not company:
       logger.warning(f"Company not found id={company_id}")
       raise CompanyNotFound()
-    if (
-      company.owner_id != current_user.id
-      and not company.is_visible
-    ):
+    if (company.owner_id != current_user.id and not company.is_visible):
       logger.warning(f"User tried to access hidden company {company_id}")
       raise CompanyForbidden()
     logger.info(f"Fetched company id={company_id}")
@@ -78,23 +67,25 @@ class CompanyService:
       is_visible=company_data.is_visible,
       owner_id=owner.id
     )
-    company = await self.repo.create_company(
-      company
-    )
+    company = await self.repo.create_company(company)
     logger.info(f"Company created id={company.id}")
-    return CompanyDetailResponse.model_validate(
-      company
-    )
+    return CompanyDetailResponse.model_validate(company)
 
   async def update_company(
     self,
-    company: Company,
+    company_id: UUID,
     current_user: User,
     update_data: CompanyUpdateRequest
   ) -> CompanyDetailResponse:
+    # Перевірка компанії та користувача
+    company = await self.repo.get_company_by_id(company_id)
+    if not company:
+      logger.warning(f"Company not found id={company_id}")
+      raise CompanyNotFound()
     if company.owner_id != current_user.id:
       logger.warning(f"Only owner can update company id={company.id}")
       raise CompanyUpdateForbidden()
+    # Перевірка даних
     if update_data.name is not None:
       company.name = update_data.name
     if update_data.description is not None:
@@ -103,18 +94,20 @@ class CompanyService:
       company.is_visible = update_data.is_visible
     company = await self.repo.update_company(company)
     logger.info(f"Company updated id={company.id}")
-    return CompanyDetailResponse.model_validate(
-      company
-    )
+    return CompanyDetailResponse.model_validate(company)
 
   async def delete_company(
     self,
-    company: Company,
+    company_id: UUID,
     current_user: User
   ) -> None:
+    # Перевірка компанії та користувача
+    company = await self.repo.get_company_by_id(company_id)
+    if not company:
+      logger.warning(f"Company not found id={company_id}")
+      raise CompanyNotFound()
     if company.owner_id != current_user.id:
       logger.warning(f"Only owner can delete company id={company.id}")
       raise CompanyDeleteForbidden()
     await self.repo.delete_company(company)
     logger.info(f"Company deleted id={company.id}")
-    return

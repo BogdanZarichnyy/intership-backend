@@ -111,25 +111,16 @@ class CompanyNotFound(BusinessError):
     super().__init__(self.detail)
 
 class CompanyForbidden(BusinessError):
-  def __init__(
-    self,
-    detail: str = "Not enough permissions to access this company"
-  ):
+  def __init__(self, detail: str = "Not enough permissions to access this company"):
     self.detail = detail
     super().__init__(self.detail)
 
 class CompanyUpdateForbidden(BusinessError):
-  def __init__(
-    self,
-    detail: str = "Only owner can update company"
-  ):
+  def __init__(self, detail: str = "Only owner can update company"):
     self.detail = detail
     super().__init__(self.detail)
 
 class CompanyDeleteForbidden(BusinessError):
-  def __init__(
-    self,
-    detail: str = "Only owner can delete company"
-  ):
+  def __init__(self, detail: str = "Only owner can delete company"):
     self.detail = detail
     super().__init__(self.detail)
