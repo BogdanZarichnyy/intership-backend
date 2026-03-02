@@ -13,7 +13,11 @@ class QuizService:
     self.quiz_repo = quiz_repo
     self.member_repo = member_repo
 
-  async def check_owner_or_admin(self, company_id: UUID, user_id: UUID):
+  async def check_owner_or_admin(
+    self, 
+    company_id: UUID, 
+    user_id: UUID
+  ):
     # перевіряємо чи користувач є членом компанії
     member = await self.member_repo.get_member(company_id, user_id)
     if not member:
@@ -31,7 +35,12 @@ class QuizService:
         raise BusinessError("User must be admin or owner to perform this action")
       logger.warning(f"User {user_id} is neither admin nor owner of company {company_id}")
 
-  async def create_quiz(self, company_id: UUID, user_id: UUID, quiz_data: QuizCreateRequest):
+  async def create_quiz(
+    self, 
+    company_id: UUID, 
+    user_id: UUID, 
+    quiz_data: QuizCreateRequest
+  ):
     await self.check_owner_or_admin(company_id, user_id)
     if len(quiz_data.questions) < 2:
       raise BusinessError("Quiz must have at least 2 questions")
@@ -54,15 +63,15 @@ class QuizService:
     self, 
     quiz_id: UUID
   ):
-    """Збільшення лічильника частоти проходження тесту"""
+    """Збільшення лічильника частоти проходження тесту для всіх користувачів"""
     quiz = await self.quiz_repo.get_quiz_by_id(quiz_id)
     if not quiz:
       logger.warning(f"Tried to record participation for non-existent quiz {quiz_id}")
       raise BusinessError("Quiz not found")
     quiz.participation_count += 1
     await self.quiz_repo.update_quiz(quiz)
-    await self.quiz_repo.db.commit()
     logger.info(f"Quiz {quiz_id} participation incremented to {quiz.participation_count}")
+    await self.quiz_repo.db.commit()
     return quiz.participation_count # Отримуємо лічильник (число)
 
   async def get_quizzes(
@@ -117,8 +126,8 @@ class QuizService:
         questions.append(question)
       quiz.questions = questions
     quiz = await self.quiz_repo.update_quiz(quiz)
-    await self.quiz_repo.db.commit()
     logger.info(f"Updated quiz {quiz.id} for company {quiz.company_id} by user {user_id}")
+    await self.quiz_repo.db.commit()
     return quiz
 
   async def delete_quiz(

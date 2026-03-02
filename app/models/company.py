@@ -19,3 +19,5 @@ class Company(Base):
   owner = relationship("User", back_populates="companies")
   members = relationship("CompanyMember", back_populates="company", cascade="all, delete-orphan")
   invitations = relationship("CompanyInvitation", back_populates="company", cascade="all, delete-orphan")
+  quizzes = relationship("Quiz", back_populates="company", cascade="all, delete-orphan")
+  quiz_results = relationship("QuizResult", back_populates="company", cascade="all, delete-orphan")

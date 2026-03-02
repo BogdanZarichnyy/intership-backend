@@ -12,7 +12,12 @@ class CompanyAdminService:
     self.member_repo = CompanyMemberRepository(db)
     self.company_repo = CompanyRepository(db)
 
-  async def get_admin(self, company_id: UUID, owner_id: UUID, user_id: UUID):
+  async def get_admin(
+    self, 
+    company_id: UUID, 
+    owner_id: UUID, 
+    user_id: UUID
+  ):
     company = await self.company_repo.get_company_by_id(company_id)
     if not company:
       logger.warning(f"Company {company_id} not found (user_id={user_id})")
@@ -26,7 +31,12 @@ class CompanyAdminService:
       raise CompanyMembershipForbidden("User is not an admin")
     return member
 
-  async def remove_admin(self, company_id: UUID, owner_id: UUID, user_id: UUID):
+  async def remove_admin(
+    self, 
+    company_id: UUID, 
+    owner_id: UUID, 
+    user_id: UUID
+  ):
     company = await self.company_repo.get_company_by_id(company_id)
     if not company:
       logger.warning(f"Company {company_id} not found (user_id={user_id})")
@@ -40,7 +50,13 @@ class CompanyAdminService:
       raise CompanyMembershipForbidden("User is not an admin")
     await self.member_repo.remove_member(member)
 
-  async def change_member_role(self, company_id: UUID, owner_id: UUID, user_id: UUID, role: CompanyRole) -> CompanyMember:
+  async def change_member_role(
+    self, 
+    company_id: UUID, 
+    owner_id: UUID, 
+    user_id: UUID, 
+    role: CompanyRole
+  ) -> CompanyMember:
     company = await self.company_repo.get_company_by_id(company_id)
     if not company:
       logger.warning(f"Company {company_id} not found (user_id={user_id})")
@@ -55,7 +71,11 @@ class CompanyAdminService:
     logger.info(f"Changed role of user {user_id} in company {company_id} from {member.role} to {role} (owner_id_id={owner_id})")
     return await self.member_repo.set_role(member, role)
 
-  async def get_list_admins(self, company_id: UUID, owner_id: UUID):
+  async def get_list_admins(
+    self, 
+    company_id: UUID, 
+    owner_id: UUID
+  ):
     company = await self.company_repo.get_company_by_id(company_id)
     if not company:
       logger.warning(f"Company {company_id} not found (user_id={owner_id})")

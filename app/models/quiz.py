@@ -17,6 +17,7 @@ class Quiz(Base):
 
   questions = relationship("QuizQuestion", back_populates="quiz", cascade="all, delete-orphan")
   company = relationship("Company", back_populates="quizzes")
+  results = relationship("QuizResult", back_populates="quiz", cascade="all, delete-orphan")
 
 class QuizQuestion(Base):
   __tablename__ = "quiz_questions"
