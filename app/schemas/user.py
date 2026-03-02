@@ -13,8 +13,7 @@ class UserSchema(BaseModel):
   created_at: datetime
   updated_at: datetime
 
-  class Config:
-    from_attributes = True  # Для SQLAlchemy об'єктів
+  model_config = ConfigDict(from_attributes=True)
 
 class SignInRequest(BaseModel):
   """Схема для входу користувача"""
@@ -34,7 +33,7 @@ class UserUpdate(BaseModel):
   model_config = ConfigDict(extra="forbid")
   username: str | None = None
   current_password: str | None = None  # поточний пароль для підтвердження
-  new_password: str | None = None     # новий пароль, який користувач хоче встановити
+  new_password: str | None = None      # новий пароль, який користувач хоче встановити
 
 class UsersListResponse(BaseModel):
   """Відповідь API зі списком користувачів"""
