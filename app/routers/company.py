@@ -1,5 +1,5 @@
 from uuid import UUID
-from fastapi import APIRouter, Depends, Query
+from fastapi import APIRouter, Depends, Query, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.db.postgres import get_db
@@ -27,61 +27,47 @@ def get_company_service(
 @router.get(
   "/",
   response_model=CompaniesListResponse,
-  summary="Get list of companies with pagination"
+  status_code=status.HTTP_200_OK
 )
 async def get_all_companies(
-  limit: int = Query(
-    default=10,
-    ge=1,
-    le=100,
-    description="Number of companies per page"
-  ),
-  offset: int = Query(
-    default=0,
-    ge=0,
-    description="Pagination offset"
-  ),
+  limit: int = Query(default=10, ge=1, le=100),
+  offset: int = Query(default=0, ge=0),
   current_user: UserDetailResponse = Depends(get_current_user),
   service: CompanyService = Depends(get_company_service)
 ):
-  return await service.get_all_companies(
-    limit=limit,
-    offset=offset,
-  )
+  return await service.get_all_companies(limit, offset)
 
 # Отримати компанію по ID
 @router.get(
   "/{company_id}",
   response_model=CompanyDetailResponse,
+  status_code=status.HTTP_200_OK
 )
 async def get_company_by_id(
   company_id: UUID,
   current_user: UserDetailResponse = Depends(get_current_user),
   service: CompanyService = Depends(get_company_service)
 ):
-  # Передаємо current_user у сервіс, щоб він міг визначити, чи є користувач власником компанії і чи можна показувати її дані
-  company = await service.get_company_by_id(company_id, current_user)
-  return company
+  return await service.get_company_by_id(company_id, current_user)
 
 # Створити компанію
 @router.post(
   "/",
   response_model=CompanyDetailResponse,
+  status_code=status.HTTP_201_CREATED
 )
 async def create_company(
   company_data: CompanyCreateRequest,
   current_user: UserDetailResponse = Depends(get_current_user),
   service: CompanyService = Depends(get_company_service)
 ):
-  return await service.create_company(
-    owner=current_user,
-    company_data=company_data
-  )
+  return await service.create_company(current_user, company_data)
 
-# Оновити компанію (тільки owner)
-@router.put(
+# Оновити дані про компанію може тільки власник
+@router.patch(
   "/{company_id}",
-  response_model=CompanyDetailResponse
+  response_model=CompanyDetailResponse,
+  status_code=status.HTTP_200_OK
 )
 async def update_company(
   company_id: UUID,
@@ -89,25 +75,17 @@ async def update_company(
   current_user: UserDetailResponse = Depends(get_current_user),
   service: CompanyService = Depends(get_company_service)
 ):
-  company = await service.get_company_by_id(company_id, current_user)
-  return await service.update_company(
-    company=company,
-    current_user=current_user,
-    update_data=update_data
-)
+  return await service.update_company(company_id, current_user, update_data)
 
-# Видалити компанію (тільки owner)
+# Видалити компанію може тільки власник
 @router.delete(
   "/{company_id}",
+  status_code=status.HTTP_204_NO_CONTENT
 )
 async def delete_company(
   company_id: UUID,
   current_user: UserDetailResponse = Depends(get_current_user),
   service: CompanyService = Depends(get_company_service)
 ):
-  company = await service.get_company_by_id(company_id, current_user)
-  await service.delete_company(
-    company=company,
-    current_user=current_user
-  )
+  await service.delete_company(company_id, current_user)
   return
