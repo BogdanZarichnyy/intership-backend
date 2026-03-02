@@ -13,7 +13,11 @@ class QuizService:
     self.quiz_repo = quiz_repo
     self.member_repo = member_repo
 
-  async def check_owner_or_admin(self, company_id: UUID, user_id: UUID):
+  async def check_owner_or_admin(
+    self, 
+    company_id: UUID, 
+    user_id: UUID
+  ):
     # перевіряємо чи користувач є членом компанії
     member = await self.member_repo.get_member(company_id, user_id)
     if not member:
@@ -31,7 +35,12 @@ class QuizService:
         raise BusinessError("User must be admin or owner to perform this action")
       logger.warning(f"User {user_id} is neither admin nor owner of company {company_id}")
 
-  async def create_quiz(self, company_id: UUID, user_id: UUID, quiz_data: QuizCreateRequest):
+  async def create_quiz(
+    self, 
+    company_id: UUID, 
+    user_id: UUID, 
+    quiz_data: QuizCreateRequest
+  ):
     await self.check_owner_or_admin(company_id, user_id)
     if len(quiz_data.questions) < 2:
       raise BusinessError("Quiz must have at least 2 questions")

@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, Query
+from fastapi import APIRouter, Depends, Query, status
 from uuid import UUID
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -24,7 +24,8 @@ def get_quiz_service(db: AsyncSession = Depends(get_db)) -> QuizService:
 # Створення тесту
 @router.post(
   "/{company_id}", 
-  response_model=QuizSchema
+  response_model=QuizSchema,
+  status_code=status.HTTP_201_CREATED
 )
 async def create_quiz(
   company_id: UUID, 
@@ -38,7 +39,8 @@ async def create_quiz(
 # Список тестів компанії
 @router.get(
   "/{company_id}", 
-  response_model=QuizListResponse
+  response_model=QuizListResponse,
+  status_code=status.HTTP_200_OK
 )
 async def list_quizzes(
   company_id: UUID, 
@@ -53,7 +55,8 @@ async def list_quizzes(
 # Деталі одного тесту
 @router.get(
   "/detail/{quiz_id}", 
-  response_model=QuizSchema
+  response_model=QuizSchema,
+  status_code=status.HTTP_200_OK
 )
 async def get_quiz(
   quiz_id: UUID, 
@@ -63,9 +66,10 @@ async def get_quiz(
   return await service.get_quiz(quiz_id)
 
 # Оновлення тесту
-@router.put(
+@router.patch(
   "/detail/{quiz_id}", 
-  response_model=QuizSchema
+  response_model=QuizSchema,
+  status_code=status.HTTP_200_OK
 )
 async def update_quiz(
   quiz_id: UUID, 
@@ -77,7 +81,8 @@ async def update_quiz(
 
 # Видалення тесту
 @router.delete(
-  "/detail/{quiz_id}"
+  "/detail/{quiz_id}",
+  status_code=status.HTTP_204_NO_CONTENT
 )
 async def delete_quiz(
   quiz_id: UUID, 
@@ -85,4 +90,4 @@ async def delete_quiz(
   service: QuizService = Depends(get_quiz_service)
 ):
   await service.delete_quiz(quiz_id, current_user.id)
-  return {"detail": "Quiz deleted successfully"}
+  return
