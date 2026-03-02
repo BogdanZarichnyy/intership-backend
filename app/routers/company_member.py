@@ -8,12 +8,17 @@ from app.schemas.company_member import CompanyMemberResponse
 from app.services.company_member import CompanyMemberService
 from app.db.postgres import get_db
 from app.repositories.company_member import CompanyMemberRepository
+from app.repositories.company import CompanyRepository
 
 router = APIRouter(tags=["company-members"])
 
 # Dependency
-async def get_service(db: AsyncSession = Depends(get_db)) -> CompanyMemberService:
-  return CompanyMemberService(CompanyMemberRepository(db))
+async def get_service(
+  db: AsyncSession = Depends(get_db)
+) -> CompanyMemberService:
+  member_repo = CompanyMemberRepository(db)
+  company_repo = CompanyRepository(db)
+  return CompanyMemberService(member_repo, company_repo)
 
 # Отримати всіх учасників компанії
 @router.get(
@@ -32,7 +37,7 @@ async def get_members_of_company(
 
 # Власник видаляє користувача
 @router.delete(
-  "/{company_id}/{member_id}",
+  "/{company_id}/remove-member/{member_id}",
   status_code=status.HTTP_204_NO_CONTENT
 )
 async def remove_member_by_company_owner(
@@ -46,13 +51,14 @@ async def remove_member_by_company_owner(
 
 # Користувач сам залишає компанію
 @router.delete(
-  "/leave/{company_id}",
+  "/{company_id}/member-leave/{member_id}",
   status_code=status.HTTP_204_NO_CONTENT
 )
 async def leave_company_by_member(
   company_id: UUID,
+  member_id: UUID,
   current_user: UserDetailResponse = Depends(get_current_user),
   service: CompanyMemberService = Depends(get_service)
 ):
-  await service.leave_company(company_id, current_user)
+  await service.leave_company(company_id, member_id, current_user)
   return

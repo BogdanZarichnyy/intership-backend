@@ -38,6 +38,6 @@ async def get_current_user(
 # CompanyInvitationService dependency
 # =========================
 def get_invitation_service(
-  db: AsyncSession = Depends(get_user_service)
+  db: AsyncSession = Depends(get_db)
 ):
   return CompanyInvitationService(db)
