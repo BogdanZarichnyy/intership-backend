@@ -11,6 +11,8 @@ from app.schemas.user import (
 from app.core.security import hash_password, verify_password
 from app.repositories.user import UserRepository
 from app.core.exceptions import (
+  ForbiddenAction,
+  UserNotFound,
   ExistsEmail,
   ExistsUsername,
   InvalidPassword,
@@ -44,23 +46,30 @@ class UserService:
     user_id: UUID
   ) -> User | None:
     user = await self.repo.get_user_by_id(user_id)
-    if user:
-      logger.info(f"Fetched user id={user_id}")
+    if not user:
+      raise UserNotFound()
+    logger.info(f"Fetched user id={user_id}")
     return user
 
   async def get_user_by_email(
     self,
     email: str
   ) -> User | None:
+    user = await self.repo.get_user_by_email(email)
+    if not user:
+      raise UserNotFound()
     logger.info(f"Fetched user email={email}")
-    return await self.repo.get_user_by_email(email)
+    return user
 
   async def get_user_by_provider_id(
     self,
     provider_id: str
   ) -> User | None:
+    user = await self.repo.get_user_by_provider_id(provider_id)
+    if not user:
+      raise UserNotFound()
     logger.info(f"Fetched user provider_id={provider_id}")
-    return await self.repo.get_user_by_provider_id(provider_id)
+    return user
 
   async def create_new_user(
     self,
@@ -102,13 +111,29 @@ class UserService:
 
   async def update_user_details(
     self,
-    user: User,
-    update_data: UserUpdate
+    user_id: UUID,
+    update_data: UserUpdate,
+    current_user_id: UUID
   ) -> UserDetailResponse:
+    # Переконуємося що користвуач змінює свої дані
+    if user_id != current_user_id:
+      raise ForbiddenAction("You are trying to edit data that is not yours")
+    user = await self.repo.get_user_by_id(user_id)
+    if not user:
+      raise UserNotFound()
+    logger.info(f"Fetched user id={user_id}")
+    # --- Username ---
     if update_data.username is not None:
-      user.username = update_data.username
-    if update_data.new_password:
-      if not update_data.current_password:
+      # якщо username реально змінюється
+      if update_data.username != user.username:
+        existing_user = await self.repo.get_user_by_username(update_data.username)
+        if existing_user:
+          logger.warning(f"Username already exists: {update_data.username}")
+          raise ExistsUsername(update_data.username)
+        user.username = update_data.username
+    # --- Password ---
+    if update_data.new_password is not None:
+      if update_data.current_password is None:
         logger.warning("Current password must be provided")
         raise MissingCurrentPassword()
       if not verify_password(
@@ -117,17 +142,23 @@ class UserService:
       ):
         logger.warning("Current password is incorrect")
         raise InvalidPassword()
-      user.hashed_password = hash_password(
-        update_data.new_password
-      )
+      user.hashed_password = hash_password(update_data.new_password)
     user = await self.repo.update_user_details(user)
     logger.info(f"User updated id={user.id}")
     return UserDetailResponse.model_validate(user)
 
   async def delete_user(
     self,
-    user: User
+    user_id: UUID,
+    current_user_id: UUID
   ) -> None:
+    # Переконуємося що користвуач змінює свої дані
+    if user_id != current_user_id:
+      raise ForbiddenAction("You are trying to edit data that is not yours")
+    user = await self.repo.get_user_by_id(user_id)
+    if not user:
+      raise UserNotFound()
+    logger.info(f"Fetched user id={user_id}")
     await self.repo.delete_user(user)
-    logger.info(f"User deleted id={user.id}")
+    logger.info(f"User deleted id={user_id}")
     return

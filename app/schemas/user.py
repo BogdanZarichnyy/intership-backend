@@ -13,8 +13,7 @@ class UserSchema(BaseModel):
   created_at: datetime
   updated_at: datetime
 
-  class Config:
-    from_attributes = True  # Для SQLAlchemy об'єктів
+  model_config = ConfigDict(from_attributes=True)
 
 class SignInRequest(BaseModel):
   """Схема для входу користувача"""
