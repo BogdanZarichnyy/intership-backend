@@ -4,7 +4,7 @@ class Settings(BaseSettings):
   host: str = "0.0.0.0"
   port: int = 8000
 
-  cors_origins: list[str] = ["http://localhost:3000"]
+  cors_origins: list[str] = ["http://localhost:5173"]
 
   # Start DB
   max_retries: int = 5  # кількість спроб підключення до БД
@@ -24,6 +24,22 @@ class Settings(BaseSettings):
   # Redis
   redis_host: str = "redis"
   redis_port: int = 6379
+
+  # JWT
+  jwt_secret_key: str
+  jwt_algorithm: str = "HS256"
+  access_token_expire_minutes: int = 30  # Час життя access токена в хвилинах
+  refresh_token_expire_days: int = 7  # Час життя refresh токена в днях
+
+  # Auth0
+  auth0_algorithm: str = "RS256" # Auth0 завжди RS256, але його можна змінити на сайті сервісу
+  auth0_domain: str
+  auth0_audience: str
+  auth0_client_id: str
+  auth0_client_secret: str
+  # auth0_secret: str
+  auth0_redirect_uri: str
+  frontend_redirect_url: str
 
   model_config = SettingsConfigDict(
     env_file=".env",

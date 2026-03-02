@@ -7,13 +7,14 @@ from app.core.logger import logger
 
 from app.routers.health import router as healthRouter
 from app.routers.user import router as userRouter
+from app.routers.auth import router as authRouter
 
 from app.middleware.cors import setup_middlewares
 from app.middleware.logger_middleware import RequestLoggingMiddleware
 from app.middleware.exception_handler import (
   http_exception_handler,
   validation_exception_handler,
-  business_error_handler,
+  business_error_handler
 )
 from app.core.exceptions import BusinessError
 from fastapi.exceptions import RequestValidationError
@@ -81,6 +82,7 @@ def create_app() -> FastAPI: # Використовуємо factory pattern, щ�
   # Роутери
   app.include_router(healthRouter)
   app.include_router(userRouter, prefix="/users")
+  app.include_router(authRouter, prefix="/auth")
 
   return app
 
