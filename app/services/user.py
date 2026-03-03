@@ -5,8 +5,7 @@ from app.schemas.user import (
   UserSchema,
   SignUpRequest,
   UserUpdate,
-  UsersListResponse,
-  UserDetailResponse
+  UsersListResponse
 )
 from app.core.security import hash_password, verify_password
 from app.repositories.user import UserRepository
@@ -33,18 +32,12 @@ class UserService:
     users = await self.repo.get_all_user(limit, offset)
     total = await self.repo.count()
     logger.info(f"Fetched users list limit={limit} offset={offset}")
-    return UsersListResponse(
-      users=[
-        UserSchema.model_validate(user)
-        for user in users
-      ],
-      total=total
-    )
+    return UsersListResponse(users=[UserSchema.model_validate(user) for user in users], total=total)
 
   async def get_user_by_id(
     self,
     user_id: UUID
-  ) -> User | None:
+  ) -> User:
     user = await self.repo.get_user_by_id(user_id)
     if not user:
       raise UserNotFound()
@@ -54,7 +47,7 @@ class UserService:
   async def get_user_by_email(
     self,
     email: str
-  ) -> User | None:
+  ) -> User:
     user = await self.repo.get_user_by_email(email)
     if not user:
       raise UserNotFound()
@@ -64,7 +57,7 @@ class UserService:
   async def get_user_by_provider_id(
     self,
     provider_id: str
-  ) -> User | None:
+  ) -> User:
     user = await self.repo.get_user_by_provider_id(provider_id)
     if not user:
       raise UserNotFound()
@@ -74,7 +67,7 @@ class UserService:
   async def create_new_user(
     self,
     user_data: SignUpRequest
-  ) -> UserDetailResponse:
+  ) -> UserSchema:
     # Перевірка email
     existing_user = await self.repo.get_user_by_email(user_data.email)
     if existing_user:
@@ -107,14 +100,14 @@ class UserService:
         raise ExistsEmail(user_data.email)
       raise
     logger.info(f"User created id={user.id}")
-    return UserDetailResponse.model_validate(user)
+    return UserSchema.model_validate(user)
 
   async def update_user_details(
     self,
     user_id: UUID,
     update_data: UserUpdate,
     current_user_id: UUID
-  ) -> UserDetailResponse:
+  ) -> UserSchema:
     # Переконуємося що користвуач змінює свої дані
     if user_id != current_user_id:
       raise ForbiddenAction("You are trying to edit data that is not yours")
@@ -145,15 +138,15 @@ class UserService:
       user.hashed_password = hash_password(update_data.new_password)
     user = await self.repo.update_user_details(user)
     logger.info(f"User updated id={user.id}")
-    return UserDetailResponse.model_validate(user)
+    return UserSchema.model_validate(user)
 
   async def delete_user(
     self,
     user_id: UUID,
-    current_user_id: UUID
+    current_user: User
   ) -> None:
     # Переконуємося що користвуач змінює свої дані
-    if user_id != current_user_id:
+    if user_id != current_user.id:
       raise ForbiddenAction("You are trying to edit data that is not yours")
     user = await self.repo.get_user_by_id(user_id)
     if not user:

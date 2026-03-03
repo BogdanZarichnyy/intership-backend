@@ -2,7 +2,7 @@ import uuid
 from sqlalchemy import String, Text, DateTime, func, Boolean, ForeignKey
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from sqlalchemy.dialects.postgresql import UUID
-
+from datetime import datetime
 from app.db.postgres import Base
 
 class Company(Base):
@@ -40,13 +40,13 @@ class Company(Base):
     index=True
   )
 
-  created_at: Mapped[DateTime] = mapped_column(
+  created_at: Mapped[datetime] = mapped_column(
     DateTime,
     server_default=func.now()
   )
 
-  updated_at: Mapped[DateTime] = mapped_column(
-    DateTime,
+  updated_at: Mapped[datetime] = mapped_column(
+      DateTime,
     server_default=func.now(),
     onupdate=func.now()
   )
