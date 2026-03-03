@@ -59,7 +59,7 @@ class CompanyMemberRepository:
   ):
     query = select(CompanyMember).where(CompanyMember.company_id == company_id)
     if role is not None:
-      query = query.where(CompanyMember.role == role)
+      query = query.where(CompanyMember.role == role.value)
     query = query.limit(limit).offset(offset)
     result = await self.db.execute(query)
     return result.scalars().all()
@@ -69,8 +69,8 @@ class CompanyMemberRepository:
     member: CompanyMember, 
     role: CompanyRole
   ) -> CompanyMember:
-    member.role = role             # <- змінюємо роль у наявного користувача
-    self.db.add(member)            # <- додаємо об’єкт у сесію (для SQLAlchemy це потрібно навіть для оновлень)
-    await self.db.commit()         # <- фіксуємо зміни в базі
-    await self.db.refresh(member)  # <- отримуємо оновлені дані з бази
-    return member                  # <- повертаємо об’єкт для Pydantic
+    member.role = role
+    self.db.add(member)
+    await self.db.commit()
+    await self.db.refresh(member)
+    return member

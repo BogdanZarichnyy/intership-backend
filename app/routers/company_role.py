@@ -1,20 +1,13 @@
 from uuid import UUID
 from fastapi import APIRouter, Depends, status
-from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.schemas.company_member import CompanyMemberResponse, CompanyAdminsResponse
-from app.core.dependencies import get_current_user, get_db
+from app.core.dependencies import get_current_user, get_company_admin_service
 from app.services.company_role import CompanyAdminService
 from app.models.company_member import CompanyRole
 from app.models.user import User
 
 router = APIRouter(tags=["company-role"])
-
-# Dependency для сервісу
-async def get_admin_service(
-  db: AsyncSession = Depends(get_db)
-) -> CompanyAdminService:
-  return CompanyAdminService(db)
 
 # Отримати список адміністраторів компанії
 @router.get(
@@ -25,7 +18,7 @@ async def get_admin_service(
 async def list_admins(
   company_id: UUID,
   current_user: User = Depends(get_current_user),
-  service: CompanyAdminService = Depends(get_admin_service)
+  service: CompanyAdminService = Depends(get_company_admin_service)
 ):
   admins = await service.get_list_admins(company_id, current_user)
   return CompanyAdminsResponse(admins=admins)
@@ -40,7 +33,7 @@ async def set_role_admin(
   company_id: UUID,
   user_id: UUID,
   current_user: User = Depends(get_current_user),
-  service: CompanyAdminService = Depends(get_admin_service)
+  service: CompanyAdminService = Depends(get_company_admin_service)
 ):
   return await service.change_member_role(company_id, user_id, current_user, role=CompanyRole.admin)
 
@@ -54,7 +47,7 @@ async def set_role_member(
   company_id: UUID,
   user_id: UUID,
   current_user: User = Depends(get_current_user),
-  service: CompanyAdminService = Depends(get_admin_service)
+  service: CompanyAdminService = Depends(get_company_admin_service)
 ):
   return await service.change_member_role(company_id, user_id, current_user, role=CompanyRole.member)
 
@@ -67,7 +60,6 @@ async def remove_admin(
   company_id: UUID,
   user_id: UUID,
   current_user: User = Depends(get_current_user),
-  service: CompanyAdminService = Depends(get_admin_service)
+  service: CompanyAdminService = Depends(get_company_admin_service)
 ):
   await service.remove_admin(company_id, user_id, current_user)
-  return

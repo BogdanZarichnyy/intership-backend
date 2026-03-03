@@ -3,7 +3,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.schemas.company_invitation import InvitationResponse
 from app.models.company import Company
 from app.models.user import User
-from app.models.company_invitation import InvitationStatus, CompanyInvitation
+from app.models.company_invitation import InvitationStatus
 from app.repositories.company_invitation import CompanyInvitationRepository
 from app.repositories.company_member import CompanyMemberRepository
 from app.repositories.company import CompanyRepository
@@ -35,7 +35,7 @@ class CompanyInvitationService:
     company: Company = await self.company_repo.get_company_by_id(company_id)
     if not company:
       logger.warning(f"Company not found id={company_id}")
-      raise CompanyNotFound("Company not found")
+      raise CompanyNotFound()
     # Перевірка - хто із авторизованих користувачів ініціює приєднання до компанії
     if current_user.id == company.owner_id:
       # Якщо ініціатор власник компанії (owner company), тоді він запрошує користувача → invite
@@ -94,10 +94,10 @@ class CompanyInvitationService:
     company = await self.company_repo.get_company_by_id(company_id)
     if not company:
       logger.warning(f"Company not found id={company_id}")
-      raise CompanyNotFound("Company not found")
+      raise CompanyNotFound()
     if company.owner_id != current_user.id:
       logger.warning(f"User is not owner of company id={current_user.id}")
-      raise CompanyOwnerOnly("Only owners can see invited users")
+      raise CompanyOwnerOnly()
     return await self.invitation_repo.get_company_invited_users(company_id, current_user.id, limit, offset)
 
   # ==========================================================================
@@ -113,10 +113,10 @@ class CompanyInvitationService:
     company = await self.company_repo.get_company_by_id(company_id)
     if not company:
       logger.warning(f"Company not found id={company_id}")
-      raise CompanyNotFound("Company not found")
+      raise CompanyNotFound()
     if company.owner_id != current_user.id:
       logger.warning(f"User is not owner of company id={current_user.id}")
-      raise CompanyOwnerOnly("Only owners can see pending membership requests")
+      raise CompanyOwnerOnly()
     return await self.invitation_repo.get_company_membership_requests(company_id, current_user.id, limit, offset)
 
   # ===============================================================
@@ -137,7 +137,7 @@ class CompanyInvitationService:
     company = await self.company_repo.get_company_by_id(invitation.company_id)
     if not company:
       logger.warning(f"Company not found id={invitation.company_id}")
-      raise CompanyNotFound("Company not found")
+      raise CompanyNotFound()
     # Логіка підтвердження:
     # 1) Власник компанії
     if current_user.id == company.owner_id:
@@ -197,7 +197,7 @@ class CompanyInvitationService:
     company = await self.company_repo.get_company_by_id(invitation.company_id)
     if not company:
       logger.warning(f"Company not found id={invitation.company_id}")
-      raise CompanyNotFound("Company not found")
+      raise CompanyNotFound()
     # Відхиляти може тільки власник компанії
     if company.owner_id != current_user.id:
       logger.warning("Only owner can decline invitations or requests")
@@ -231,7 +231,7 @@ class CompanyInvitationService:
     company = await self.company_repo.get_company_by_id(invitation.company_id)
     if not company:
       logger.warning(f"Company not found id={invitation.company_id}")
-      raise CompanyNotFound("Company not found")
+      raise CompanyNotFound()
     # Скасувати може тільки користувач, який подав заявку
     if invitation.invited_user_id != current_user.id:
       logger.warning("Only the requesting user can cancel their invitation")

@@ -1,5 +1,5 @@
 from uuid import UUID
-from pydantic import BaseModel, EmailStr, Field, ConfigDict
+from pydantic import BaseModel, EmailStr, ConfigDict
 from datetime import datetime
 
 class UserSchema(BaseModel):
@@ -23,7 +23,7 @@ class SignInRequest(BaseModel):
 class SignUpRequest(BaseModel):
   """Схема для реєстрації користувача"""
   email: EmailStr
-  username: str = Field(min_length=3, max_length=100)
+  username: str
   password: str | None = None  # тепер дозволяємо None для авторизованих користувачів через сервіс auth0
   provider: str | None = None
   provider_id: str | None = None
@@ -39,16 +39,3 @@ class UsersListResponse(BaseModel):
   """Відповідь API зі списком користувачів"""
   users: list[UserSchema]
   total: int
-
-class UserDetailResponse(UserSchema):
-  """Відповідь API з детальною інформацією про користувача з ролями та компаніями"""
-  # Список компаній, де користувач є власником
-  owned_company_ids: list[UUID] = []
-  # Список компаній, де користувач є учасником
-  member_company_ids: list[UUID] = []
-
-  def is_owner_of_company(self, company_id: UUID) -> bool:
-    return company_id in self.owned_company_ids
-
-  def is_member_of_company(self, company_id: UUID) -> bool:
-    return company_id in self.member_company_ids
