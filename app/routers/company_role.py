@@ -27,14 +27,14 @@ async def list_admins(
   current_user: User = Depends(get_current_user),
   service: CompanyAdminService = Depends(get_admin_service)
 ):
-  admins = await service.get_list_admins(company_id, current_user.id)
-  return CompanyAdminsResponse(admins)
+  admins = await service.get_list_admins(company_id, current_user)
+  return CompanyAdminsResponse(admins=admins)
 
 # Призначити користувача адміністратором
-@router.post(
+@router.patch(
   "/{company_id}/admin/{user_id}",
   response_model=CompanyMemberResponse,
-  status_code=status.HTTP_201_CREATED
+  status_code=status.HTTP_200_OK
 )
 async def set_role_admin(
   company_id: UUID,
@@ -42,13 +42,13 @@ async def set_role_admin(
   current_user: User = Depends(get_current_user),
   service: CompanyAdminService = Depends(get_admin_service)
 ):
-  return await service.change_member_role(company_id, current_user.id, user_id, role=CompanyRole.admin)
+  return await service.change_member_role(company_id, user_id, current_user, role=CompanyRole.admin)
 
 # Призначити користувача членом компанії
-@router.post(
+@router.patch(
   "/{company_id}/member/{user_id}",
   response_model=CompanyMemberResponse,
-  status_code=status.HTTP_201_CREATED
+  status_code=status.HTTP_200_OK
 )
 async def set_role_member(
   company_id: UUID,
@@ -56,9 +56,9 @@ async def set_role_member(
   current_user: User = Depends(get_current_user),
   service: CompanyAdminService = Depends(get_admin_service)
 ):
-  return await service.change_member_role(company_id, current_user.id, user_id, role=CompanyRole.member)
+  return await service.change_member_role(company_id, user_id, current_user, role=CompanyRole.member)
 
-# Вилучити адміністратора/члена компанії
+# Вилучити адміністратора з компанії
 @router.delete(
   "/{company_id}/remove/{user_id}",
   status_code=status.HTTP_204_NO_CONTENT
@@ -69,5 +69,5 @@ async def remove_admin(
   current_user: User = Depends(get_current_user),
   service: CompanyAdminService = Depends(get_admin_service)
 ):
-  await service.remove_admin(company_id, current_user.id, user_id)
+  await service.remove_admin(company_id, user_id, current_user)
   return

@@ -1,6 +1,8 @@
 from passlib.context import CryptContext
 from datetime import datetime, timedelta, timezone
-from jose import jwt, JWTError
+from jose import jwt
+from jose.exceptions import ExpiredSignatureError, JWTError
+from app.core.exceptions import InvalidToken
 from app.config import settings
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
@@ -49,5 +51,7 @@ def decode_token(token: str) -> dict:
       algorithms=[settings.jwt_algorithm]
     )
     return payload
+  except ExpiredSignatureError:
+    raise InvalidToken("Token has expired")
   except JWTError:
-    raise ValueError("Invalid token")
+    raise InvalidToken("Invalid token")

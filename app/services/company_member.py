@@ -1,15 +1,28 @@
 from uuid import UUID
+
 from app.repositories.company_member import CompanyMemberRepository
+from app.repositories.company import CompanyRepository
+
 from app.schemas.user import UserDetailResponse
-from app.core.exceptions import CompanyOwnerOnly, CompanyMembershipForbidden
 from app.schemas.company_member import CompanyMemberResponse
+
+from app.core.exceptions import (
+  CompanyOwnerOnly,
+  CompanyMembershipForbidden,
+  CompanyNotFound
+)
 
 from app.core.logger import logger
 
 class CompanyMemberService:
 
-  def __init__(self, repository: CompanyMemberRepository):
-    self.repository = repository
+  def __init__(
+    self,
+    member_repo: CompanyMemberRepository,
+    company_repo: CompanyRepository
+  ):
+    self.member_repo = member_repo
+    self.company_repo = company_repo
 
   # ===================================================================================
   # Отримати всіх учасників компанії
@@ -20,7 +33,7 @@ class CompanyMemberService:
     limit: int = 100, 
     offset: int = 0
   ) -> list[CompanyMemberResponse]:
-    members = await self.repository.get_all_members_for_current_company(company_id, limit, offset)
+    members = await self.member_repo.get_all_members_for_current_company(company_id, limit, offset)
     logger.info(f"Fetched members of company {company_id}, limit={limit}, offset={offset}")
     return [CompanyMemberResponse.model_validate(member) for member in members]
 
@@ -28,17 +41,28 @@ class CompanyMemberService:
   # Власник компанії видаляє члена
   # ===================================================================================
   async def remove_member(
-    self, 
-    company_id: UUID, 
-    member_id: UUID, 
+    self,
+    company_id: UUID,
+    member_id: UUID,
     current_user: UserDetailResponse
   ):
-    # Перевірка, чи current_user є власником компанії
-    if not current_user.is_owner_of_company(company_id):
-      logger.warning(f"User is not owner of company {company_id}")
+    # Перевіряємо що компанія існує
+    company = await self.company_repo.get_company_by_id(company_id)
+    if not company:
+      logger.warning(f"Company not found id={company_id}")
+      raise CompanyNotFound("Company not found")
+    # Перевіряємо що поточний користувач є власником цієї компанії
+    if company.owner_id != current_user.id:
+      logger.warning(f"User {current_user.id} is not owner of company {company_id}")
       raise CompanyOwnerOnly("Only owners can remove members")
-    await self.repository.remove_member(company_id, member_id)
-    logger.info(f"Owner removed from company id={company_id} member {member_id}")
+    # Перевіряємо що користувач дійсно є членом цієї компанії
+    member = await self.member_repo.get_member_of_company(company_id, member_id)
+    if not member:
+      logger.warning(f"User {member_id} is not a member of company {company_id}")
+      raise CompanyMembershipForbidden("User is not a member of this company")
+    # Видаляємо
+    await self.member_repo.remove_member(company_id, member_id)
+    logger.info(f"Owner {current_user.id} removed member {member_id} from company {company_id}")
     return
 
   # ===================================================================================
@@ -46,13 +70,29 @@ class CompanyMemberService:
   # ===================================================================================
   async def leave_company(
     self, 
-    company_id: UUID, 
+    company_id: UUID,
+    member_id: UUID,
     current_user: UserDetailResponse
   ):
-    # Перевірка, що користувач видаляє тільки себе
-    if not current_user.is_member_of_company(company_id):
-      logger.warning(f"User is not member of company {company_id}")
-      raise CompanyMembershipForbidden("You can only leave your own company membership")
-    await self.repository.remove_member(company_id, current_user.id)
-    logger.info(f"Member leave company {company_id}")
+    # Перевіряємо що компанія існує
+    company = await self.company_repo.get_company_by_id(company_id)
+    if not company:
+      logger.warning(f"Company not found id={company_id}")
+      raise CompanyNotFound("Company not found")
+    # Власник не може залишити компанію
+    if company.owner_id == current_user.id:
+      logger.warning("Owner cannot leave company without ownership transfer")
+      raise CompanyMembershipForbidden("Owner cannot leave their own company")
+    # Користувач може видаляти лише самого себе
+    if current_user.id != member_id:
+      logger.warning(f"User {current_user.id} tried to leave company {company_id} for another user {member_id}")
+      raise CompanyMembershipForbidden("You can only leave company for yourself")
+    # Перевірка що користувач є членом компанії
+    member = await self.member_repo.get_member_of_company(company_id, member_id)
+    if not member:
+      logger.warning(f"User {member_id} is not a member of company {company_id}")
+      raise CompanyMembershipForbidden("You are not a member of this company")
+    # Видаляємо тільки самого себе
+    await self.member_repo.remove_member(company_id, member_id)
+    logger.info(f"User {member_id} left company {company_id}")
     return
