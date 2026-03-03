@@ -11,11 +11,11 @@ class Quiz(Base):
   company_id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), ForeignKey("companies.id", ondelete="CASCADE"), nullable=False, index=True)
   title: Mapped[str] = mapped_column(String(255), nullable=False)
   description: Mapped[str | None] = mapped_column(Text, nullable=True)
-  participation_count: Mapped[int] = mapped_column(default=0)  # частота участі всіх користувачів
+  participation_count: Mapped[int] = mapped_column(default=0, nullable=False)  # частота участі всіх користувачів
   created_at: Mapped[DateTime] = mapped_column(DateTime, server_default=func.now())
   updated_at: Mapped[DateTime] = mapped_column(DateTime, server_default=func.now(), onupdate=func.now())
 
-  questions = relationship("QuizQuestion", back_populates="quiz", cascade="all, delete-orphan")
+  questions = relationship("QuizQuestion", back_populates="quiz", cascade="all, delete-orphan", lazy="selectin")
   company = relationship("Company", back_populates="quizzes")
   results = relationship("QuizResult", back_populates="quiz", cascade="all, delete-orphan")
 
@@ -30,7 +30,7 @@ class QuizQuestion(Base):
   updated_at: Mapped[DateTime] = mapped_column(DateTime, server_default=func.now(), onupdate=func.now())
 
   quiz = relationship("Quiz", back_populates="questions")
-  options = relationship("QuizAnswerOption", back_populates="question", cascade="all, delete-orphan")
+  options = relationship("QuizAnswerOption", back_populates="question", cascade="all, delete-orphan", lazy="selectin")
 
 class QuizAnswerOption(Base):
   __tablename__ = "quiz_answer_options"

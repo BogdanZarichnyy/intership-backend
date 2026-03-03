@@ -20,7 +20,7 @@ async def invite_user(
   service: CompanyInvitationService = Depends(get_invitation_service),
   current_user=Depends(get_current_user)
 ):
-  return await service.company_join_initialization(company_id, current_user, user_id)
+  return await service.company_join_initialization(company_id, user_id, current_user)
 
 # 1 user requests
 @router.get(

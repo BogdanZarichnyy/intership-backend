@@ -4,7 +4,13 @@ from fastapi.exceptions import RequestValidationError
 from starlette.exceptions import HTTPException as StarletteHTTPException
 
 from app.core.logger import logger
-from app.core.exceptions import BusinessError, UserNotFound, ForbiddenAction
+from app.core.exceptions import (
+  BusinessError,
+  UserNotFound,
+  ForbiddenAction,
+  InvalidToken,
+  InvalidCredentials,
+)
 
 # Обробка HTTPException
 async def http_exception_handler(request: Request, exc: StarletteHTTPException):
@@ -31,6 +37,8 @@ async def business_error_handler(request: Request, exc: BusinessError):
     status_code = 404
   elif isinstance(exc, ForbiddenAction):
     status_code = 403
+  elif isinstance(exc, (InvalidToken, InvalidCredentials)):
+    status_code = 401
   else:
     status_code = 400
 
