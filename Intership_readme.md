@@ -221,11 +221,3 @@ http://localhost:8000/docs
   source venv/Scripts/activate
   python -m app.main
   ```
-
-## Регулярка для VSCode для пошуку і заміни мусору на прикладі логера
-  ``` поле "search" vscode [Use Regular Expression]
-  logger\.bind\((.|\n)*?\)\.
-  ```
-  ```полу "replace" замінює на
-  logger.
-  ```

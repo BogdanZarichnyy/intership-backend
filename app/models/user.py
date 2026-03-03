@@ -1,5 +1,5 @@
 import uuid
-from sqlalchemy import String, Boolean, DateTime, func, text
+from sqlalchemy import String, Boolean, DateTime, func, UniqueConstraint
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from sqlalchemy.dialects.postgresql import UUID
 
@@ -7,13 +7,11 @@ from app.db.postgres import Base
 
 class User(Base):
   __tablename__ = "users"
-
-  id: Mapped[uuid.UUID] = mapped_column(
-    UUID(as_uuid=True),
-    primary_key=True,
-    default=uuid.uuid4,
-    index=True,
+  __table_args__ = (
+    UniqueConstraint("provider", "provider_id", name="uq_provider_provider_id"),
   )
+
+  id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4, index=True)
   email: Mapped[str] = mapped_column(String(255), unique=True, nullable=False, index=True)
   username: Mapped[str] = mapped_column(String(100), unique=True, nullable=False)
   hashed_password: Mapped[str | None] = mapped_column(String(255), nullable=True)

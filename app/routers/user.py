@@ -1,34 +1,25 @@
 from uuid import UUID
 from fastapi import APIRouter, Depends, Query, status
-from sqlalchemy.ext.asyncio import AsyncSession
+from app.core.dependencies import get_current_user, get_user_service
 from app.schemas.user import (
+  UserSchema,
   SignUpRequest,
-  UserUpdate,
   UsersListResponse,
-  UserDetailResponse
+  UserUpdate
 )
-from app.db.postgres import get_db
 from app.services.user import UserService
-from app.core.dependencies import get_current_user
-from app.repositories.user import UserRepository
-
-__all__ = ["UserService"] # Для тестування
+from app.models.user import User
 
 router = APIRouter(tags=["users"])
 
-def get_user_service(
-  db: AsyncSession = Depends(get_db)
-) -> UserService:
-  return UserService(UserRepository(db))
-
 @router.get(
   "/me",
-  response_model=UserDetailResponse,
+  response_model=UserSchema,
   status_code=status.HTTP_200_OK
 )
 async def get_me(
-    current_user: UserDetailResponse = Depends(get_current_user)  # тільки авторизовані користувачі можуть здійснювати операцію
-  ):
+  current_user: User = Depends(get_current_user)
+):
   """Повертає дані поточного користувача на основі access token."""
   return current_user
 
@@ -40,26 +31,26 @@ async def get_me(
 async def get_all_users(
   limit: int = Query(10, ge=1, le=100),
   offset: int = Query(0, ge=0),
-  current_user: UserDetailResponse = Depends(get_current_user),  # тільки авторизовані користувачі можуть здійснювати операцію
+  current_user: User = Depends(get_current_user),
   service: UserService = Depends(get_user_service)
 ):
   return await service.get_all_users(limit, offset)
 
 @router.get(
   "/{user_id}",
-  response_model=UserDetailResponse,
+  response_model=UserSchema,
   status_code=status.HTTP_200_OK
 )
 async def get_user_by_id(
   user_id: UUID,
-  current_user: UserDetailResponse = Depends(get_current_user),  # тільки авторизовані користувачі можуть здійснювати операцію
+  current_user: User = Depends(get_current_user),
   service: UserService = Depends(get_user_service)
 ):
   return await service.get_user_by_id(user_id)
 
 @router.post(
   "/",
-  response_model=UserDetailResponse,
+  response_model=UserSchema,
   status_code=status.HTTP_201_CREATED
 )
 async def create_new_user(
@@ -70,16 +61,16 @@ async def create_new_user(
 
 @router.patch(
   "/{user_id}",
-  response_model=UserDetailResponse,
+  response_model=UserSchema,
   status_code=status.HTTP_200_OK
 )
 async def update_user(
   user_id: UUID,
   update_data: UserUpdate,
-  current_user: UserDetailResponse = Depends(get_current_user),  # тільки авторизовані користувачі можуть здійснювати операцію
+  current_user: User = Depends(get_current_user),
   service: UserService = Depends(get_user_service)
 ):
-  return await service.update_user_details(user_id, update_data, current_user)
+  return await service.update_user_details(user_id, update_data, current_user.id)
 
 @router.delete(
   "/{user_id}",
@@ -87,8 +78,7 @@ async def update_user(
 )
 async def delete_user(
   user_id: UUID,
-  current_user: UserDetailResponse = Depends(get_current_user),  # тільки авторизовані користувачі можуть здійснювати операцію
+  current_user: User = Depends(get_current_user),
   service: UserService = Depends(get_user_service)
 ):
   await service.delete_user(user_id, current_user)
-  return
