@@ -1,17 +1,13 @@
 from uuid import UUID
-
 from app.repositories.company_member import CompanyMemberRepository
 from app.repositories.company import CompanyRepository
-
-from app.schemas.user import UserDetailResponse
+from app.models.user import User
 from app.schemas.company_member import CompanyMemberResponse
-
 from app.core.exceptions import (
   CompanyOwnerOnly,
   CompanyMembershipForbidden,
   CompanyNotFound
 )
-
 from app.core.logger import logger
 
 class CompanyMemberService:
@@ -44,13 +40,13 @@ class CompanyMemberService:
     self,
     company_id: UUID,
     member_id: UUID,
-    current_user: UserDetailResponse
-  ):
+    current_user: User
+  ) -> None:
     # Перевіряємо що компанія існує
     company = await self.company_repo.get_company_by_id(company_id)
     if not company:
       logger.warning(f"Company not found id={company_id}")
-      raise CompanyNotFound("Company not found")
+      raise CompanyNotFound()
     # Перевіряємо що поточний користувач є власником цієї компанії
     if company.owner_id != current_user.id:
       logger.warning(f"User {current_user.id} is not owner of company {company_id}")
@@ -63,7 +59,6 @@ class CompanyMemberService:
     # Видаляємо
     await self.member_repo.remove_member(company_id, member_id)
     logger.info(f"Owner {current_user.id} removed member {member_id} from company {company_id}")
-    return
 
   # ===================================================================================
   # Член компанії сам залишає компанію
@@ -72,13 +67,13 @@ class CompanyMemberService:
     self, 
     company_id: UUID,
     member_id: UUID,
-    current_user: UserDetailResponse
-  ):
+    current_user: User
+  ) -> None:
     # Перевіряємо що компанія існує
     company = await self.company_repo.get_company_by_id(company_id)
     if not company:
       logger.warning(f"Company not found id={company_id}")
-      raise CompanyNotFound("Company not found")
+      raise CompanyNotFound()
     # Власник не може залишити компанію
     if company.owner_id == current_user.id:
       logger.warning("Owner cannot leave company without ownership transfer")
@@ -95,4 +90,3 @@ class CompanyMemberService:
     # Видаляємо тільки самого себе
     await self.member_repo.remove_member(company_id, member_id)
     logger.info(f"User {member_id} left company {company_id}")
-    return
