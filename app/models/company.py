@@ -1,8 +1,8 @@
 import uuid
-from sqlalchemy import String, Text, DateTime, Boolean, func, ForeignKey
+from sqlalchemy import String, Text, DateTime, func, Boolean, ForeignKey
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from sqlalchemy.dialects.postgresql import UUID
-
+from datetime import datetime
 from app.db.postgres import Base
 
 class Company(Base):
@@ -13,9 +13,11 @@ class Company(Base):
   name: Mapped[str] = mapped_column(String(255), nullable=False, index=True)
   description: Mapped[str | None] = mapped_column(Text, nullable=True)
   is_visible: Mapped[bool] = mapped_column(Boolean, nullable=False, default=True, index=True)
-  created_at: Mapped[DateTime] = mapped_column(DateTime, server_default=func.now())
-  updated_at: Mapped[DateTime] = mapped_column(DateTime, server_default=func.now(), onupdate=func.now())
+  created_at: Mapped[datetime] = mapped_column(DateTime, server_default=func.now())
+  updated_at: Mapped[datetime] = mapped_column(DateTime, server_default=func.now(), onupdate=func.now())
 
   owner = relationship("User", back_populates="companies")
   members = relationship("CompanyMember", back_populates="company", cascade="all, delete-orphan")
   invitations = relationship("CompanyInvitation", back_populates="company", cascade="all, delete-orphan")
+  quizzes = relationship("Quiz", back_populates="company", cascade="all, delete-orphan")
+  quiz_workflow = relationship("QuizWorkflow", back_populates="company", cascade="all, delete-orphan")

@@ -1,6 +1,6 @@
 {
   "info": {
-    "_postman_id": "99e5a938-96ee-4e7f-9308-fc0bedb7a464",
+    "_postman_id": "41744ba0-1277-47f3-a7e0-962226006d27",
     "name": "Intership Backend (Python)",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
     "_exporter_id": "24134261"
@@ -10,10 +10,17 @@
       "name": "User",
       "item": [
         {
-          "name": "All users",
+          "name": "All Users",
           "request": {
             "auth": {
-              "type": "noauth"
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{jwt_token}}",
+                  "type": "string"
+                }
+              ]
             },
             "method": "GET",
             "header": [],
@@ -42,7 +49,7 @@
           "response": []
         },
         {
-          "name": "User Registration - Local",
+          "name": "User Registration - Local Provider",
           "request": {
             "auth": {
               "type": "noauth"
@@ -73,7 +80,7 @@
           "response": []
         },
         {
-          "name": "Current user",
+          "name": "Current User",
           "request": {
             "auth": {
               "type": "bearer",
@@ -133,7 +140,7 @@
           "response": []
         },
         {
-          "name": "User Edit Details",
+          "name": "Update User Details",
           "request": {
             "auth": {
               "type": "bearer",
@@ -145,11 +152,11 @@
                 }
               ]
             },
-            "method": "PUT",
+            "method": "PATCH",
             "header": [],
             "body": {
               "mode": "raw",
-              "raw": "{\r\n    \"email\": \"test@test.email\",\r\n    \"username\": \"Test\",\r\n    \"current_password\": \"1234\",\r\n    \"new_password\": \"123\"\r\n}",
+              "raw": "{\r\n    \"username\": \"Test\",\r\n    \"current_password\": \"123\",\r\n    \"new_password\": \"1234\"\r\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -157,7 +164,7 @@
               }
             },
             "url": {
-              "raw": "http://localhost:8000/users/f67c47da-1f1e-4b07-a781-a0f1b362bfcb",
+              "raw": "http://localhost:8000/users/55eda0fd-a826-49b2-ad46-e4bd95fe099b",
               "protocol": "http",
               "host": [
                 "localhost"
@@ -165,7 +172,7 @@
               "port": "8000",
               "path": [
                 "users",
-                "f67c47da-1f1e-4b07-a781-a0f1b362bfcb"
+                "55eda0fd-a826-49b2-ad46-e4bd95fe099b"
               ]
             }
           },
@@ -207,7 +214,101 @@
       "name": "Authorization",
       "item": [
         {
-          "name": "User registration - auth0",
+          "name": "User Authorization on Auth0 Service - get id_token",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  ""
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "// Зберігаємо токени після успішного логіну\r",
+                  "if (pm.response.code === 200) {\r",
+                  "    const jsonData = pm.response.json();\r",
+                  "    pm.collectionVariables.set(\"auth0_access_token\", jsonData.auth0_access_token);\r",
+                  "    pm.collectionVariables.set(\"auth0_id_token\", jsonData.auth0_id_token);\r",
+                  "}"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "formdata",
+              "formdata": []
+            },
+            "url": {
+              "raw": "https://dev-ja1yqcpfw2odtfhp.eu.auth0.com/oauth/token",
+              "protocol": "https",
+              "host": [
+                "dev-ja1yqcpfw2odtfhp",
+                "eu",
+                "auth0",
+                "com"
+              ],
+              "path": [
+                "oauth",
+                "token"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "User Authorization with Auth0 id_token on callback",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "// зберігаємо токен після успішного логіну\r",
+                  "if (pm.response.code === 200) {\r",
+                  "    const jsonData = pm.response.json();\r",
+                  "    pm.collectionVariables.set(\"jwt_token\", jsonData.access_token);\r",
+                  "    pm.collectionVariables.set(\"refresh_token\", jsonData.refresh_token);\r",
+                  "    console.log(\"Token updated:\", jsonData.access_token);\r",
+                  "    console.log(\"Refresh Token updated:\", jsonData.refresh_token);\r",
+                  "}"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            },
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  "// Зберігаємо токени, які повернув сервіс auth0\r",
+                  "//if (pm.response.code === 200) {\r",
+                  "//    const data = pm.response.json();\r",
+                  "//    pm.collectionVariables.get(\"auth0_access_token\", data.auth0_access_token);\r",
+                  "//    pm.collectionVariables.get(\"auth0_id_token\", data.auth0_id_token);\r",
+                  "//}"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
           "request": {
             "auth": {
               "type": "noauth"
@@ -216,7 +317,7 @@
             "header": [],
             "body": {
               "mode": "raw",
-              "raw": "{\r\n    \"access_token\": \"eyJhbGciOiJkaXIiLCJlbmMiOiJBMjU2R0NNIiwiaXNzIjoiaHR0cHM6Ly9kZXYtamExeXFjcGZ3Mm9kdGZocC5ldS5hdXRoMC5jb20vIn0..SmYLep55jfPYJocs._qUufoUx16GzkboI8v_j2mZGzcBz6JBt0nxuKM-IuyvjnRDVzciXcLH2QQdZXPyQsTxma3wJgK6PpH4sPPCf486v-wQCrZVqz7keSyRvOfHTEF4DrUbpDgueAmltcqfqiHym7dF3SzupIxIe4JrwQE1uxoqQWiVfDwzIcpBU-a_17S8K-e8x5BuXIvvD61zER87KpqwWrMZDomrhONP8bnHnrVCFYagzgOz-FsOLjyPRX5AA-X1ZkgzAalf80oBkp-_sPd4pEQpek-I-2tPaCzp2xN5salqMK7rbuDb_X5q2xOYvLjSRjqbTrn-7vrBXaF3RTNZBuh-PLIymRViU1GXPkxtkW8g.Y53JLBnTc-JVcsx1rQjQoA\",\r\n    \"id_token\": \"eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6IlNGWkpLNHVsMHI3cDBCdG9TelVIMyJ9.eyJnaXZlbl9uYW1lIjoiMSIsImZhbWlseV9uYW1lIjoiMSIsIm5pY2tuYW1lIjoia3VydGthbmF2YXRpIiwibmFtZSI6IjEgMSIsInBpY3R1cmUiOiJodHRwczovL2xoMy5nb29nbGV1c2VyY29udGVudC5jb20vYS9BQ2c4b2NLMWViZWdIUUlLNDZxN3J4YW1iUlB0OG1hMmFuUGtnbjBwRFNBSFo1TTBBZWdQT1E9czk2LWMiLCJ1cGRhdGVkX2F0IjoiMjAyNi0wMi0xOFQyMjo0MzoxMS4wODlaIiwiZW1haWwiOiJrdXJ0a2FuYXZhdGlAZ21haWwuY29tIiwiZW1haWxfdmVyaWZpZWQiOnRydWUsImlzcyI6Imh0dHBzOi8vZGV2LWphMXlxY3BmdzJvZHRmaHAuZXUuYXV0aDAuY29tLyIsImF1ZCI6InBER3dvaEVNbTFReVloMXpKZUdqNk1wRnFnSUt2aTFXIiwic3ViIjoiZ29vZ2xlLW9hdXRoMnwxMDcxOTUwNTAzMDkzOTA2NDY3NDIiLCJpYXQiOjE3NzE2MTIxMTIsImV4cCI6MTc3MTY0ODExMiwic2lkIjoiSU0wcWtxYzBWUzNDS05RSGY2Zk54U0ZudjMtVGNpd0wiLCJub25jZSI6IlExTnlOa2s1VTJzeU0xWTNOa2hoWldNMlUxUnZXRTlzWVZvdGMzUXRNRVYwVGk1YVRWQTNiMVIxYXc9PSJ9.LTKOURXswNSENwTktknwPH1V1o_cr6Ls2yZk03fOnTh7sswz6Kj--MR9hLRbsR1VgxpHLH_e1i_4b_XUkGmQtSZOvhwz_ZIqpF0aj7NGAHkWojLhsWk9VvvRoTzLOFYrmgnFKBOxgz7hn0QLhDPQTPFsusXl2cIXNEM4hcpR4xJhUgGERGev_nhH9ADRy6fW5p6ieQRGDklZksS17cKmrTpTGlKE9ziuiD5yXjoFtXya7bwXQQfRUFNEFEFTlNxNhgxMD1IHkKBevJ7DkpE_v-4dRDjfPVUwdrKeFTcxQgrbWxQjfWxYyHiHmL_dSHUXH4QBuCsDk5_bIJizvfwhfQ\",\r\n    \"scope\": \"openid profile email\",\r\n    \"expires_in\": 86400,\r\n    \"token_type\": \"Bearer\"\r\n}",
+              "raw": "{\r\n    \"access_token\": \"eyJhbGciOiJkaXIiLCJlbmMiOiJBMjU2R0NNIiwiaXNzIjoiaHR0cHM6Ly9kZXYtamExeXFjcGZ3Mm9kdGZocC5ldS5hdXRoMC5jb20vIn0..hp-GJUsOnHwjodiH.DVaJzMtWB0fuWkZvNEfqS5FqIe-YYF_59gQLrrFFQV82YmfMvdzO9g54r1EjMip2G279iR6WXE_4hzpxhSxKUbcVwZph_TWJ--BJGgFypoKDMiUivSTv11OZEx7YfQlT9jmpqXo5btepo61cqn2C_fz9XGtJxLjh3fKrgGB7e1KITba6-thZArYOv9F6usTgXiqN8aDkFX90gCKRHt4OOylF3xCLymMGPIiPuJbK8VY3N5jT4gor6Xrd_UDK7wf35QiMjrmyMXmZMYQcEck-XfovPEysmBP8ZkET4HLtnOpHV7cn-qrRxbx898Zgr9k54Ih3_nBbCaIfA5h-G5skJtQS_IOhduE.TWK-pwnLQltwSSi7i5Bn0Q\",\r\n    \"id_token\": \"eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6IlNGWkpLNHVsMHI3cDBCdG9TelVIMyJ9.eyJnaXZlbl9uYW1lIjoiMSIsImZhbWlseV9uYW1lIjoiMSIsIm5pY2tuYW1lIjoia3VydGthbmF2YXRpIiwibmFtZSI6IjEgMSIsInBpY3R1cmUiOiJodHRwczovL2xoMy5nb29nbGV1c2VyY29udGVudC5jb20vYS9BQ2c4b2NLMWViZWdIUUlLNDZxN3J4YW1iUlB0OG1hMmFuUGtnbjBwRFNBSFo1TTBBZWdQT1E9czk2LWMiLCJ1cGRhdGVkX2F0IjoiMjAyNi0wMy0wMVQyMzozMzoxNC44MjBaIiwiZW1haWwiOiJrdXJ0a2FuYXZhdGlAZ21haWwuY29tIiwiZW1haWxfdmVyaWZpZWQiOnRydWUsImlzcyI6Imh0dHBzOi8vZGV2LWphMXlxY3BmdzJvZHRmaHAuZXUuYXV0aDAuY29tLyIsImF1ZCI6InBER3dvaEVNbTFReVloMXpKZUdqNk1wRnFnSUt2aTFXIiwic3ViIjoiZ29vZ2xlLW9hdXRoMnwxMDcxOTUwNTAzMDkzOTA2NDY3NDIiLCJpYXQiOjE3NzI0MDgwMTYsImV4cCI6MTc3MjQ0NDAxNiwic2lkIjoiZjVKWGd6RTU3R29lRTh4VmR6MFAtbFpYNW1rcVd0NlMiLCJub25jZSI6IlZIVkRRMGhWV2t4cGJIZEJWVXd5Y2t4emRFTkxPRGhrY0ZjMGRtaDJUV2hNWjFaVVgyNUxhWFV0Tnc9PSJ9.eUBm3Lx_NkibWctIwvnAbyfOxk5L-JNNpO2Fe-L4of-vsayM3Mp1thA817ounOwRlgiQ08qSNs9jv_vXl8JitfgvSSu3gwc0t_JT1YoAs2pqzhnll14tZx26Dtod3sZnWCi8EmkYXFOy_mexzwj5zfpHJT_Q5MAjuvCKfEE76taqC-zQrI8M9IMB6aN-_iLR-FcHTogQjwS9O91b0dJJcKM1IovYN7Z3B6NaUUb9PDj9Kg1qmNpCe7W2g9gHzZ1RFNmp4Pwfj9pg3_pYixHtz_17KH9VowqsLbFDadaQ9T65ArOgDSiuNNcYPYq6PGfOdmeOg4k5czNE_7VWiM1kVg\",\r\n    \"scope\": \"openid profile email\",\r\n    \"expires_in\": 86400,\r\n    \"token_type\": \"Bearer\"\r\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -240,6 +341,26 @@
         },
         {
           "name": "User login",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "// зберігаємо токен після успішного логіну\r",
+                  "if (pm.response.code === 200) {\r",
+                  "    const jsonData = pm.response.json();\r",
+                  "    pm.collectionVariables.set(\"jwt_token\", jsonData.access_token);\r",
+                  "    pm.collectionVariables.set(\"refresh_token\", jsonData.refresh_token);\r",
+                  "    console.log(\"Token updated:\", jsonData.access_token);\r",
+                  "    console.log(\"Refresh Token updated:\", jsonData.refresh_token);\r",
+                  "}"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
           "request": {
             "auth": {
               "type": "noauth"
@@ -278,7 +399,7 @@
               "bearer": [
                 {
                   "key": "token",
-                  "value": "{{jwt_token}}",
+                  "value": "{{refresh_token}}",
                   "type": "string"
                 }
               ]
@@ -312,7 +433,983 @@
       ]
     },
     {
-      "name": "Health",
+      "name": "Company",
+      "item": [
+        {
+          "name": "All Companies",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{jwt_token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:8000/companies?limit=10&offset=0",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8000",
+              "path": [
+                "companies"
+              ],
+              "query": [
+                {
+                  "key": "limit",
+                  "value": "10"
+                },
+                {
+                  "key": "offset",
+                  "value": "0"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Create Company",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{jwt_token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"name\": \"Test company\",\r\n  \"description\": \"Test application for intership\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://localhost:8000/companies/",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8000",
+              "path": [
+                "companies",
+                ""
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Company by ID",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{jwt_token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:8000/companies/e5fcb66a-8116-4ca9-9a35-0fb0234c7e48",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8000",
+              "path": [
+                "companies",
+                "e5fcb66a-8116-4ca9-9a35-0fb0234c7e48"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Update Company Details",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{jwt_token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "PATCH",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"name\": \"isdfhidwuhfiue\",\r\n  \"description\": \"dfwdfwefwefewf\",\r\n  \"is_visible\": true\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://localhost:8000/companies/48c4a6c1-7b01-4be4-8504-1b94f1177f0c",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8000",
+              "path": [
+                "companies",
+                "48c4a6c1-7b01-4be4-8504-1b94f1177f0c"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Delete Company",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{jwt_token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:8000/companies/48c4a6c1-7b01-4be4-8504-1b94f1177f0c",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8000",
+              "path": [
+                "companies",
+                "48c4a6c1-7b01-4be4-8504-1b94f1177f0c"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Company Members",
+      "item": [
+        {
+          "name": "All Members of Company",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{jwt_token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:8000/company-members/a5bb832d-46d7-4d10-9cd1-c415caf33db1/members?limit=10&offset=0",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8000",
+              "path": [
+                "company-members",
+                "a5bb832d-46d7-4d10-9cd1-c415caf33db1",
+                "members"
+              ],
+              "query": [
+                {
+                  "key": "limit",
+                  "value": "10"
+                },
+                {
+                  "key": "offset",
+                  "value": "0"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Remove Member from Company",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{jwt_token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:8000/company-members/a5bb832d-46d7-4d10-9cd1-c415caf33db1/remove-member/d618fa5a-5088-494b-9504-530b8257e772",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8000",
+              "path": [
+                "company-members",
+                "a5bb832d-46d7-4d10-9cd1-c415caf33db1",
+                "remove-member",
+                "d618fa5a-5088-494b-9504-530b8257e772"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Member Leave Company",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{jwt_token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:8000/company-members/a5bb832d-46d7-4d10-9cd1-c415caf33db1/member-leave/8ba956a1-4ad0-4d4c-b4c2-dc3a31675c8d",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8000",
+              "path": [
+                "company-members",
+                "a5bb832d-46d7-4d10-9cd1-c415caf33db1",
+                "member-leave",
+                "8ba956a1-4ad0-4d4c-b4c2-dc3a31675c8d"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Company Invitations",
+      "item": [
+        {
+          "name": "Create Invitation to join in company",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{jwt_token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://localhost:8000/company-invitations/a5bb832d-46d7-4d10-9cd1-c415caf33db1/8c20832f-a345-4f58-8795-325f9858171f",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8000",
+              "path": [
+                "company-invitations",
+                "a5bb832d-46d7-4d10-9cd1-c415caf33db1",
+                "8c20832f-a345-4f58-8795-325f9858171f"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "My Requests",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{jwt_token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:8000/company-invitations/my-requests",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8000",
+              "path": [
+                "company-invitations",
+                "my-requests"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "My Invitations",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{jwt_token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:8000/company-invitations/my-invitations",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8000",
+              "path": [
+                "company-invitations",
+                "my-invitations"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Company Invitations",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{jwt_token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:8000/company-invitations/company/a5bb832d-46d7-4d10-9cd1-c415caf33db1/invited",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8000",
+              "path": [
+                "company-invitations",
+                "company",
+                "a5bb832d-46d7-4d10-9cd1-c415caf33db1",
+                "invited"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Company Requests",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{jwt_token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:8000/company-invitations/company/a5bb832d-46d7-4d10-9cd1-c415caf33db1/requests",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8000",
+              "path": [
+                "company-invitations",
+                "company",
+                "a5bb832d-46d7-4d10-9cd1-c415caf33db1",
+                "requests"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Invitation Accepted",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{jwt_token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "PATCH",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:8000/company-invitations/d5469ad0-051e-4692-90fc-786f0cf6e828/accept",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8000",
+              "path": [
+                "company-invitations",
+                "d5469ad0-051e-4692-90fc-786f0cf6e828",
+                "accept"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Invitation Declined",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{jwt_token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "PATCH",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://localhost:8000/company-invitations/dbd0f6e4-d1b0-423d-b22b-de9eae215ba0/decline",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8000",
+              "path": [
+                "company-invitations",
+                "dbd0f6e4-d1b0-423d-b22b-de9eae215ba0",
+                "decline"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Request Canceled",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{jwt_token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "PATCH",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://localhost:8000/company-invitations/bbc53598-8f39-439d-97c5-367911b61253/cancel",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8000",
+              "path": [
+                "company-invitations",
+                "bbc53598-8f39-439d-97c5-367911b61253",
+                "cancel"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Roles of Members in Company",
+      "item": [
+        {
+          "name": "All Admins in Company",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{jwt_token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:8000/company-role/a5bb832d-46d7-4d10-9cd1-c415caf33db1",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8000",
+              "path": [
+                "company-role",
+                "a5bb832d-46d7-4d10-9cd1-c415caf33db1"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Assign User as Administrator",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{jwt_token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "PATCH",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://localhost:8000/company-role/a5bb832d-46d7-4d10-9cd1-c415caf33db1/admin/8ba956a1-4ad0-4d4c-b4c2-dc3a31675c8d",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8000",
+              "path": [
+                "company-role",
+                "a5bb832d-46d7-4d10-9cd1-c415caf33db1",
+                "admin",
+                "8ba956a1-4ad0-4d4c-b4c2-dc3a31675c8d"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Assign User as Member",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{jwt_token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "PATCH",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://localhost:8000/company-role/a5bb832d-46d7-4d10-9cd1-c415caf33db1/member/8ba956a1-4ad0-4d4c-b4c2-dc3a31675c8d",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8000",
+              "path": [
+                "company-role",
+                "a5bb832d-46d7-4d10-9cd1-c415caf33db1",
+                "member",
+                "8ba956a1-4ad0-4d4c-b4c2-dc3a31675c8d"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Remove Administrator of Company",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{jwt_token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:8000/company-role/a5bb832d-46d7-4d10-9cd1-c415caf33db1/remove/8ba956a1-4ad0-4d4c-b4c2-dc3a31675c8d",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8000",
+              "path": [
+                "company-role",
+                "a5bb832d-46d7-4d10-9cd1-c415caf33db1",
+                "remove",
+                "8ba956a1-4ad0-4d4c-b4c2-dc3a31675c8d"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Quizzes",
+      "item": [
+        {
+          "name": "Create Quiz",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{jwt_token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"title\": \"Архітектура сучасного бекенду\",\r\n  \"description\": \"Квіз про підходи, патерни та інфраструктуру сучасних backend-систем.\",\r\n  \"questions\": [\r\n    {\r\n      \"title\": \"Які архітектурні стилі використовуються у сучасному бекенді?\",\r\n      \"allows_multiple_correct\": true,\r\n      \"options\": [\r\n        {\r\n          \"text\": \"Мікросервісна архітектура\",\r\n          \"is_correct\": true\r\n        },\r\n        {\r\n          \"text\": \"Моноліт\",\r\n          \"is_correct\": true\r\n        },\r\n        {\r\n          \"text\": \"Event-driven architecture\",\r\n          \"is_correct\": true\r\n        },\r\n        {\r\n          \"text\": \"Client-side only architecture\",\r\n          \"is_correct\": false\r\n        }\r\n      ]\r\n    },\r\n    {\r\n      \"title\": \"Які протоколи часто використовуються для API?\",\r\n      \"allows_multiple_correct\": true,\r\n      \"options\": [\r\n        {\r\n          \"text\": \"HTTP/HTTPS\",\r\n          \"is_correct\": true\r\n        },\r\n        {\r\n          \"text\": \"gRPC\",\r\n          \"is_correct\": true\r\n        },\r\n        {\r\n          \"text\": \"WebSocket\",\r\n          \"is_correct\": true\r\n        },\r\n        {\r\n          \"text\": \"FTP для REST API\",\r\n          \"is_correct\": false\r\n        }\r\n      ]\r\n    },\r\n    {\r\n      \"title\": \"Які інструменти використовуються для контейнеризації та оркестрації?\",\r\n      \"allows_multiple_correct\": true,\r\n      \"options\": [\r\n        {\r\n          \"text\": \"Docker\",\r\n          \"is_correct\": true\r\n        },\r\n        {\r\n          \"text\": \"Kubernetes\",\r\n          \"is_correct\": true\r\n        },\r\n        {\r\n          \"text\": \"Podman\",\r\n          \"is_correct\": true\r\n        },\r\n        {\r\n          \"text\": \"Apache OpenOffice\",\r\n          \"is_correct\": false\r\n        }\r\n      ]\r\n    },\r\n    {\r\n      \"title\": \"Які патерни застосовуються у backend-розробці?\",\r\n      \"allows_multiple_correct\": true,\r\n      \"options\": [\r\n        {\r\n          \"text\": \"Repository Pattern\",\r\n          \"is_correct\": true\r\n        },\r\n        {\r\n          \"text\": \"Dependency Injection\",\r\n          \"is_correct\": true\r\n        },\r\n        {\r\n          \"text\": \"CQRS\",\r\n          \"is_correct\": true\r\n        },\r\n        {\r\n          \"text\": \"MVC лише для фронтенду\",\r\n          \"is_correct\": false\r\n        }\r\n      ]\r\n    },\r\n    {\r\n      \"title\": \"Які компоненти входять до типової backend-інфраструктури?\",\r\n      \"allows_multiple_correct\": true,\r\n      \"options\": [\r\n        {\r\n          \"text\": \"База даних\",\r\n          \"is_correct\": true\r\n        },\r\n        {\r\n          \"text\": \"Кеш (наприклад Redis)\",\r\n          \"is_correct\": true\r\n        },\r\n        {\r\n          \"text\": \"Message broker\",\r\n          \"is_correct\": true\r\n        },\r\n        {\r\n          \"text\": \"Графічний редактор зображень\",\r\n          \"is_correct\": false\r\n        }\r\n      ]\r\n    }\r\n  ]\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://localhost:8000/quizzes/a5bb832d-46d7-4d10-9cd1-c415caf33db1",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8000",
+              "path": [
+                "quizzes",
+                "a5bb832d-46d7-4d10-9cd1-c415caf33db1"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "All Quizzes",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{jwt_token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:8000/quizzes/a5bb832d-46d7-4d10-9cd1-c415caf33db1",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8000",
+              "path": [
+                "quizzes",
+                "a5bb832d-46d7-4d10-9cd1-c415caf33db1"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Quiz by ID",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{jwt_token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:8000/quizzes/detail/77d71159-9830-47c5-81b8-51266e7d638c",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8000",
+              "path": [
+                "quizzes",
+                "detail",
+                "77d71159-9830-47c5-81b8-51266e7d638c"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Update Quiz Details",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{jwt_token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "PATCH",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"title\": \"Архітектура сучасного бекенду\",\r\n  \"description\": \"Квіз про підходи, патерни та інфраструктуру сучасних backend-систем.\",\r\n  \"questions\": [\r\n    {\r\n      \"title\": \"Які архітектурні стилі використовуються у сучасному бекенді?\",\r\n      \"allows_multiple_correct\": true,\r\n      \"options\": [\r\n        {\r\n          \"text\": \"Мікросервісна архітектура\",\r\n          \"is_correct\": true\r\n        },\r\n        {\r\n          \"text\": \"Моноліт\",\r\n          \"is_correct\": true\r\n        },\r\n        {\r\n          \"text\": \"Event-driven architecture\",\r\n          \"is_correct\": true\r\n        },\r\n        {\r\n          \"text\": \"Client-side only architecture\",\r\n          \"is_correct\": false\r\n        }\r\n      ]\r\n    },\r\n    {\r\n      \"title\": \"Які протоколи часто використовуються для API?\",\r\n      \"allows_multiple_correct\": true,\r\n      \"options\": [\r\n        {\r\n          \"text\": \"HTTP/HTTPS\",\r\n          \"is_correct\": true\r\n        },\r\n        {\r\n          \"text\": \"gRPC\",\r\n          \"is_correct\": true\r\n        },\r\n        {\r\n          \"text\": \"WebSocket\",\r\n          \"is_correct\": true\r\n        },\r\n        {\r\n          \"text\": \"FTP для REST API\",\r\n          \"is_correct\": false\r\n        }\r\n      ]\r\n    },\r\n    {\r\n      \"title\": \"Які інструменти використовуються для контейнеризації та оркестрації?\",\r\n      \"allows_multiple_correct\": true,\r\n      \"options\": [\r\n        {\r\n          \"text\": \"Docker\",\r\n          \"is_correct\": true\r\n        },\r\n        {\r\n          \"text\": \"Kubernetes\",\r\n          \"is_correct\": true\r\n        },\r\n        {\r\n          \"text\": \"Podman\",\r\n          \"is_correct\": true\r\n        },\r\n        {\r\n          \"text\": \"Apache OpenOffice\",\r\n          \"is_correct\": false\r\n        }\r\n      ]\r\n    },\r\n    {\r\n      \"title\": \"Які патерни застосовуються у backend-розробці?\",\r\n      \"allows_multiple_correct\": true,\r\n      \"options\": [\r\n        {\r\n          \"text\": \"Repository Pattern\",\r\n          \"is_correct\": true\r\n        },\r\n        {\r\n          \"text\": \"Dependency Injection\",\r\n          \"is_correct\": true\r\n        },\r\n        {\r\n          \"text\": \"CQRS\",\r\n          \"is_correct\": true\r\n        },\r\n        {\r\n          \"text\": \"MVC лише для фронтенду\",\r\n          \"is_correct\": false\r\n        }\r\n      ]\r\n    },\r\n    {\r\n      \"title\": \"Які компоненти входять до типової backend-інфраструктури?\",\r\n      \"allows_multiple_correct\": true,\r\n      \"options\": [\r\n        {\r\n          \"text\": \"База даних\",\r\n          \"is_correct\": true\r\n        },\r\n        {\r\n          \"text\": \"Кеш (наприклад Redis)\",\r\n          \"is_correct\": true\r\n        },\r\n        {\r\n          \"text\": \"Message broker\",\r\n          \"is_correct\": true\r\n        },\r\n        {\r\n          \"text\": \"Графічний редактор зображень\",\r\n          \"is_correct\": false\r\n        }\r\n      ]\r\n    }\r\n  ]\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://localhost:8000/quizzes/detail/77d71159-9830-47c5-81b8-51266e7d638c",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8000",
+              "path": [
+                "quizzes",
+                "detail",
+                "77d71159-9830-47c5-81b8-51266e7d638c"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Delete Quiz",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{jwt_token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:8000/quizzes/detail/77d71159-9830-47c5-81b8-51266e7d638c",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8000",
+              "path": [
+                "quizzes",
+                "detail",
+                "77d71159-9830-47c5-81b8-51266e7d638c"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Quiz Workflow",
+      "item": [
+        {
+          "name": "Create Attempt Quiz",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{jwt_token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"answers\": [\r\n    {\r\n      \"question_id\": \"079b3cc2-55ed-42ba-a1be-7aa56a92f527\",\r\n      \"selected_option_ids\": [\r\n        \"29e52984-eab0-4e5f-9d25-b54609cef67e\"\r\n      ]\r\n    },\r\n    {\r\n      \"question_id\": \"4dc59f69-05c7-4146-933b-eb7080e9c7bf\",\r\n      \"selected_option_ids\": [\r\n        \"3892869a-1c8e-4163-b86d-d52503770dd5\"\r\n      ]\r\n    },\r\n    {\r\n      \"question_id\": \"f9708b59-486a-46fc-ad27-5d671a3b27ce\",\r\n      \"selected_option_ids\": [\r\n        \"33ed65ae-7bc9-43a1-85ee-501c504487c0\"\r\n      ]\r\n    },\r\n    {\r\n      \"question_id\": \"ae265beb-9058-44ce-8e7a-a9565c3a77d9\",\r\n      \"selected_option_ids\": [\r\n        \"23e0b48f-e5ec-4124-8ec7-2eb59c0a7286\"\r\n      ]\r\n    },\r\n    {\r\n      \"question_id\": \"76a73774-75d1-4bb1-92f4-a56c11feb399\",\r\n      \"selected_option_ids\": [\r\n        \"a750df59-d20d-4078-8ae5-b9773c5b2191\"\r\n      ]\r\n    },\r\n    {\r\n      \"question_id\": \"76a73774-75d1-4bb1-92f4-a56c11feb399\",\r\n      \"selected_option_ids\": [\r\n        \"a750df59-d20d-4078-8ae5-b9773c5b2191\"\r\n      ]\r\n    }\r\n  ]\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://localhost:8000/quiz-workflow/a5bb832d-46d7-4d10-9cd1-c415caf33db1/c7d6e708-961a-4dfe-ab5a-6f0dc2b3862f/attempt",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8000",
+              "path": [
+                "quiz-workflow",
+                "a5bb832d-46d7-4d10-9cd1-c415caf33db1",
+                "c7d6e708-961a-4dfe-ab5a-6f0dc2b3862f",
+                "attempt"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Member Statistics in the Quiz",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{jwt_token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:8000/quiz-workflow/a5bb832d-46d7-4d10-9cd1-c415caf33db1/user/3e64d870-75d0-4e0a-93c4-3714ef7be982/stats",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8000",
+              "path": [
+                "quiz-workflow",
+                "a5bb832d-46d7-4d10-9cd1-c415caf33db1",
+                "user",
+                "3e64d870-75d0-4e0a-93c4-3714ef7be982",
+                "stats"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Check Health Server",
       "request": {
         "auth": {
           "type": "noauth"
@@ -329,6 +1426,48 @@
         }
       },
       "response": []
+    }
+  ],
+  "event": [
+    {
+      "listen": "prerequest",
+      "script": {
+        "type": "text/javascript",
+        "packages": {},
+        "requests": {},
+        "exec": [
+          ""
+        ]
+      }
+    },
+    {
+      "listen": "test",
+      "script": {
+        "type": "text/javascript",
+        "packages": {},
+        "requests": {},
+        "exec": [
+          ""
+        ]
+      }
+    }
+  ],
+  "variable": [
+    {
+      "key": "jwt_token",
+      "value": ""
+    },
+    {
+      "key": "refresh_token",
+      "value": ""
+    },
+    {
+      "key": "auth0_access_token",
+      "value": ""
+    },
+    {
+      "key": "auth0_id_token",
+      "value": ""
     }
   ]
 }

@@ -202,11 +202,12 @@ http://localhost:8000/docs
 ## Запуск міграцій:
   ```bash
   uvicorn app.main:app --reload  # зупинений бекенд
-  python -m alembic revision --autogenerate -m "create users tables"  # створення міграції
-  python -m alembic revision --autogenerate -m "add provider auth0"  # створення міграції
+  python -m alembic revision --autogenerate -m "create tables"  # створення міграції
   python -m alembic revision --autogenerate -m "create companies table"  # створення міграції
-  python -m alembic revision --autogenerate -m "add company membership system"  # створення міграції
-  python -m alembic revision --autogenerate -m "fix company invitation table"  # створення міграції
+  python -m alembic revision --autogenerate -m "create company actions tables"  # створення міграції
+  python -m alembic revision --autogenerate -m "add roles for members"  # створення міграції
+  python -m alembic revision --autogenerate -m "create quizzes table"  # створення міграції
+  python -m alembic revision --autogenerate -m "create quiz workflow table"  # створення міграції
   python -m alembic upgrade head  # запис міграції в БД для Windows
   alembic upgrade head  # запис міграції в БД для UNIX
   alembic -x db_url=postgresql+asyncpg://postgres:postgres@localhost:5433/internship_test_db upgrade head # для тестової БД
