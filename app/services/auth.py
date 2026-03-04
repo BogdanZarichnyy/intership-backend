@@ -28,7 +28,11 @@ class AuthService:
   # =======================
   # Локальна авторизація
   # =======================
-  async def login(self, email: str, password: str) -> dict:
+  async def login(
+    self, 
+    email: str, 
+    password: str
+  ) -> dict:
     user: User = await self.repo.get_user_by_email(email)
     if not user or user.provider != "local":
       raise InvalidCredentials()
@@ -49,7 +53,10 @@ class AuthService:
   # =======================
   # Рефреш токен для авторизації
   # =======================
-  async def refresh_access_token(self, refresh_token: str) -> dict:
+  async def refresh_access_token(
+    self, 
+    refresh_token: str
+  ) -> dict:
     try:
       payload = decode_token(refresh_token)
     except Exception:

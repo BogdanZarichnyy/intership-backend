@@ -29,6 +29,14 @@ class QuizRepository:
     )
     return result.scalar_one_or_none()
 
+  async def update_quiz(
+    self, 
+    quiz: Quiz
+  ) -> Quiz:
+    self.db.add(quiz)
+    await self.db.flush()
+    return quiz
+
   async def get_quizzes_for_company(
     self, 
     company_id: UUID, 

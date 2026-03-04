@@ -59,7 +59,7 @@ class CompanyMemberRepository:
   ):
     query = select(CompanyMember).where(CompanyMember.company_id == company_id)
     if role is not None:
-      query = query.where(CompanyMember.role == role)
+      query = query.where(CompanyMember.role == role.value)
     query = query.limit(limit).offset(offset)
     result = await self.db.execute(query)
     return result.scalars().all()

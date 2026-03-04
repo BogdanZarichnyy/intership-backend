@@ -13,28 +13,16 @@ from app.routers.company_member import router as companyMemberRouter
 from app.routers.company_invitation import router as companyInvitationRouter
 from app.routers.company_role import router as companyRoleRouter
 from app.routers.quiz import router as quizRouter
-from app.routers.quiz_result import router as quizResultsRouter
+from app.routers.quiz_workflow import router as quizResultsRouter
 
 from app.middleware.cors import setup_middlewares
 from app.middleware.logger_middleware import RequestLoggingMiddleware
-from app.middleware.exception_handler import (
-  http_exception_handler,
-  validation_exception_handler,
-  business_error_handler
-)
-from app.core.exceptions import BusinessError
-from fastapi.exceptions import RequestValidationError
-from starlette.exceptions import HTTPException as StarletteHTTPException
+from app.middleware.exception_handler import setup_exception_handlers
 
 from app.config import settings
 
 from app.db.postgres import engine
 from app.db.redis import redis_client
-
-def setup_exception_handlers(app: FastAPI):
-  app.add_exception_handler(StarletteHTTPException, http_exception_handler)
-  app.add_exception_handler(RequestValidationError, validation_exception_handler)
-  app.add_exception_handler(BusinessError, business_error_handler)
 
 async def wait_for_postgres():
   retries = 0
@@ -94,7 +82,7 @@ def create_app() -> FastAPI: # Використовуємо factory pattern, щ�
   app.include_router(companyInvitationRouter, prefix="/company-invitations")
   app.include_router(companyRoleRouter, prefix="/company-role")
   app.include_router(quizRouter, prefix="/quizzes")
-  app.include_router(quizResultsRouter, prefix="/quiz_results")
+  app.include_router(quizResultsRouter, prefix="/quiz-workflow")
 
   return app
 

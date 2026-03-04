@@ -17,7 +17,7 @@ class CompanyAdminService:
     self, 
     company_id: UUID, 
     current_user: User
-  ):
+  )-> list[CompanyMember]:
     company = await self.company_repo.get_company_by_id(company_id)
     if not company:
       logger.warning(f"Company {company_id} not found (user_id={current_user.id})")
@@ -32,7 +32,7 @@ class CompanyAdminService:
     company_id: UUID,
     user_id: UUID,
     current_user: User
-  ):
+  ) -> CompanyMember:
     company = await self.company_repo.get_company_by_id(company_id)
     if not company:
       logger.warning(f"Company {company_id} not found (user_id={user_id})")
@@ -72,7 +72,7 @@ class CompanyAdminService:
     company_id: UUID,
     user_id: UUID,
     current_user: User
-  ):
+  )-> None:
     company = await self.company_repo.get_company_by_id(company_id)
     if not company:
       logger.warning(f"Company {company_id} not found (user_id={user_id})")
@@ -85,4 +85,3 @@ class CompanyAdminService:
       logger.warning(f"User {user_id} is not a member or admin of company {company_id}")
       raise CompanyMembershipForbidden("User is not an admin")
     await self.member_repo.remove_member(company_id, user_id)
-    return

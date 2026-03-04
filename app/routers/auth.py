@@ -1,26 +1,15 @@
 from fastapi import APIRouter, Depends, Body, status
 from fastapi.responses import JSONResponse, RedirectResponse
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
-from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.services.auth import AuthService
-from app.repositories.user import UserRepository
-from app.schemas.user import SignInRequest, UserDetailResponse
-from app.core.dependencies import get_current_user
-from app.db.postgres import get_db
+from app.schemas.user import SignInRequest, UserSchema
+from app.core.dependencies import get_current_user, get_auth_service
 from app.core.exceptions import AuthProviderUnknown
 from app.config import settings
 
 router = APIRouter(tags=["auth"])
 security = HTTPBearer()
-
-# =========================
-# AuthService dependency
-# =========================
-def get_auth_service(
-  db: AsyncSession = Depends(get_db)
-) -> AuthService:
-  return AuthService(UserRepository(db))
 
 # =========================
 # Авторизація
@@ -43,7 +32,7 @@ async def login(
   status_code=status.HTTP_200_OK
 )
 async def logout(
-  current_user: UserDetailResponse = Depends(get_current_user)
+  current_user: UserSchema = Depends(get_current_user)
 ):
   """
   - local: повертаємо повідомлення

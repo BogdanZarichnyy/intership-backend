@@ -1,5 +1,5 @@
-from pydantic import BaseModel, Field, ConfigDict
 from uuid import UUID
+from pydantic import BaseModel, Field, ConfigDict
 from datetime import datetime
 
 class QuizAttemptAnswerSchema(BaseModel):

@@ -1,168 +1,143 @@
-class BusinessError(Exception):
-  """Base class for domain/business errors"""
-  pass
+from app.middleware.exception_handler import (
+  APIException,
+  BadRequest,
+  Unauthorized,
+  Forbidden,
+  NotFound,
+  MethodNotAllowed,
+  Conflict,
+  TooManyRequests,
+  InternalServerError,
+  ServiceUnavailable,
+)
 
 # =======================
 # Users
 # =======================
-
-class ExistsEmail(BusinessError):
-  def __init__(self, email: str | None = None):
-    self.email = email
-    self.detail = (
-      f"User with email '{email}' already exists"
-      if email else
-      "User with this email already exists"
-    )
-    super().__init__(self.detail)
-
-class ExistsUsername(BusinessError):
-  def __init__(self, username: str):
-    self.username = username
-    self.detail = f"Username '{username}' already exists."
-    super().__init__(self.detail)
-
-class InvalidPassword(BusinessError):
-  def __init__(self, detail: str = "Current password is incorrect"):
-    self.detail = detail
-    super().__init__(self.detail)
-
-class MissingCurrentPassword(BusinessError):
-  def __init__(self, detail: str = "Current password must be provided"):
-    self.detail = detail
-    super().__init__(self.detail)
-
-class MissingNewPassword(BusinessError):
-  def __init__(self, detail: str = "New password must be provided"):
-    self.detail = detail
-    super().__init__(self.detail)
-
-class UserNotFound(BusinessError):
+class UserNotFound(NotFound):
   def __init__(self, detail: str = "User not found"):
-    self.detail = detail
-    super().__init__(self.detail)
+    super().__init__(detail)
 
-class ForbiddenAction(BusinessError):
+class ForbiddenAction(Forbidden):
   def __init__(self, detail: str = "Not authorized to perform this action"):
-    self.detail = detail
-    super().__init__(self.detail)
+    super().__init__(detail)
+
+class ExistsEmail(Conflict):
+  def __init__(self, email: str | None = None):
+    detail = f"User with email '{email}' already exists" if email else "User with this email already exists"
+    super().__init__(detail)
+
+class ExistsUsername(Conflict):
+  def __init__(self, username: str):
+    super().__init__(f"Username '{username}' already exists.")
+
+class InvalidPassword(BadRequest):
+  def __init__(self, detail: str = "Current password is incorrect"):
+    super().__init__(detail)
+
+class MissingCurrentPassword(BadRequest):
+  def __init__(self, detail: str = "Current password must be provided"):
+    super().__init__(detail)
+
+class MissingNewPassword(BadRequest):
+  def __init__(self, detail: str = "New password must be provided"):
+    super().__init__(detail)
 
 # =======================
 # Authorization
 # =======================
-
-class InvalidCredentials(BusinessError):
+class InvalidCredentials(Unauthorized):
   def __init__(self, detail: str = "Invalid credentials"):
-    self.detail = detail
-    super().__init__(self.detail)
+    super().__init__(detail)
 
-class InvalidToken(BusinessError):
+class InvalidToken(Unauthorized):
   def __init__(self, detail: str = "Invalid token"):
-    self.detail = detail
-    super().__init__(self.detail)
+    super().__init__(detail)
 
-class InvalidTokenType(BusinessError):
+class InvalidTokenType(Unauthorized):
   def __init__(self, detail: str = "Invalid token type"):
-    self.detail = detail
-    super().__init__(self.detail)
+    super().__init__(detail)
 
-class InvalidTokenPayload(BusinessError):
+class InvalidTokenPayload(Unauthorized):
   def __init__(self, detail: str = "Invalid token payload"):
-    self.detail = detail
-    super().__init__(self.detail)
+    super().__init__(detail)
 
-class UserDisabled(BusinessError):
+class UserDisabled(Forbidden):
   def __init__(self, detail: str = "User account is disabled"):
-    self.detail = detail
-    super().__init__(self.detail)
+    super().__init__(detail)
 
-class AuthProviderUnknown(BusinessError):
+class AuthProviderUnknown(Conflict):
   def __init__(self, detail: str = "Unknown provider"):
-    self.detail = detail
-    super().__init__(self.detail)
+    super().__init__(detail)
 
-class MissingIdToken(BusinessError):
+class MissingIdToken(Unauthorized):
   def __init__(self, detail: str = "Missing id_token"):
-    self.detail = detail
-    super().__init__(self.detail)
+    super().__init__(detail)
 
-class InvalidAuth0Token(BusinessError):
+class InvalidAuth0Token(Unauthorized):
   def __init__(self, detail: str = "Invalid Auth0 token"):
-    self.detail = detail
-    super().__init__(self.detail)
+    super().__init__(detail)
 
-class EmailNotVerified(BusinessError):
+class EmailNotVerified(Forbidden):
   def __init__(self, detail: str = "Email not verified"):
-    self.detail = detail
-    super().__init__(self.detail)
+    super().__init__(detail)
 
-class EmailNotFoundInToken(BusinessError):
+class EmailNotFoundInToken(Unauthorized):
   def __init__(self, detail: str = "Email not found in token"):
-    self.detail = detail
-    super().__init__(self.detail)
+    super().__init__(detail)
 
 # =======================
 # Company
 # =======================
-
-class CompanyNotFound(BusinessError):
+class CompanyNotFound(NotFound):
   def __init__(self, detail: str = "Company not found"):
-    self.detail = detail
-    super().__init__(self.detail)
+    super().__init__(detail)
 
-class CompanyForbidden(BusinessError):
+class CompanyForbidden(Forbidden):
   def __init__(self, detail: str = "Not enough permissions to access this company"):
-    self.detail = detail
-    super().__init__(self.detail)
+    super().__init__(detail)
 
-class CompanyUpdateForbidden(BusinessError):
+class CompanyUpdateForbidden(Forbidden):
   def __init__(self, detail: str = "Only owner can update company"):
-    self.detail = detail
-    super().__init__(self.detail)
+    super().__init__(detail)
 
-class CompanyDeleteForbidden(BusinessError):
+class CompanyDeleteForbidden(Forbidden):
   def __init__(self, detail: str = "Only owner can delete company"):
-    self.detail = detail
-    super().__init__(self.detail)
+    super().__init__(detail)
 
 # =======================
 # Company members
 # =======================
-
-class CompanyOwnerOnly(BusinessError):
+class CompanyOwnerOnly(Forbidden):
   def __init__(self, detail: str = "Only owners can perform this action"):
-    self.detail = detail
-    super().__init__(self.detail)
+    super().__init__(detail)
 
-
-class CompanyMembershipForbidden(BusinessError):
+class CompanyMembershipForbidden(Forbidden):
   def __init__(self, detail: str = "You are not allowed to perform this membership action"):
-    self.detail = detail
-    super().__init__(self.detail)
+    super().__init__(detail)
 
 # =======================
 # Company invitation
 # =======================
+class InvitationNotFound(NotFound):
+  def __init__(self, detail: str = "Invitation not found"):
+    super().__init__(detail)
 
-class InvitationNotFound(BusinessError):
-  def __init__(self, detail="Invitation not found"):
-    self.detail = detail
-    super().__init__(self.detail)
+class InvitationAlreadyProcessed(Forbidden):
+  def __init__(self, detail: str = "Invitation already processed"):
+    super().__init__(detail)
 
-class InvitationAlreadyProcessed(BusinessError):
-  def __init__(self, detail="Invitation already processed"):
-    self.detail = detail
-    super().__init__(self.detail)
-
-class InvitationForbidden(BusinessError):
-  def __init__(self, detail="Action not allowed for this invitation"):
-    self.detail = detail
-    super().__init__(self.detail)
+class InvitationForbidden(Forbidden):
+  def __init__(self, detail: str = "Action not allowed for this invitation"):
+    super().__init__(detail)
 
 # =======================
 # Quizzes
 # =======================
-class BusinessError(Exception):
+class QuizNotFound(NotFound):
+  def __init__(self, detail: str = "Quiz not found"):
+    super().__init__(detail)
+
+class QuizForbidden(Forbidden):
   def __init__(self, detail: str):
-    self.detail = detail
     super().__init__(detail)
