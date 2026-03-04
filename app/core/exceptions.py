@@ -156,3 +156,18 @@ class QuizCacheForbidden(Forbidden):
 class QuizCacheError(APIException):
   def __init__(self, detail: str = "Redis error occurred while handling quiz cache"):
     super().__init__(detail)
+
+# =======================
+# Quiz Export Errors
+# =======================
+class QuizExportForbidden(Forbidden):
+  def __init__(self, detail: str = "You are not allowed to export this data"):
+    super().__init__(detail)
+
+class QuizExportNotFound(NotFound):
+  def __init__(self, detail: str = "No quiz attempts found to export"):
+    super().__init__(detail)
+
+class QuizExportCacheError(APIException):
+  def __init__(self, detail: str = "Error occurred while fetching data from Redis for export"):
+    super().__init__(detail)

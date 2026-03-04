@@ -17,6 +17,7 @@ from app.services.company_invitation import CompanyInvitationService
 from app.services.company_role import CompanyAdminService
 from app.services.quiz import QuizService
 from app.services.quiz_workflow import QuizWorkflowService
+from app.services.quiz_export import QuizExportService
 
 from app.core.log_context import current_user_id_var
 
@@ -58,6 +59,13 @@ def get_quiz_workflow_service(
   quiz_service: QuizService = Depends(get_quiz_service)
 ) -> QuizWorkflowService:
   return QuizWorkflowService(QuizWorkflowRepository(db), quiz_service)
+
+# QuizExportService dependency
+async def get_quiz_export_service(
+  db: AsyncSession = Depends(get_db), 
+  quiz_service: QuizService = Depends(get_quiz_service)
+) -> QuizExportService:
+  return QuizExportService(QuizWorkflowRepository(), quiz_service)
 
 # Поточний користувач із токена
 async def get_current_user(

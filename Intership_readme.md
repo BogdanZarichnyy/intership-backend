@@ -222,3 +222,17 @@ http://localhost:8000/docs
   source venv/Scripts/activate
   python -m app.main
   ```
+
+ ## Первірка підключення до Redis в контейнері docker:
+  Спочатку отримуємо список активних контейнерів і отримати run_id того контейнера, який потрібно перевірити:
+  ```bash
+  docker ps
+  docker exec -it redis redis-cli INFO server | grep run_id
+  ```
+  Має показати run_id по назві контейнера redis:
+  ```bash
+  admin@ASUS_RAMPAGE MINGW64 ~
+  $ docker exec -it redis redis-cli INFO server | grep run_id
+  run_id:19f681259eff15e8c6b7a9a52ec2bf90b8cec939
+  ```
+  Отримуємо run_id і порівнюємо з конфігурацією Redis в розширенні VSCode Redis Explorer - вони мають збігатися
