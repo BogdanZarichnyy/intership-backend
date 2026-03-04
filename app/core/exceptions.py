@@ -141,3 +141,18 @@ class QuizNotFound(NotFound):
 class QuizForbidden(Forbidden):
   def __init__(self, detail: str):
     super().__init__(detail)
+
+# =======================
+# Quiz Redis Cache Errors
+# =======================
+class QuizCacheNotFound(NotFound):
+  def __init__(self, detail: str = "Quiz attempt not found in cache"):
+    super().__init__(detail)
+
+class QuizCacheForbidden(Forbidden):
+  def __init__(self, detail: str = "Operation not allowed on quiz cache"):
+    super().__init__(detail)
+
+class QuizCacheError(APIException):
+  def __init__(self, detail: str = "Redis error occurred while handling quiz cache"):
+    super().__init__(detail)

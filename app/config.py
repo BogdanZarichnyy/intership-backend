@@ -20,6 +20,7 @@ class Settings(BaseSettings):
   # Redis
   redis_host: str = "redis"
   redis_port: int = 6379
+  redis_ttl_seconds: int = 172800 # секунди = 48 годин
 
   # JWT
   jwt_secret_key: str
