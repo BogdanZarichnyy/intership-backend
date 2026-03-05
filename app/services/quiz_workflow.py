@@ -1,18 +1,21 @@
 from uuid import UUID
-from app.repositories.quiz_workflow import QuizWorkflowRepository
-from app.services.quiz import QuizService
+from sqlalchemy.exc import IntegrityError
+from app.core.logger import logger
+from app.core.exceptions import QuizNotFound, QuizForbidden, QuizDuplicate, CompanyMembershipForbidden
 from app.models.user import User
 from app.models.quiz import Quiz, QuizQuestion, QuizAnswerOption
 from app.models.quiz_workflow import QuizWorkflow
+from app.repositories.quiz_workflow import QuizWorkflowRepository
+from app.repositories.company_member import CompanyMemberRepository
 from app.schemas.quiz_workflow import QuizAttemptRequest, QuizAttemptResponse, UserQuizStatsResponse
-from app.core.exceptions import QuizNotFound, QuizForbidden
-from app.core.logger import logger
+from app.services.quiz import QuizService
 from app.services.quiz_attempt_cache import QuizAttemptCacheService
 
 class QuizWorkflowService:
-  def __init__(self, result_repo: QuizWorkflowRepository, quiz_service: QuizService):
+  def __init__(self, result_repo: QuizWorkflowRepository, quiz_service: QuizService, member_repo: CompanyMemberRepository):
     self.result_repo = result_repo
     self.quiz_service = quiz_service
+    self.member_repo = member_repo
 
   async def attempt_quiz(
     self,
@@ -22,8 +25,11 @@ class QuizWorkflowService:
     current_user: User
   ) -> QuizAttemptResponse:
     logger.info(f"User {current_user.id} attempting quiz {quiz_id} in company {company_id}")
-    # Перевірка прав
-    await self.quiz_service.check_owner_or_admin(company_id, current_user.id)
+    # Перевірка членства в компанії
+    member = await self.member_repo.get_member_of_company(company_id, current_user.id)
+    if not member:
+      logger.warning(f"User {current_user.id} is not a member of company {company_id}")
+      raise CompanyMembershipForbidden("User must be a member of this company")
     # Отримуємо тест
     quiz: Quiz = await self.quiz_service.quiz_repo.get_quiz_by_id(quiz_id)
     if not quiz:
@@ -69,9 +75,18 @@ class QuizWorkflowService:
       total_questions=total_questions,
       score=score,
     )
-    self.result_repo.db.add(result)
-    await self.result_repo.db.commit()
-    await self.result_repo.db.refresh(result)
+    # Зберігаємо значення локально для логування
+    user_id = str(current_user.id)
+    quiz_id = str(quiz_id)
+    company_id = str(company_id)
+    try:
+      self.result_repo.db.add(result)
+      await self.result_repo.db.commit()
+      await self.result_repo.db.refresh(result)
+    except IntegrityError:
+      await self.result_repo.db.rollback()
+      logger.warning(f"User {user_id} has already taken quiz {quiz_id} at company {company_id}")
+      raise QuizDuplicate("User has already taken quiz at company")
     # Підготовка до Redis (UUID -> str)
     answers_for_cache = []
     for a in payload.answers:
@@ -101,15 +116,17 @@ class QuizWorkflowService:
       answers=answers_for_cache,
       total_questions=total_questions,
       correct_answers=correct_answers,
-      score=score
+      score=score,
+      created_at=result.updated_at
     )
     return QuizAttemptResponse(
+      attempted_at=result.updated_at,
       quiz_id=quiz_id,
       user_id=current_user.id,
       correct_answers=correct_answers,
       total_questions=total_questions,
       score=score,
-      attempted_at=result.updated_at
+      created_at=result.updated_at
     )
 
   async def get_user_stats(
@@ -118,7 +135,7 @@ class QuizWorkflowService:
     user_id: UUID,
     current_user: User
   ) -> UserQuizStatsResponse:
-    # Перевіряємо, чи користувач є членом компанії, адміном або власником
+    # Перевіряємо, чи користувач є адміном або власником компанії
     await self.quiz_service.check_owner_or_admin(company_id, current_user.id)
     logger.info(f"Calculating stats for user {user_id} in company {company_id}")
     company_avg = await self.result_repo.get_average_score(user_id, company_id)

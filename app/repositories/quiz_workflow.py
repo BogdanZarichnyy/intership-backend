@@ -27,6 +27,14 @@ class QuizWorkflowRepository:
     result = await self.db.execute(query)
     return result.scalars().all()
 
+  async def get_users_results(
+    self, 
+    company_id: UUID
+  ) -> list[QuizWorkflow]:
+    query = select(QuizWorkflow).where(QuizWorkflow.company_id == company_id)
+    result = await self.db.execute(query)
+    return result.scalars().all()
+
   async def get_average_score(
     self, 
     user_id: UUID, 

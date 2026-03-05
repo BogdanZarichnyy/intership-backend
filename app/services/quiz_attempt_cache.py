@@ -1,5 +1,6 @@
 import json
 from uuid import UUID
+from datetime import datetime
 from app.config import settings
 from app.db.redis import redis_client
 import redis.exceptions
@@ -23,6 +24,7 @@ class QuizAttemptCacheService:
     total_questions: int,
     correct_answers: int,
     score: float,
+    created_at: datetime
   ) -> None:
     key = self._build_key(user_id, quiz_id)
     payload = {
@@ -34,6 +36,7 @@ class QuizAttemptCacheService:
       "total_questions": total_questions,
       "correct_answers": correct_answers,
       "score": score,
+      "created_at": created_at.isoformat()
     }
     try:
       await self.redis.set(

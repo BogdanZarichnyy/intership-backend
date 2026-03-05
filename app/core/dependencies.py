@@ -24,33 +24,33 @@ from app.core.log_context import current_user_id_var
 security = HTTPBearer()
 
 # UserService dependency
-async def get_user_service(db: AsyncSession = Depends(get_db)) -> UserService:
+def get_user_service(db: AsyncSession = Depends(get_db)) -> UserService:
   return UserService(UserRepository(db))
 
 # AuthService dependency
-async def get_auth_service(db: AsyncSession = Depends(get_db)) -> AuthService:
+def get_auth_service(db: AsyncSession = Depends(get_db)) -> AuthService:
   return AuthService(UserRepository(db))
 
 # CompanyService dependency
-async def get_company_service(db: AsyncSession = Depends(get_db)) -> CompanyService:
+def get_company_service(db: AsyncSession = Depends(get_db)) -> CompanyService:
   return CompanyService(CompanyRepository(db))
 
 # CompanyMemberService dependency
-async def get_company_member_service(db: AsyncSession = Depends(get_db)) -> CompanyMemberService:
+def get_company_member_service(db: AsyncSession = Depends(get_db)) -> CompanyMemberService:
   member_repo = CompanyMemberRepository(db)
   company_repo = CompanyRepository(db)
   return CompanyMemberService(member_repo, company_repo)
 
 # CompanyInvitationService dependency
-async def get_invitation_service(db: AsyncSession = Depends(get_db)) -> CompanyInvitationService:
+def get_invitation_service(db: AsyncSession = Depends(get_db)) -> CompanyInvitationService:
   return CompanyInvitationService(db)
 
 # CompanyAdminService dependency
-async def get_company_admin_service(db: AsyncSession = Depends(get_db)) -> CompanyAdminService:
+def get_company_admin_service(db: AsyncSession = Depends(get_db)) -> CompanyAdminService:
   return CompanyAdminService(db)
 
 # QuizService dependency
-async def get_quiz_service(db: AsyncSession = Depends(get_db)) -> QuizService:
+def get_quiz_service(db: AsyncSession = Depends(get_db)) -> QuizService:
   return QuizService(QuizRepository(db), CompanyMemberRepository(db))
 
 # QuizWorkflowService dependency
@@ -58,14 +58,14 @@ def get_quiz_workflow_service(
   db: AsyncSession = Depends(get_db),
   quiz_service: QuizService = Depends(get_quiz_service)
 ) -> QuizWorkflowService:
-  return QuizWorkflowService(QuizWorkflowRepository(db), quiz_service)
+  member_repo = CompanyMemberRepository(db)
+  return QuizWorkflowService(QuizWorkflowRepository(db), quiz_service, member_repo)
 
 # QuizExportService dependency
-async def get_quiz_export_service(
-  db: AsyncSession = Depends(get_db), 
-  quiz_service: QuizService = Depends(get_quiz_service)
-) -> QuizExportService:
-  return QuizExportService(QuizWorkflowRepository(), quiz_service)
+def get_quiz_export_service(db: AsyncSession = Depends(get_db)) -> QuizExportService:
+  quiz_service = QuizService(QuizRepository(db), CompanyMemberRepository(db))
+  member_repo = CompanyMemberRepository(db)
+  return QuizExportService(quiz_service=quiz_service, member_repo=member_repo)
 
 # Поточний користувач із токена
 async def get_current_user(

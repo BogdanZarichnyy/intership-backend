@@ -142,6 +142,10 @@ class QuizForbidden(Forbidden):
   def __init__(self, detail: str):
     super().__init__(detail)
 
+class QuizDuplicate(Conflict):
+  def __init__(self, detail: str):
+    super().__init__(detail)
+
 # =======================
 # Quiz Redis Cache Errors
 # =======================

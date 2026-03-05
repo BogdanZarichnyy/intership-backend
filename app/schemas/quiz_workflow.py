@@ -16,7 +16,7 @@ class QuizAttemptResponse(BaseModel):
   total_questions: int
   score: float
   attempted_at: datetime
-
+  created_at: datetime
   model_config = ConfigDict(from_attributes=True)
 
 class UserQuizStatsResponse(BaseModel):
