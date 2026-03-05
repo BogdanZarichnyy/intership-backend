@@ -369,7 +369,7 @@
             "header": [],
             "body": {
               "mode": "raw",
-              "raw": "{\r\n    \"email\": \"test@test.email\",\r\n    \"password\": \"123\"\r\n}",
+              "raw": "{\r\n    \"email\": \"shtroyner@test.email\",\r\n    \"password\": \"123\"\r\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -544,7 +544,7 @@
           "response": []
         },
         {
-          "name": "Update Company Details",
+          "name": "Owner Action - Update Company Details",
           "request": {
             "auth": {
               "type": "bearer",
@@ -583,7 +583,7 @@
           "response": []
         },
         {
-          "name": "Delete Company",
+          "name": "Owner Action - Delete Company",
           "request": {
             "auth": {
               "type": "bearer",
@@ -659,7 +659,7 @@
           "response": []
         },
         {
-          "name": "Remove Member from Company",
+          "name": "Owner Action - Remove Member from Company",
           "request": {
             "auth": {
               "type": "bearer",
@@ -691,7 +691,7 @@
           "response": []
         },
         {
-          "name": "Member Leave Company",
+          "name": "Member Action - Member Leave Company",
           "request": {
             "auth": {
               "type": "bearer",
@@ -768,7 +768,7 @@
           "response": []
         },
         {
-          "name": "My Requests",
+          "name": "User Action - My Requests for Membership",
           "request": {
             "auth": {
               "type": "bearer",
@@ -798,7 +798,7 @@
           "response": []
         },
         {
-          "name": "My Invitations",
+          "name": "User Action - My Invitations for Membership",
           "request": {
             "auth": {
               "type": "bearer",
@@ -828,7 +828,7 @@
           "response": []
         },
         {
-          "name": "Company Invitations",
+          "name": "Owner Action - Company Invitations for Membership",
           "request": {
             "auth": {
               "type": "bearer",
@@ -860,7 +860,7 @@
           "response": []
         },
         {
-          "name": "Company Requests",
+          "name": "Owner Action - Requests for Membership in Company",
           "request": {
             "auth": {
               "type": "bearer",
@@ -892,7 +892,7 @@
           "response": []
         },
         {
-          "name": "Invitation Accepted",
+          "name": "Owner/User Action - Invitation Accepted",
           "request": {
             "auth": {
               "type": "bearer",
@@ -923,7 +923,7 @@
           "response": []
         },
         {
-          "name": "Invitation Declined",
+          "name": "Owner Action - Invitation Declined",
           "request": {
             "auth": {
               "type": "bearer",
@@ -963,7 +963,7 @@
           "response": []
         },
         {
-          "name": "Request Canceled",
+          "name": "User Action - Request Canceled",
           "request": {
             "auth": {
               "type": "bearer",
@@ -1008,7 +1008,7 @@
       "name": "Roles of Members in Company",
       "item": [
         {
-          "name": "All Admins in Company",
+          "name": "Owner Action - All Admins in Company",
           "request": {
             "auth": {
               "type": "bearer",
@@ -1038,7 +1038,7 @@
           "response": []
         },
         {
-          "name": "Assign User as Administrator",
+          "name": "Owner Action - Assign User as Administrator",
           "request": {
             "auth": {
               "type": "bearer",
@@ -1079,7 +1079,7 @@
           "response": []
         },
         {
-          "name": "Assign User as Member",
+          "name": "Owner Action - Assign User as Member",
           "request": {
             "auth": {
               "type": "bearer",
@@ -1120,7 +1120,7 @@
           "response": []
         },
         {
-          "name": "Remove Administrator of Company",
+          "name": "Owner Action - Remove Administrator of Company",
           "request": {
             "auth": {
               "type": "bearer",
@@ -1157,7 +1157,7 @@
       "name": "Quizzes",
       "item": [
         {
-          "name": "Create Quiz",
+          "name": "Owner/Admin Action - Create Quiz",
           "request": {
             "auth": {
               "type": "bearer",
@@ -1196,7 +1196,7 @@
           "response": []
         },
         {
-          "name": "All Quizzes",
+          "name": "Owner/Admin/Member Action - All Quizzes",
           "request": {
             "auth": {
               "type": "bearer",
@@ -1226,7 +1226,7 @@
           "response": []
         },
         {
-          "name": "Quiz by ID",
+          "name": "Owner/Admin/Member Action - Get Quiz by ID",
           "request": {
             "auth": {
               "type": "bearer",
@@ -1257,7 +1257,7 @@
           "response": []
         },
         {
-          "name": "Update Quiz Details",
+          "name": "Owner/Admin Action - Update Quiz Details",
           "request": {
             "auth": {
               "type": "bearer",
@@ -1297,7 +1297,7 @@
           "response": []
         },
         {
-          "name": "Delete Quiz",
+          "name": "Owner/Admin Action - Delete Quiz",
           "request": {
             "auth": {
               "type": "bearer",
@@ -1333,7 +1333,7 @@
       "name": "Quiz Workflow",
       "item": [
         {
-          "name": "Create Attempt Quiz",
+          "name": "Member Action - Create Attempt Quiz",
           "request": {
             "auth": {
               "type": "bearer",
@@ -1374,7 +1374,7 @@
           "response": []
         },
         {
-          "name": "Member Statistics in the Quiz",
+          "name": "Owner/Admin Action - Member Statistics in the Quiz",
           "request": {
             "auth": {
               "type": "bearer",
@@ -1401,6 +1401,161 @@
                 "user",
                 "3e64d870-75d0-4e0a-93c4-3714ef7be982",
                 "stats"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Quiz Export Data",
+      "item": [
+        {
+          "name": "Member Action - Export My Results",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{jwt_token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:8000/quiz-export/a5bb832d-46d7-4d10-9cd1-c415caf33db1/my?format=json",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8000",
+              "path": [
+                "quiz-export",
+                "a5bb832d-46d7-4d10-9cd1-c415caf33db1",
+                "my"
+              ],
+              "query": [
+                {
+                  "key": "format",
+                  "value": "json"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Owner/Admin Action - Export User Results",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{jwt_token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:8000/quiz-export/a5bb832d-46d7-4d10-9cd1-c415caf33db1/user/d755e06c-d3a6-4f66-9599-a5a6f3aea738?format=json",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8000",
+              "path": [
+                "quiz-export",
+                "a5bb832d-46d7-4d10-9cd1-c415caf33db1",
+                "user",
+                "d755e06c-d3a6-4f66-9599-a5a6f3aea738"
+              ],
+              "query": [
+                {
+                  "key": "format",
+                  "value": "json"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Owner/Admin Action - Export Users Results",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{jwt_token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:8000/quiz-export/a5bb832d-46d7-4d10-9cd1-c415caf33db1/users?format=json",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8000",
+              "path": [
+                "quiz-export",
+                "a5bb832d-46d7-4d10-9cd1-c415caf33db1",
+                "users"
+              ],
+              "query": [
+                {
+                  "key": "format",
+                  "value": "json"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Owner/Admin Action - Export Quizzes Results",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{jwt_token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:8000/quiz-export/a5bb832d-46d7-4d10-9cd1-c415caf33db1/quizzes/c7d6e708-961a-4dfe-ab5a-6f0dc2b3862f?format=json",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8000",
+              "path": [
+                "quiz-export",
+                "a5bb832d-46d7-4d10-9cd1-c415caf33db1",
+                "quizzes",
+                "c7d6e708-961a-4dfe-ab5a-6f0dc2b3862f"
+              ],
+              "query": [
+                {
+                  "key": "format",
+                  "value": "json"
+                }
               ]
             }
           },
