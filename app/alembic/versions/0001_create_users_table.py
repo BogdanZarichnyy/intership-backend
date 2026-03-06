@@ -1,4 +1,4 @@
-"""create users tables
+"""create users table
 
 Revision ID: 0001
 Revises: 

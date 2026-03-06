@@ -131,29 +131,26 @@ class CompanyInvitationService:
     if not invitation:
       logger.warning(f"Invitation id={invitation_id} not found")
       raise InvitationNotFound()
-    if invitation.status != InvitationStatus.pending:
+    if invitation.status != InvitationStatus.pending:  # якщо заявка була вже оброблена раніше, забороняємо зміну статусу
       logger.warning(f"Invitation already processed")
       raise InvitationAlreadyProcessed()
     company = await self.company_repo.get_company_by_id(invitation.company_id)
     if not company:
       logger.warning(f"Company not found id={invitation.company_id}")
       raise CompanyNotFound()
-    # Логіка підтвердження:
-    # 1) Власник компанії
-    if current_user.id == company.owner_id:
-      # Власник може підтверджувати всі заявки, які надійшли в його компанію
-      allowed = True
-    # 2) Користувач, який подав заявку
-    elif current_user.id == invitation.invited_user_id:
-      # Користувач може підтвердити лише свої власні заявки
-      # Перевіряємо, що ініціатором не був власник компанії або інший користувач
-      if invitation.invited_by == company.owner_id:
-        # Немає права підтверджувати запрошення від власника (invite)
-        allowed = False
-      else:
-        allowed = True
+    # Надання дозвілу на обробку заявки по зміні статусу:
+    if (
+      current_user.id == company.owner_id and   # Власник компанії не може підтверджувати заявки, які він надіслав користувачам
+      current_user.id == invitation.invited_by  # Перевіряємо, що ініціатором був власник компанії, а не користувачам
+    ):
+      allowed = False  # Не даємо дозвіл на зміну статусу власнику компанії, якщо він сам надіслав її користувачу
+    elif (
+      current_user.id == invitation.invited_user_id and   # Користувач який подав заявку в компанію, не може підтверджувати її
+      current_user.id == invitation.invited_by            # Перевіряємо, що ініціатором був користувачам, а не власник компанії
+    ):
+      allowed = False  # Не даємо дозвіл на зміну статусу користувачу, якщо він сам надіслав цю заявку в компанію
     else:
-      allowed = False
+      allowed = True  # Якщо ні одна з умов не пройшла, значить дозволяємо зміну статусу поточної заявки 
     if not allowed:
       logger.warning(f"User {current_user.id} cannot accept this invitation {invitation.id}")
       raise InvitationForbidden("You are not allowed to accept this invitation")
@@ -163,11 +160,14 @@ class CompanyInvitationService:
     # заявку може кинути як і власник компанії користувачу, так і сам користувач в компанію. Також потрібно 
     # врахувати момент що старі по часу заявки можна відхиляти, а нові можна підтверджувати на вступ. Таким 
     # чином у нас буде історія заявок на вступ, з різними часовими мітками та часом обробки цих заявок.
+    # Ця перевірка потрібна для того, щоб повторно не кидати одного і того ж користувача в члени компанії 
+    # по декілька разів - це потрібно щоб не робити дублікатів даних в таблиці, які мають різні ідентифікатори
     existing_member = await self.member_repo.get_member_of_company(invitation.company_id, invitation.invited_user_id)
     if existing_member:
+      # Якщо такий користувач вже є членом компанії, то повертаємо запис із таблиці про нього
       logger.info(f"User {invitation.invited_user_id} is already a member of company {invitation.company_id}")
     else:
-      # Додаємо користувача в члени компанії якщо такого запису ще немає в таблиці
+      # Додаємо користувача в члени компанії, якщо такого запису ще немає в таблиці
       await self.member_repo.add_member(invitation.company_id, invitation.invited_user_id)
     await self.db.commit()
     await self.db.refresh(invitation)

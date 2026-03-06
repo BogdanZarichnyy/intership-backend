@@ -1,4 +1,4 @@
-"""create companies table
+"""create company table
 
 Revision ID: 0002
 Revises: 0001

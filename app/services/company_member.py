@@ -30,8 +30,6 @@ class CompanyMemberService:
     offset: int = 0
   ) -> list[CompanyMemberResponse]:
     members = await self.member_repo.get_all_members_for_current_company(company_id=company_id, limit=limit, offset=offset)
-    print("MEMBERS FROM DB:", members)
-    print("COUNT:", len(members))
     logger.info(f"Fetched members of company {company_id}, limit={limit}, offset={offset}")
     return [CompanyMemberResponse.model_validate(member) for member in members]
 

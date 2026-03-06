@@ -9,6 +9,7 @@ from app.repositories.company import CompanyRepository
 from app.repositories.company_member import CompanyMemberRepository
 from app.repositories.quiz import QuizRepository
 from app.repositories.quiz_workflow import QuizWorkflowRepository
+from app.repositories.analytics import AnalyticsRepository
 from app.services.user import UserService
 from app.services.auth import AuthService
 from app.services.company import CompanyService
@@ -18,6 +19,7 @@ from app.services.company_role import CompanyAdminService
 from app.services.quiz import QuizService
 from app.services.quiz_workflow import QuizWorkflowService
 from app.services.quiz_export import QuizExportService
+from app.services.analytics import AnalyticsService
 
 from app.core.log_context import current_user_id_var
 
@@ -66,6 +68,14 @@ def get_quiz_export_service(db: AsyncSession = Depends(get_db)) -> QuizExportSer
   quiz_service = QuizService(QuizRepository(db), CompanyMemberRepository(db))
   member_repo = CompanyMemberRepository(db)
   return QuizExportService(quiz_service=quiz_service, member_repo=member_repo)
+
+# AnalyticsService dependency
+def get_analytics_service(
+  db: AsyncSession = Depends(get_db),
+  quiz_service: QuizService = Depends(get_quiz_service),
+):
+  repo = AnalyticsRepository(db)
+  return AnalyticsService(repo, quiz_service)
 
 # Поточний користувач із токена
 async def get_current_user(

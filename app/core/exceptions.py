@@ -175,3 +175,14 @@ class QuizExportNotFound(NotFound):
 class QuizExportCacheError(APIException):
   def __init__(self, detail: str = "Error occurred while fetching data from Redis for export"):
     super().__init__(detail)
+
+# =======================
+# Analytics
+# =======================
+class AnalyticsForbidden(Forbidden):
+  def __init__(self, detail: str = "Not allowed to access analytics"):
+    super().__init__(detail)
+
+class AnalyticsNotFound(NotFound):
+  def __init__(self, detail: str = "Analytics data not found"):
+    super().__init__(detail)
