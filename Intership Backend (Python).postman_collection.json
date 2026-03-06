@@ -152,11 +152,11 @@
                 }
               ]
             },
-            "method": "PUT",
+            "method": "PATCH",
             "header": [],
             "body": {
               "mode": "raw",
-              "raw": "{\r\n    \"email\": \"test@test.email\",\r\n    \"username\": \"Test\",\r\n    \"current_password\": \"1234\",\r\n    \"new_password\": \"123\"\r\n}",
+              "raw": "{\r\n    \"username\": \"Test\",\r\n    \"current_password\": \"123\",\r\n    \"new_password\": \"1234\"\r\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -164,7 +164,7 @@
               }
             },
             "url": {
-              "raw": "http://localhost:8000/users/f67c47da-1f1e-4b07-a781-a0f1b362bfcb",
+              "raw": "http://localhost:8000/users/55eda0fd-a826-49b2-ad46-e4bd95fe099b",
               "protocol": "http",
               "host": [
                 "localhost"
@@ -172,7 +172,7 @@
               "port": "8000",
               "path": [
                 "users",
-                "f67c47da-1f1e-4b07-a781-a0f1b362bfcb"
+                "55eda0fd-a826-49b2-ad46-e4bd95fe099b"
               ]
             }
           },
@@ -297,11 +297,11 @@
               "script": {
                 "exec": [
                   "// Зберігаємо токени, які повернув сервіс auth0\r",
-                  "if (pm.response.code === 200) {\r",
-                  "    const data = pm.response.json();\r",
-                  "    pm.collectionVariables.get(\"auth0_access_token\", data.auth0_access_token);\r",
-                  "    pm.collectionVariables.get(\"auth0_id_token\", data.auth0_id_token);\r",
-                  "}"
+                  "//if (pm.response.code === 200) {\r",
+                  "//    const data = pm.response.json();\r",
+                  "//    pm.collectionVariables.get(\"auth0_access_token\", data.auth0_access_token);\r",
+                  "//    pm.collectionVariables.get(\"auth0_id_token\", data.auth0_id_token);\r",
+                  "//}"
                 ],
                 "type": "text/javascript",
                 "packages": {},
@@ -317,7 +317,7 @@
             "header": [],
             "body": {
               "mode": "raw",
-              "raw": "{\r\n  \"access_token\": \"{{auth0_access_token}}\",\r\n  \"id_token\": \"{{auth0_id_token}}\"\r\n}",
+              "raw": "{\r\n    \"access_token\": \"eyJhbGciOiJkaXIiLCJlbmMiOiJBMjU2R0NNIiwiaXNzIjoiaHR0cHM6Ly9kZXYtamExeXFjcGZ3Mm9kdGZocC5ldS5hdXRoMC5jb20vIn0..hp-GJUsOnHwjodiH.DVaJzMtWB0fuWkZvNEfqS5FqIe-YYF_59gQLrrFFQV82YmfMvdzO9g54r1EjMip2G279iR6WXE_4hzpxhSxKUbcVwZph_TWJ--BJGgFypoKDMiUivSTv11OZEx7YfQlT9jmpqXo5btepo61cqn2C_fz9XGtJxLjh3fKrgGB7e1KITba6-thZArYOv9F6usTgXiqN8aDkFX90gCKRHt4OOylF3xCLymMGPIiPuJbK8VY3N5jT4gor6Xrd_UDK7wf35QiMjrmyMXmZMYQcEck-XfovPEysmBP8ZkET4HLtnOpHV7cn-qrRxbx898Zgr9k54Ih3_nBbCaIfA5h-G5skJtQS_IOhduE.TWK-pwnLQltwSSi7i5Bn0Q\",\r\n    \"id_token\": \"eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6IlNGWkpLNHVsMHI3cDBCdG9TelVIMyJ9.eyJnaXZlbl9uYW1lIjoiMSIsImZhbWlseV9uYW1lIjoiMSIsIm5pY2tuYW1lIjoia3VydGthbmF2YXRpIiwibmFtZSI6IjEgMSIsInBpY3R1cmUiOiJodHRwczovL2xoMy5nb29nbGV1c2VyY29udGVudC5jb20vYS9BQ2c4b2NLMWViZWdIUUlLNDZxN3J4YW1iUlB0OG1hMmFuUGtnbjBwRFNBSFo1TTBBZWdQT1E9czk2LWMiLCJ1cGRhdGVkX2F0IjoiMjAyNi0wMy0wMVQyMzozMzoxNC44MjBaIiwiZW1haWwiOiJrdXJ0a2FuYXZhdGlAZ21haWwuY29tIiwiZW1haWxfdmVyaWZpZWQiOnRydWUsImlzcyI6Imh0dHBzOi8vZGV2LWphMXlxY3BmdzJvZHRmaHAuZXUuYXV0aDAuY29tLyIsImF1ZCI6InBER3dvaEVNbTFReVloMXpKZUdqNk1wRnFnSUt2aTFXIiwic3ViIjoiZ29vZ2xlLW9hdXRoMnwxMDcxOTUwNTAzMDkzOTA2NDY3NDIiLCJpYXQiOjE3NzI0MDgwMTYsImV4cCI6MTc3MjQ0NDAxNiwic2lkIjoiZjVKWGd6RTU3R29lRTh4VmR6MFAtbFpYNW1rcVd0NlMiLCJub25jZSI6IlZIVkRRMGhWV2t4cGJIZEJWVXd5Y2t4emRFTkxPRGhrY0ZjMGRtaDJUV2hNWjFaVVgyNUxhWFV0Tnc9PSJ9.eUBm3Lx_NkibWctIwvnAbyfOxk5L-JNNpO2Fe-L4of-vsayM3Mp1thA817ounOwRlgiQ08qSNs9jv_vXl8JitfgvSSu3gwc0t_JT1YoAs2pqzhnll14tZx26Dtod3sZnWCi8EmkYXFOy_mexzwj5zfpHJT_Q5MAjuvCKfEE76taqC-zQrI8M9IMB6aN-_iLR-FcHTogQjwS9O91b0dJJcKM1IovYN7Z3B6NaUUb9PDj9Kg1qmNpCe7W2g9gHzZ1RFNmp4Pwfj9pg3_pYixHtz_17KH9VowqsLbFDadaQ9T65ArOgDSiuNNcYPYq6PGfOdmeOg4k5czNE_7VWiM1kVg\",\r\n    \"scope\": \"openid profile email\",\r\n    \"expires_in\": 86400,\r\n    \"token_type\": \"Bearer\"\r\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -491,7 +491,7 @@
             "header": [],
             "body": {
               "mode": "raw",
-              "raw": "{\r\n  \"name\": \"Test company 6\",\r\n  \"description\": \"test 6 application for intership\"\r\n}",
+              "raw": "{\r\n  \"name\": \"Test company\",\r\n  \"description\": \"Test application for intership\"\r\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -529,7 +529,7 @@
             "method": "GET",
             "header": [],
             "url": {
-              "raw": "http://localhost:8000/companies/07b93522-14e9-45b5-aaf8-d6212037f7e6",
+              "raw": "http://localhost:8000/companies/e5fcb66a-8116-4ca9-9a35-0fb0234c7e48",
               "protocol": "http",
               "host": [
                 "localhost"
@@ -537,7 +537,7 @@
               "port": "8000",
               "path": [
                 "companies",
-                "07b93522-14e9-45b5-aaf8-d6212037f7e6"
+                "e5fcb66a-8116-4ca9-9a35-0fb0234c7e48"
               ]
             }
           },
@@ -556,11 +556,11 @@
                 }
               ]
             },
-            "method": "PUT",
+            "method": "PATCH",
             "header": [],
             "body": {
               "mode": "raw",
-              "raw": "{\r\n  \"is_visible\": true\r\n}",
+              "raw": "{\r\n  \"name\": \"isdfhidwuhfiue\",\r\n  \"description\": \"dfwdfwefwefewf\",\r\n  \"is_visible\": true\r\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -568,7 +568,7 @@
               }
             },
             "url": {
-              "raw": "http://localhost:8000/companies/07b93522-14e9-45b5-aaf8-d6212037f7e6",
+              "raw": "http://localhost:8000/companies/48c4a6c1-7b01-4be4-8504-1b94f1177f0c",
               "protocol": "http",
               "host": [
                 "localhost"
@@ -576,7 +576,7 @@
               "port": "8000",
               "path": [
                 "companies",
-                "07b93522-14e9-45b5-aaf8-d6212037f7e6"
+                "48c4a6c1-7b01-4be4-8504-1b94f1177f0c"
               ]
             }
           },
@@ -598,7 +598,7 @@
             "method": "DELETE",
             "header": [],
             "url": {
-              "raw": "http://localhost:8000/companies/07b93522-14e9-45b5-aaf8-d6212037f7e6",
+              "raw": "http://localhost:8000/companies/48c4a6c1-7b01-4be4-8504-1b94f1177f0c",
               "protocol": "http",
               "host": [
                 "localhost"
@@ -606,7 +606,7 @@
               "port": "8000",
               "path": [
                 "companies",
-                "07b93522-14e9-45b5-aaf8-d6212037f7e6"
+                "48c4a6c1-7b01-4be4-8504-1b94f1177f0c"
               ]
             }
           },
@@ -616,7 +616,393 @@
     },
     {
       "name": "Company Members",
-      "item": []
+      "item": [
+        {
+          "name": "All Members of Company",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{jwt_token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:8000/company-members/a5bb832d-46d7-4d10-9cd1-c415caf33db1/members?limit=10&offset=0",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8000",
+              "path": [
+                "company-members",
+                "a5bb832d-46d7-4d10-9cd1-c415caf33db1",
+                "members"
+              ],
+              "query": [
+                {
+                  "key": "limit",
+                  "value": "10"
+                },
+                {
+                  "key": "offset",
+                  "value": "0"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Remove Member from Company",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{jwt_token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:8000/company-members/a5bb832d-46d7-4d10-9cd1-c415caf33db1/remove-member/d618fa5a-5088-494b-9504-530b8257e772",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8000",
+              "path": [
+                "company-members",
+                "a5bb832d-46d7-4d10-9cd1-c415caf33db1",
+                "remove-member",
+                "d618fa5a-5088-494b-9504-530b8257e772"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Member Leave Company",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{jwt_token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:8000/company-members/a5bb832d-46d7-4d10-9cd1-c415caf33db1/member-leave/8ba956a1-4ad0-4d4c-b4c2-dc3a31675c8d",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8000",
+              "path": [
+                "company-members",
+                "a5bb832d-46d7-4d10-9cd1-c415caf33db1",
+                "member-leave",
+                "8ba956a1-4ad0-4d4c-b4c2-dc3a31675c8d"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Company Invitations",
+      "item": [
+        {
+          "name": "Create Invitation",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{jwt_token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://localhost:8000/company-invitations/a5bb832d-46d7-4d10-9cd1-c415caf33db1/6ec75114-3ccb-4196-a47a-40e767844d15",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8000",
+              "path": [
+                "company-invitations",
+                "a5bb832d-46d7-4d10-9cd1-c415caf33db1",
+                "6ec75114-3ccb-4196-a47a-40e767844d15"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "My Requests",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{jwt_token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:8000/company-invitations/my-requests",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8000",
+              "path": [
+                "company-invitations",
+                "my-requests"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "My Invitations",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{jwt_token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:8000/company-invitations/my-invitations",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8000",
+              "path": [
+                "company-invitations",
+                "my-invitations"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Company Invitations",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{jwt_token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:8000/company-invitations/company/a5bb832d-46d7-4d10-9cd1-c415caf33db1/invited",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8000",
+              "path": [
+                "company-invitations",
+                "company",
+                "a5bb832d-46d7-4d10-9cd1-c415caf33db1",
+                "invited"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Company Requests",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{jwt_token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:8000/company-invitations/company/a5bb832d-46d7-4d10-9cd1-c415caf33db1/requests",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8000",
+              "path": [
+                "company-invitations",
+                "company",
+                "a5bb832d-46d7-4d10-9cd1-c415caf33db1",
+                "requests"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Invitation Accepted",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{jwt_token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "PATCH",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:8000/company-invitations/af8773bb-00eb-44bb-9752-8f112b354590/accept",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8000",
+              "path": [
+                "company-invitations",
+                "af8773bb-00eb-44bb-9752-8f112b354590",
+                "accept"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Invitation Declined",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{jwt_token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "PATCH",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://localhost:8000/company-invitations/dbd0f6e4-d1b0-423d-b22b-de9eae215ba0/decline",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8000",
+              "path": [
+                "company-invitations",
+                "dbd0f6e4-d1b0-423d-b22b-de9eae215ba0",
+                "decline"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Request Canceled",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{jwt_token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "PATCH",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://localhost:8000/company-invitations/bbc53598-8f39-439d-97c5-367911b61253/cancel",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8000",
+              "path": [
+                "company-invitations",
+                "bbc53598-8f39-439d-97c5-367911b61253",
+                "cancel"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
     },
     {
       "name": "Check Health Server",
@@ -636,6 +1022,48 @@
         }
       },
       "response": []
+    }
+  ],
+  "event": [
+    {
+      "listen": "prerequest",
+      "script": {
+        "type": "text/javascript",
+        "packages": {},
+        "requests": {},
+        "exec": [
+          ""
+        ]
+      }
+    },
+    {
+      "listen": "test",
+      "script": {
+        "type": "text/javascript",
+        "packages": {},
+        "requests": {},
+        "exec": [
+          ""
+        ]
+      }
+    }
+  ],
+  "variable": [
+    {
+      "key": "jwt_token",
+      "value": ""
+    },
+    {
+      "key": "refresh_token",
+      "value": ""
+    },
+    {
+      "key": "auth0_access_token",
+      "value": ""
+    },
+    {
+      "key": "auth0_id_token",
+      "value": ""
     }
   ],
   "event": [

@@ -11,7 +11,7 @@ class CompanySchema(BaseModel):
   is_visible: bool
   created_at: datetime
   updated_at: datetime
-  
+
   model_config = ConfigDict(from_attributes=True)
 
 class CompanyCreateRequest(BaseModel):
@@ -27,8 +27,9 @@ class CompanyUpdateRequest(BaseModel):
   is_visible: bool | None = None
   model_config = ConfigDict(extra="forbid")
 
+  model_config = ConfigDict(extra="forbid")
+
 class CompaniesListResponse(BaseModel):
   """Відповідь API зі списком компаній"""
   companies: list[CompanySchema]
   total: int
-  

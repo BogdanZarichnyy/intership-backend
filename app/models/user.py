@@ -1,5 +1,4 @@
 import uuid
-from datetime import datetime
 from sqlalchemy import String, Boolean, DateTime, func, UniqueConstraint
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from sqlalchemy.dialects.postgresql import UUID
@@ -16,9 +15,11 @@ class User(Base):
   username: Mapped[str] = mapped_column(String(100), unique=True, nullable=False)
   hashed_password: Mapped[str | None] = mapped_column(String(255), nullable=True)
   provider: Mapped[str] = mapped_column(String(50), nullable=False, default="local", index=True)
-  provider_id: Mapped[str | None] = mapped_column(String(255), nullable=True, index=True)
-  is_active: Mapped[bool] = mapped_column(Boolean, default=True, nullable=False)
-  created_at: Mapped[datetime] = mapped_column(DateTime, server_default=func.now())
-  updated_at: Mapped[datetime] = mapped_column(DateTime, server_default=func.now(), onupdate=func.now())
+  provider_id: Mapped[str | None] = mapped_column(String(255), unique=True, nullable=True, index=True)
+  is_active: Mapped[bool] = mapped_column(Boolean, nullable=False, default=True)
+  created_at: Mapped[DateTime] = mapped_column(DateTime, server_default=func.now())
+  updated_at: Mapped[DateTime] = mapped_column(DateTime, server_default=func.now(), onupdate=func.now())
 
   companies = relationship("Company", back_populates="owner", cascade="all, delete-orphan")
+  member_companies = relationship("CompanyMember", back_populates="member", cascade="all, delete-orphan")
+  invitations_sent = relationship("CompanyInvitation", back_populates="invited_by_user", foreign_keys="CompanyInvitation.invited_by")

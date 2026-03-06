@@ -104,3 +104,29 @@ class CompanyUpdateForbidden(Forbidden):
 class CompanyDeleteForbidden(Forbidden):
   def __init__(self, detail: str = "Only owner can delete company"):
     super().__init__(detail)
+
+# =======================
+# Company members
+# =======================
+class CompanyOwnerOnly(Forbidden):
+  def __init__(self, detail: str = "Only owners can perform this action"):
+    super().__init__(detail)
+
+class CompanyMembershipForbidden(Forbidden):
+  def __init__(self, detail: str = "You are not allowed to perform this membership action"):
+    super().__init__(detail)
+
+# =======================
+# Company invitation
+# =======================
+class InvitationNotFound(NotFound):
+  def __init__(self, detail="Invitation not found"):
+    super().__init__(detail)
+
+class InvitationAlreadyProcessed(Forbidden):
+  def __init__(self, detail="Invitation already processed"):
+    super().__init__(detail)
+
+class InvitationForbidden(Forbidden):
+  def __init__(self, detail="Action not allowed for this invitation"):
+    super().__init__(detail)

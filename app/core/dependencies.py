@@ -1,30 +1,45 @@
 from fastapi import Depends
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from sqlalchemy.ext.asyncio import AsyncSession
-from app.models.user import User
-from app.services.auth import AuthService
-from app.repositories.user import UserRepository
-from app.services.user import UserService
+
 from app.db.postgres import get_db
+from app.models.user import User
+from app.repositories.user import UserRepository
+from app.repositories.company import CompanyRepository
+from app.repositories.company_member import CompanyMemberRepository
+from app.services.user import UserService
+from app.services.auth import AuthService
+from app.services.company import CompanyService
+from app.services.company_member import CompanyMemberService
+from app.services.company_invitation import CompanyInvitationService
+
 from app.core.log_context import current_user_id_var
 
 security = HTTPBearer()
 
-# =========================
 # UserService dependency
-# =========================
-def get_user_service(db: AsyncSession = Depends(get_db)) -> UserService:
+async def get_user_service(db: AsyncSession = Depends(get_db)) -> UserService:
   return UserService(UserRepository(db))
 
-# =========================
 # AuthService dependency
-# =========================
-def get_auth_service(db: AsyncSession = Depends(get_db)) -> AuthService:
+async def get_auth_service(db: AsyncSession = Depends(get_db)) -> AuthService:
   return AuthService(UserRepository(db))
 
-# =========================
+# CompanyService dependency
+async def get_company_service(db: AsyncSession = Depends(get_db)) -> CompanyService:
+  return CompanyService(CompanyRepository(db))
+
+# CompanyMemberService dependency
+async def get_company_member_service(db: AsyncSession = Depends(get_db)) -> CompanyMemberService:
+  member_repo = CompanyMemberRepository(db)
+  company_repo = CompanyRepository(db)
+  return CompanyMemberService(member_repo, company_repo)
+
+# CompanyInvitationService dependency
+async def get_invitation_service(db: AsyncSession = Depends(get_db)) -> CompanyInvitationService:
+  return CompanyInvitationService(db)
+
 # Поточний користувач із токена
-# =========================
 async def get_current_user(
   credentials: HTTPAuthorizationCredentials = Depends(security),
   service: AuthService = Depends(get_auth_service),

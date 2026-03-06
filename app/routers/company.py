@@ -1,8 +1,5 @@
 from uuid import UUID
 from fastapi import APIRouter, Depends, Query, status
-from sqlalchemy.ext.asyncio import AsyncSession
-
-from app.db.postgres import get_db
 from app.services.company import CompanyService
 from app.schemas.company import (
   CompanySchema,
@@ -11,15 +8,9 @@ from app.schemas.company import (
   CompaniesListResponse
 )
 from app.models.user import User
-from app.core.dependencies import get_current_user
-from app.repositories.company import CompanyRepository
+from app.core.dependencies import get_current_user, get_company_service
 
 router = APIRouter(tags=["companies"])
-
-def get_company_service(
-  db: AsyncSession = Depends(get_db)
-) -> CompanyService:
-  return CompanyService(CompanyRepository(db))
 
 # Отримати список компаній
 @router.get(

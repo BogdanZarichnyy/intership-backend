@@ -43,7 +43,7 @@ class UserRepository:
       select(User).where(User.email == email)
     )
     return result.scalar_one_or_none()
-  
+
   async def get_user_by_username(
     self,
     username: str

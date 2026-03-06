@@ -154,4 +154,3 @@ class UserService:
     logger.info(f"Fetched user id={user_id}")
     await self.repo.delete_user(user)
     logger.info(f"User deleted id={user_id}")
-    return

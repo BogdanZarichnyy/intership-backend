@@ -39,4 +39,3 @@ class UsersListResponse(BaseModel):
   """Відповідь API зі списком користувачів"""
   users: list[UserSchema]
   total: int
-  
