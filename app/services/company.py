@@ -1,14 +1,12 @@
 from uuid import UUID
-
+from typing import Tuple
 from app.models.company import Company
 from app.models.user import User
 from app.schemas.company import CompanyCreateRequest, CompanyUpdateRequest
 from app.repositories.company import CompanyRepository
 from app.core.exceptions import (
   CompanyNotFound,
-  CompanyForbidden,
-  CompanyUpdateForbidden,
-  CompanyDeleteForbidden,
+  CompanyForbidden
 )
 from app.core.logger import logger
 
@@ -19,11 +17,12 @@ class CompanyService:
 
   async def get_all_companies(
     self,
+    current_user: User,
     limit: int,
-    offset: int,
-  ) -> tuple[list[Company], int]:
-    companies = await self.repo.get_all_visible_companies(limit, offset)
-    total = await self.repo.count_visible_companies()
+    offset: int
+  ) -> Tuple[list[Company], int]:
+    companies = await self.repo.get_all_visible_companies(current_user.id, limit, offset)
+    total = await self.repo.count_visible_companies(current_user.id,)
     logger.info(f"Fetched visible companies limit={limit} offset={offset}")
     return companies, total
 
@@ -47,13 +46,9 @@ class CompanyService:
     owner: User,
     company_data: CompanyCreateRequest,
   ) -> Company:
-    company = Company(
-      name=company_data.name,
-      description=company_data.description,
-      is_visible=company_data.is_visible,
-      owner_id=owner.id,
-    )
-    company = await self.repo.create_company(company)
+    data = company_data.model_dump()
+    data["owner_id"] = owner.id
+    company = await self.repo.create_company(data)
     logger.info(f"Company created id={company.id}")
     return company
 
@@ -69,14 +64,12 @@ class CompanyService:
       raise CompanyNotFound()
     if company.owner_id != current_user.id:
       logger.warning(f"Only owner can update company id={company.id}")
-      raise CompanyUpdateForbidden()
-    if update_data.name is not None:
-      company.name = update_data.name
-    if update_data.description is not None:
-      company.description = update_data.description
-    if update_data.is_visible is not None:
-      company.is_visible = update_data.is_visible
-    company = await self.repo.update_company(company)
+      raise CompanyNotFound()
+    new_data = update_data.model_dump(exclude_none=True)
+    if not new_data:
+      logger.warning(f"Empty update payload for company id={company.id} by user id={current_user.id}")
+      raise CompanyForbidden(f"Empty update payload for company id={company.id} by user id={current_user.id}")
+    company = await self.repo.update_company(company, new_data)
     logger.info(f"Company updated id={company.id}")
     return company
 
@@ -91,6 +84,6 @@ class CompanyService:
       raise CompanyNotFound()
     if company.owner_id != current_user.id:
       logger.warning(f"Only owner can delete company id={company.id}")
-      raise CompanyDeleteForbidden()
+      raise CompanyNotFound()
     await self.repo.delete_company(company)
     logger.info(f"Company deleted id={company.id}")
