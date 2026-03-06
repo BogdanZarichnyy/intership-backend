@@ -20,8 +20,7 @@ async def list_admins(
   current_user: User = Depends(get_current_user),
   service: CompanyAdminService = Depends(get_company_admin_service)
 ):
-  admins = await service.get_list_admins(company_id, current_user)
-  return CompanyAdminsResponse(admins=admins)
+  return await service.get_list_admins(company_id, current_user)
 
 # Призначити користувача адміністратором
 @router.patch(

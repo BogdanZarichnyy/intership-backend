@@ -42,7 +42,9 @@ async def get_invitation_service(db: AsyncSession = Depends(get_db)) -> CompanyI
 
 # CompanyAdminService dependency
 async def get_company_admin_service(db: AsyncSession = Depends(get_db)) -> CompanyAdminService:
-  return CompanyAdminService(db)
+  member_repo = CompanyMemberRepository(db)
+  company_repo = CompanyRepository(db)
+  return CompanyAdminService(member_repo, company_repo)
 
 # Поточний користувач із токена
 async def get_current_user(

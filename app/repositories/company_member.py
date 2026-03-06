@@ -1,8 +1,8 @@
 from uuid import UUID
 
-from sqlalchemy import select, delete
+from sqlalchemy import insert, select, update, delete
 from sqlalchemy.ext.asyncio import AsyncSession
-
+from app.models.user import User
 from app.models.company_member import CompanyMember, CompanyRole
 
 class CompanyMemberRepository:
@@ -23,17 +23,32 @@ class CompanyMemberRepository:
     await self.db.commit()
     return member
   
+    # query = (
+    #   insert(CompanyMember)
+    #   .values(
+    #     company_id=company_id,
+    #     user_id=user_id
+    #   )
+    #   .execution_options(synchronize_session="fetch")
+    #   .returning(CompanyMember)
+    # )
+    # result = await self.db.execute(query)
+    # await self.db.commit()
+    # return result
+  
   async def get_member_of_company(
     self, 
     company_id: UUID, 
     user_id: UUID
   ) -> CompanyMember | None:
-    result = await self.db.execute(
-      select(CompanyMember).where(
+    query = (
+      select(CompanyMember)
+      .where(
         CompanyMember.company_id == company_id,
         CompanyMember.member_id == user_id
       )
     )
+    result = await self.db.execute(query)
     return result.scalar_one_or_none()
 
   async def remove_member(
@@ -51,26 +66,37 @@ class CompanyMemberRepository:
     await self.db.commit()
 
   async def get_all_members_for_current_company(
-    self, 
-    company_id: UUID, 
-    role: CompanyRole | None = None, 
+    self,
+    company_id: UUID,
     limit: int = 100, 
     offset: int = 0
   ):
-    query = select(CompanyMember).where(CompanyMember.company_id == company_id)
-    if role is not None:
-      query = query.where(CompanyMember.role == role.value)
-    query = query.limit(limit).offset(offset)
+    query = (
+      select(CompanyMember)
+      .where(
+        CompanyMember.company_id == company_id,
+        CompanyMember.role == CompanyRole.admin
+      )
+      .limit(limit).offset(offset)
+    )
     result = await self.db.execute(query)
     return result.scalars().all()
 
   async def set_role(
     self, 
-    member: CompanyMember, 
+    company_id: UUID, 
+    member_id: UUID, 
     role: CompanyRole
   ) -> CompanyMember:
-    member.role = role
-    self.db.add(member)
-    await self.db.commit()
-    await self.db.refresh(member)
-    return member
+    query = (
+      update(CompanyMember)
+      .where(
+          CompanyMember.company_id == company_id,
+          CompanyMember.member_id == member_id
+      )
+      .values(role=role)
+      .execution_options(synchronize_session="fetch")
+      .returning(CompanyMember)
+    )
+    result = await self.db.execute(query)
+    return result.scalar_one_or_none()

@@ -24,7 +24,7 @@ async def get_all_companies(
   current_user: User = Depends(get_current_user),
   service: CompanyService = Depends(get_company_service)
 ):
-  companies, total = await service.get_all_companies(limit, offset)
+  companies, total = await service.get_all_companies(current_user, limit, offset)
   return CompaniesListResponse(companies=companies, total=total)
 
 # Отримати компанію по ID
