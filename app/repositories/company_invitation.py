@@ -10,17 +10,12 @@ class CompanyInvitationRepository:
 
   async def create_invitation(
     self,
-    company_id: UUID,
-    invited_user_id: UUID,
-    invited_by: UUID
+    data: dict
   ) -> CompanyInvitation:
-    invitation = CompanyInvitation(
-      company_id=company_id,
-      invited_user_id=invited_user_id,
-      invited_by=invited_by
-    )
+    invitation = CompanyInvitation(**data)
     self.db.add(invitation)
-    await self.db.flush()
+    await self.db.commit()
+    await self.db.refresh(invitation)
     return invitation
 
   async def get_invitation_by_id(
@@ -150,8 +145,9 @@ class CompanyInvitationRepository:
     status: InvitationStatus,
   ) -> CompanyInvitation:
     invitation.status = status
-    # add не обов'язковий, але safe
     self.db.add(invitation)
+    await self.db.commit()
+    await self.db.refresh(invitation)
     return invitation
 
   # delete_invitation наразі не використовується, але може знадобитися для повного видалення запрошення замість простої зміни статусу
@@ -160,3 +156,4 @@ class CompanyInvitationRepository:
     invitation: CompanyInvitation,
   ) -> None:
     await self.db.delete(invitation)
+    await self.db.commit()
