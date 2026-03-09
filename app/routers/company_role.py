@@ -1,11 +1,10 @@
 from uuid import UUID
 from fastapi import APIRouter, Depends, status
-
-from app.schemas.company_member import CompanyMemberResponse, CompanyAdminsResponse
 from app.core.dependencies import get_current_user, get_company_admin_service
-from app.services.company_role import CompanyAdminService
-from app.models.company_member import CompanyRole
 from app.models.user import User
+from app.models.company_member import CompanyRole
+from app.schemas.company_member import CompanyMemberResponse, CompanyAdminsResponse
+from app.services.company_role import CompanyAdminService
 
 router = APIRouter(tags=["company-role"])
 

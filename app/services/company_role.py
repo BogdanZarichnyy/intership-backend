@@ -3,7 +3,7 @@ from app.core.logger import logger
 from app.core.exceptions import CompanyNotFound, CompanyOwnerOnly, CompanyMembershipForbidden
 from app.repositories.company_member import CompanyMemberRepository
 from app.repositories.company import CompanyRepository
-from app.models.company_member import CompanyMember, CompanyRole
+from app.models.company_member import CompanyRole
 from app.models.user import User
 from app.schemas.company_member import CompanyAdminsResponse, CompanyMemberResponse
 
@@ -25,7 +25,7 @@ class CompanyAdminService:
       logger.warning(f"User {current_user.id} is not owner company id={company_id}")
       raise CompanyOwnerOnly()
     logger.info(f"Fetched member in company id={company_id}")
-    result = await self.member_repo.get_all_members_for_current_company(company_id)
+    result = await self.member_repo.get_all_members_for_current_company(company_id, role=CompanyRole.admin)
     return CompanyAdminsResponse(admins=result)
 
   async def change_member_role(
@@ -68,4 +68,3 @@ class CompanyAdminService:
       logger.warning(f"User {user_id} is not a member or admin of company {company_id}")
       raise CompanyMembershipForbidden("User is not an admin")
     await self.member_repo.remove_member(company_id, user_id)
-

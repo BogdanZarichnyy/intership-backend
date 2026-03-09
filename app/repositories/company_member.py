@@ -1,8 +1,6 @@
 from uuid import UUID
-
-from sqlalchemy import insert, select, update, delete
 from sqlalchemy.ext.asyncio import AsyncSession
-from app.models.user import User
+from sqlalchemy import insert, select, update, delete
 from app.models.company_member import CompanyMember, CompanyRole
 
 class CompanyMemberRepository:
@@ -14,27 +12,18 @@ class CompanyMemberRepository:
     self, 
     company_id: UUID,
     user_id: UUID
-  ):
-    member = CompanyMember(
-      company_id=company_id,
-      member_id=user_id
+  ) -> CompanyMember:
+    query = (
+      insert(CompanyMember)
+      .values(
+        company_id=company_id,
+        member_id=user_id
+      )
+      .returning(CompanyMember)
     )
-    self.db.add(member)
+    result = await self.db.execute(query)
     await self.db.commit()
-    return member
-  
-    # query = (
-    #   insert(CompanyMember)
-    #   .values(
-    #     company_id=company_id,
-    #     user_id=user_id
-    #   )
-    #   .execution_options(synchronize_session="fetch")
-    #   .returning(CompanyMember)
-    # )
-    # result = await self.db.execute(query)
-    # await self.db.commit()
-    # return result
+    return result
   
   async def get_member_of_company(
     self, 
@@ -55,7 +44,7 @@ class CompanyMemberRepository:
     self, 
     company_id: UUID, 
     user_id: UUID
-  ):
+  ) -> None:
     await self.db.execute(
       delete(CompanyMember)
       .where(
@@ -68,17 +57,17 @@ class CompanyMemberRepository:
   async def get_all_members_for_current_company(
     self,
     company_id: UUID,
+    role: CompanyRole | None = None,
     limit: int = 100, 
     offset: int = 0
-  ):
+  ) -> list[CompanyMember]:
     query = (
       select(CompanyMember)
-      .where(
-        CompanyMember.company_id == company_id,
-        CompanyMember.role == CompanyRole.admin
-      )
-      .limit(limit).offset(offset)
+      .where(CompanyMember.company_id == company_id)
     )
+    if role is not None:
+      query = query.where(CompanyMember.role == role)
+    query = query.limit(limit).offset(offset)
     result = await self.db.execute(query)
     return result.scalars().all()
 
