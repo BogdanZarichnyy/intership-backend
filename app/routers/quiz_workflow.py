@@ -9,7 +9,7 @@ from app.models.user import User
 router = APIRouter(tags=["quiz-workflow"])
 
 @router.post(
-  "/{company_id}/{quiz_id}/attempt",
+  "/company/{company_id}/quiz/{quiz_id}/attempt",
   response_model=QuizAttemptResponse,
   status_code=status.HTTP_201_CREATED
 )
@@ -23,7 +23,7 @@ async def attempt_quiz(
   return await service.attempt_quiz(company_id, quiz_id, payload, current_user)
 
 @router.get(
-  "/{company_id}/user/{user_id}/stats",
+  "/company/{company_id}/user/{user_id}/stats",
   response_model=UserQuizStatsResponse,
   status_code=status.HTTP_200_OK
 )
