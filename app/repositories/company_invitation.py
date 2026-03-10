@@ -1,6 +1,6 @@
 from uuid import UUID
-from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy import insert, select, update, delete
 from app.models.company_invitation import CompanyInvitation, InvitationStatus
 from app.models.company import Company
 
@@ -10,27 +10,26 @@ class CompanyInvitationRepository:
 
   async def create_invitation(
     self,
-    company_id: UUID,
-    invited_user_id: UUID,
-    invited_by: UUID
+    data: dict
   ) -> CompanyInvitation:
-    invitation = CompanyInvitation(
-      company_id=company_id,
-      invited_user_id=invited_user_id,
-      invited_by=invited_by
+    query = (
+      insert(CompanyInvitation)
+      .values(**data)
+      .returning(CompanyInvitation)
     )
-    self.db.add(invitation)
-    await self.db.flush()
-    return invitation
+    result = await self.db.execute(query)
+    await self.db.commit()
+    return result.scalar_one()
 
   async def get_invitation_by_id(
     self,
     invitation_id: UUID
   ) -> CompanyInvitation | None:
-    stmt = select(CompanyInvitation).where(
-      CompanyInvitation.id == invitation_id
+    query = (
+      select(CompanyInvitation)
+      .where(CompanyInvitation.id == invitation_id)
     )
-    result = await self.db.execute(stmt)
+    result = await self.db.execute(query)
     return result.scalar_one_or_none()
 
   async def get_user_invitations(
@@ -39,7 +38,7 @@ class CompanyInvitationRepository:
     limit: int,
     offset: int
   ) -> list[CompanyInvitation]:
-      stmt = (
+      query = (
         select(CompanyInvitation)
         .where(
           CompanyInvitation.invited_user_id == user_id,
@@ -49,7 +48,7 @@ class CompanyInvitationRepository:
         .limit(limit)
         .offset(offset)
       )
-      result = await self.db.execute(stmt)
+      result = await self.db.execute(query)
       return result.scalars().all()
   
   # 1. USER → список своїх membership requests
@@ -59,7 +58,7 @@ class CompanyInvitationRepository:
     limit: int,
     offset: int
   ) -> list[CompanyInvitation]:
-    stmt = (
+    query = (
       select(CompanyInvitation)
       .join(
         Company,
@@ -74,7 +73,7 @@ class CompanyInvitationRepository:
       .limit(limit)
       .offset(offset)
     )
-    result = await self.db.execute(stmt)
+    result = await self.db.execute(query)
     return result.scalars().all()
 
   # 2. USER → список received invitations
@@ -84,7 +83,7 @@ class CompanyInvitationRepository:
     limit: int,
     offset: int
   ) -> list[CompanyInvitation]:
-    stmt = (
+    query = (
       select(CompanyInvitation)
       .join(
         Company,
@@ -98,7 +97,7 @@ class CompanyInvitationRepository:
       .limit(limit)
       .offset(offset)
     )
-    result = await self.db.execute(stmt)
+    result = await self.db.execute(query)
     return result.scalars().all()
 
   # 3. OWNER → invited users
@@ -109,7 +108,7 @@ class CompanyInvitationRepository:
     limit: int,
     offset: int
   ) -> list[CompanyInvitation]:
-    stmt = (
+    query = (
       select(CompanyInvitation)
       .where(
         CompanyInvitation.company_id == company_id,
@@ -119,7 +118,7 @@ class CompanyInvitationRepository:
       .limit(limit)
       .offset(offset)
     )
-    result = await self.db.execute(stmt)
+    result = await self.db.execute(query)
     return result.scalars().all()
 
   # 4. OWNER → pending membership requests
@@ -130,7 +129,7 @@ class CompanyInvitationRepository:
       limit: int,
       offset: int
   ) -> list[CompanyInvitation]:
-    stmt = (
+    query = (
       select(CompanyInvitation)
       .where(
         CompanyInvitation.company_id == company_id,
@@ -141,22 +140,29 @@ class CompanyInvitationRepository:
       .limit(limit)
       .offset(offset)
     )
-    result = await self.db.execute(stmt)
+    result = await self.db.execute(query)
     return result.scalars().all()
 
   async def update_status(
     self,
-    invitation: CompanyInvitation,
+    invitation_id: UUID,
     status: InvitationStatus,
   ) -> CompanyInvitation:
-    invitation.status = status
-    # add не обов'язковий, але safe
-    self.db.add(invitation)
-    return invitation
+    query = (
+      update(CompanyInvitation)
+      .where(CompanyInvitation.id == invitation_id)
+      .values(status=status)
+      .returning(CompanyInvitation)
+    )
+    result = await self.db.execute(query)
+    await self.db.commit()
+    return result.scalar_one_or_none()
 
   # delete_invitation наразі не використовується, але може знадобитися для повного видалення запрошення замість простої зміни статусу
   async def delete_invitation(
     self,
-    invitation: CompanyInvitation,
+    invitation_id: UUID
   ) -> None:
-    await self.db.delete(invitation)
+    query = delete(CompanyInvitation).where(CompanyInvitation.id == invitation_id)
+    await self.db.execute(query)
+    await self.db.commit()

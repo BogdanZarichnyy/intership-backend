@@ -1,10 +1,9 @@
-from fastapi import APIRouter, Depends, Query, status
 from uuid import UUID
-
+from fastapi import APIRouter, Depends, Query, status
+from app.core.dependencies import get_current_user, get_quiz_service
+from app.models.user import User
 from app.schemas.quiz import QuizCreateRequest, QuizUpdateRequest, QuizSchema, QuizListResponse
 from app.services.quiz import QuizService
-from app.models.user import User
-from app.core.dependencies import get_current_user, get_quiz_service
 
 router = APIRouter(tags=["quizzes"])
 

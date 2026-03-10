@@ -1,12 +1,13 @@
 from fastapi import Depends
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from sqlalchemy.ext.asyncio import AsyncSession
-
+from app.core.log_context import current_user_id_var
 from app.db.postgres import get_db
 from app.models.user import User
 from app.repositories.user import UserRepository
 from app.repositories.company import CompanyRepository
 from app.repositories.company_member import CompanyMemberRepository
+from app.repositories.company_invitation import CompanyInvitationRepository
 from app.repositories.quiz import QuizRepository
 from app.services.user import UserService
 from app.services.auth import AuthService
@@ -15,8 +16,6 @@ from app.services.company_member import CompanyMemberService
 from app.services.company_invitation import CompanyInvitationService
 from app.services.company_role import CompanyAdminService
 from app.services.quiz import QuizService
-
-from app.core.log_context import current_user_id_var
 
 security = HTTPBearer()
 
@@ -40,15 +39,24 @@ async def get_company_member_service(db: AsyncSession = Depends(get_db)) -> Comp
 
 # CompanyInvitationService dependency
 async def get_invitation_service(db: AsyncSession = Depends(get_db)) -> CompanyInvitationService:
-  return CompanyInvitationService(db)
+  invitation_repo = CompanyInvitationRepository(db)
+  member_repo = CompanyMemberRepository(db)
+  company_repo = CompanyRepository(db)
+  return CompanyInvitationService(invitation_repo, member_repo, company_repo)
 
 # CompanyAdminService dependency
 async def get_company_admin_service(db: AsyncSession = Depends(get_db)) -> CompanyAdminService:
-  return CompanyAdminService(db)
+  member_repo = CompanyMemberRepository(db)
+  company_repo = CompanyRepository(db)
+  return CompanyAdminService(member_repo, company_repo)
 
 # QuizService dependency
 async def get_quiz_service(db: AsyncSession = Depends(get_db)) -> QuizService:
-  return QuizService(QuizRepository(db), CompanyMemberRepository(db))
+  quiz_repo = QuizRepository(db)
+  member_repo = CompanyMemberRepository(db)
+  company_repo = CompanyRepository(db)
+  company_member_service = CompanyMemberService(member_repo, company_repo)
+  return QuizService(quiz_repo, member_repo, company_repo, company_member_service)
 
 # Поточний користувач із токена
 async def get_current_user(
