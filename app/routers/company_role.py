@@ -1,11 +1,10 @@
 from uuid import UUID
 from fastapi import APIRouter, Depends, status
-
-from app.schemas.company_member import CompanyMemberResponse, CompanyAdminsResponse
 from app.core.dependencies import get_current_user, get_company_admin_service
-from app.services.company_role import CompanyAdminService
-from app.models.company_member import CompanyRole
 from app.models.user import User
+from app.models.company_member import CompanyRole
+from app.schemas.company_member import CompanyMemberResponse, CompanyAdminsResponse
+from app.services.company_role import CompanyAdminService
 
 router = APIRouter(tags=["company-role"])
 
@@ -20,8 +19,7 @@ async def list_admins(
   current_user: User = Depends(get_current_user),
   service: CompanyAdminService = Depends(get_company_admin_service)
 ):
-  admins = await service.get_list_admins(company_id, current_user)
-  return CompanyAdminsResponse(admins=admins)
+  return await service.get_list_admins(company_id, current_user)
 
 # Призначити користувача адміністратором
 @router.patch(

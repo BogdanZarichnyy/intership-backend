@@ -11,6 +11,7 @@ class QuizAttemptRequest(BaseModel):
 
 class QuizAttemptResponse(BaseModel):
   quiz_id: UUID
+  company_id: UUID
   user_id: UUID
   correct_answers: int
   total_questions: int
