@@ -1,6 +1,4 @@
 from uuid import UUID
-from app.models.user import User
-from app.repositories.user import UserRepository
 from app.core.security import (
   verify_password, 
   create_access_token, 
@@ -9,17 +7,19 @@ from app.core.security import (
 )
 from app.core.auth0 import decode_auth0_token
 from app.core.exceptions import (
-    InvalidCredentials,
-    InvalidToken,
-    InvalidTokenType,
-    InvalidTokenPayload,
-    UserDisabled,
-    UserNotFound,
-    MissingIdToken,
-    InvalidAuth0Token,
-    EmailNotVerified,
-    EmailNotFoundInToken,
+  InvalidCredentials,
+  InvalidToken,
+  InvalidTokenType,
+  InvalidTokenPayload,
+  UserDisabled,
+  UserNotFound,
+  MissingIdToken,
+  InvalidAuth0Token,
+  EmailNotVerified,
+  EmailNotFoundInToken
 )
+from app.models.user import User
+from app.repositories.user import UserRepository
 
 class AuthService:
   def __init__(self, repo: UserRepository):

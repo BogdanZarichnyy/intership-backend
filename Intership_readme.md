@@ -1,5 +1,6 @@
 # intership-backend
 
+ТЗ: https://flash-people-437.notion.site/Tasks-Back-End-15-eng-version-2bca27416b388197bf4bf195775eaf30#2bca27416b388118b66cca861cdeec57
 Backend-сервіс, побудований за допомогою **FastAPI**
 http://localhost:8000/docs
 
@@ -224,7 +225,7 @@ http://localhost:8000/docs
   ```
 
  ## Первірка підключення до Redis в контейнері docker:
-  Спочатку отримуємо список активних контейнерів і отримати run_id того контейнера, який потрібно перевірити:
+  Спочатку отримуємо список активних контейнерів і run_id того контейнера, який потрібно перевірити:
   ```bash
   docker ps
   docker exec -it redis redis-cli INFO server | grep run_id

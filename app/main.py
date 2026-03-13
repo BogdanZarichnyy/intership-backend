@@ -14,7 +14,7 @@ from app.routers.company_invitation import router as companyInvitationRouter
 from app.routers.company_role import router as companyRoleRouter
 from app.routers.quiz import router as quizRouter
 from app.routers.quiz_workflow import router as quizResultsRouter
-from app.routers.quiz_export import router as quizExportResultsRouter
+from app.routers.quiz_workflow_export import router as quizExportResultsRouter
 
 from app.middleware.cors import setup_middlewares
 from app.middleware.logger_middleware import RequestLoggingMiddleware

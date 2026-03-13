@@ -1,6 +1,7 @@
 from uuid import UUID
 from fastapi import APIRouter, Depends, Query, status
 from app.core.dependencies import get_current_user, get_user_service
+from app.models.user import User
 from app.schemas.user import (
   UserSchema,
   SignUpRequest,
@@ -8,7 +9,6 @@ from app.schemas.user import (
   UserUpdate
 )
 from app.services.user import UserService
-from app.models.user import User
 
 router = APIRouter(tags=["users"])
 
@@ -70,10 +70,11 @@ async def update_user(
   current_user: User = Depends(get_current_user),
   service: UserService = Depends(get_user_service)
 ):
-  return await service.update_user_details(user_id, update_data, current_user.id)
+  return await service.update_user_details(user_id, update_data, current_user)
 
 @router.delete(
   "/{user_id}",
+  response_model=None,
   status_code=status.HTTP_204_NO_CONTENT
 )
 async def delete_user(

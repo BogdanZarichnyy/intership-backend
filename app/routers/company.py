@@ -1,14 +1,14 @@
 from uuid import UUID
 from fastapi import APIRouter, Depends, Query, status
-from app.services.company import CompanyService
+from app.core.dependencies import get_current_user, get_company_service
+from app.models.user import User
 from app.schemas.company import (
   CompanySchema,
   CompanyCreateRequest,
   CompanyUpdateRequest,
   CompaniesListResponse
 )
-from app.models.user import User
-from app.core.dependencies import get_current_user, get_company_service
+from app.services.company import CompanyService
 
 router = APIRouter(tags=["companies"])
 
@@ -24,8 +24,7 @@ async def get_all_companies(
   current_user: User = Depends(get_current_user),
   service: CompanyService = Depends(get_company_service)
 ):
-  companies, total = await service.get_all_companies(limit, offset)
-  return CompaniesListResponse(companies=companies, total=total)
+  return await service.get_all_companies(current_user, limit, offset)
 
 # Отримати компанію по ID
 @router.get(

@@ -156,7 +156,7 @@
             "header": [],
             "body": {
               "mode": "raw",
-              "raw": "{\r\n    \"username\": \"Test\",\r\n    \"current_password\": \"123\",\r\n    \"new_password\": \"1234\"\r\n}",
+              "raw": "{\r\n    \"username\": \"Keter\"\r\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -164,7 +164,7 @@
               }
             },
             "url": {
-              "raw": "http://localhost:8000/users/55eda0fd-a826-49b2-ad46-e4bd95fe099b",
+              "raw": "http://localhost:8000/users/6964645c-e4bd-4807-ac26-de8b0ad7e0b2",
               "protocol": "http",
               "host": [
                 "localhost"
@@ -172,7 +172,7 @@
               "port": "8000",
               "path": [
                 "users",
-                "55eda0fd-a826-49b2-ad46-e4bd95fe099b"
+                "6964645c-e4bd-4807-ac26-de8b0ad7e0b2"
               ]
             }
           },
@@ -369,7 +369,7 @@
             "header": [],
             "body": {
               "mode": "raw",
-              "raw": "{\r\n    \"email\": \"shtroyner@test.email\",\r\n    \"password\": \"123\"\r\n}",
+              "raw": "{\r\n    \"email\": \"capitoshka@test.email\",\r\n    \"password\": \"123\"\r\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -491,7 +491,7 @@
             "header": [],
             "body": {
               "mode": "raw",
-              "raw": "{\r\n  \"name\": \"Test company\",\r\n  \"description\": \"Test application for intership\"\r\n}",
+              "raw": "{\r\n  \"name\": \"Kratos company\",\r\n  \"description\": \"Kratos application for intership\"\r\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -560,7 +560,7 @@
             "header": [],
             "body": {
               "mode": "raw",
-              "raw": "{\r\n  \"name\": \"isdfhidwuhfiue\",\r\n  \"description\": \"dfwdfwefwefewf\",\r\n  \"is_visible\": true\r\n}",
+              "raw": "{\r\n  \"name\": \"isdfhidwuhfiue\",\r\n  \"description\": \"dfwdfwefwefewf\",\r\n  \"is_visible\": false\r\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -568,7 +568,7 @@
               }
             },
             "url": {
-              "raw": "http://localhost:8000/companies/48c4a6c1-7b01-4be4-8504-1b94f1177f0c",
+              "raw": "http://localhost:8000/companies/e26101e9-9b14-48a3-a07f-e2a1c1a38971",
               "protocol": "http",
               "host": [
                 "localhost"
@@ -576,7 +576,7 @@
               "port": "8000",
               "path": [
                 "companies",
-                "48c4a6c1-7b01-4be4-8504-1b94f1177f0c"
+                "e26101e9-9b14-48a3-a07f-e2a1c1a38971"
               ]
             }
           },
@@ -752,7 +752,7 @@
               }
             },
             "url": {
-              "raw": "http://localhost:8000/company-invitations/a5bb832d-46d7-4d10-9cd1-c415caf33db1/8c20832f-a345-4f58-8795-325f9858171f",
+              "raw": "http://localhost:8000/company-invitations/e26101e9-9b14-48a3-a07f-e2a1c1a38971?user_id=ff8dad2b-f723-44de-ab31-f544c325642a",
               "protocol": "http",
               "host": [
                 "localhost"
@@ -760,8 +760,13 @@
               "port": "8000",
               "path": [
                 "company-invitations",
-                "a5bb832d-46d7-4d10-9cd1-c415caf33db1",
-                "8c20832f-a345-4f58-8795-325f9858171f"
+                "e26101e9-9b14-48a3-a07f-e2a1c1a38971"
+              ],
+              "query": [
+                {
+                  "key": "user_id",
+                  "value": "ff8dad2b-f723-44de-ab31-f544c325642a"
+                }
               ]
             }
           },
@@ -843,7 +848,7 @@
             "method": "GET",
             "header": [],
             "url": {
-              "raw": "http://localhost:8000/company-invitations/company/a5bb832d-46d7-4d10-9cd1-c415caf33db1/invited",
+              "raw": "http://localhost:8000/company-invitations/a5bb832d-46d7-4d10-9cd1-c415caf33db1/invited",
               "protocol": "http",
               "host": [
                 "localhost"
@@ -851,7 +856,6 @@
               "port": "8000",
               "path": [
                 "company-invitations",
-                "company",
                 "a5bb832d-46d7-4d10-9cd1-c415caf33db1",
                 "invited"
               ]
@@ -875,7 +879,7 @@
             "method": "GET",
             "header": [],
             "url": {
-              "raw": "http://localhost:8000/company-invitations/company/a5bb832d-46d7-4d10-9cd1-c415caf33db1/requests",
+              "raw": "http://localhost:8000/company-invitations/a5bb832d-46d7-4d10-9cd1-c415caf33db1/requests",
               "protocol": "http",
               "host": [
                 "localhost"
@@ -883,7 +887,6 @@
               "port": "8000",
               "path": [
                 "company-invitations",
-                "company",
                 "a5bb832d-46d7-4d10-9cd1-c415caf33db1",
                 "requests"
               ]
@@ -907,7 +910,7 @@
             "method": "PATCH",
             "header": [],
             "url": {
-              "raw": "http://localhost:8000/company-invitations/d5469ad0-051e-4692-90fc-786f0cf6e828/accept",
+              "raw": "http://localhost:8000/company-invitations/e59bb192-8243-4cbd-b5cd-a558c4f05569/accept",
               "protocol": "http",
               "host": [
                 "localhost"
@@ -915,7 +918,7 @@
               "port": "8000",
               "path": [
                 "company-invitations",
-                "d5469ad0-051e-4692-90fc-786f0cf6e828",
+                "e59bb192-8243-4cbd-b5cd-a558c4f05569",
                 "accept"
               ]
             }
@@ -1173,7 +1176,7 @@
             "header": [],
             "body": {
               "mode": "raw",
-              "raw": "{\r\n  \"title\": \"Архітектура сучасного бекенду\",\r\n  \"description\": \"Квіз про підходи, патерни та інфраструктуру сучасних backend-систем.\",\r\n  \"questions\": [\r\n    {\r\n      \"title\": \"Які архітектурні стилі використовуються у сучасному бекенді?\",\r\n      \"allows_multiple_correct\": true,\r\n      \"options\": [\r\n        {\r\n          \"text\": \"Мікросервісна архітектура\",\r\n          \"is_correct\": true\r\n        },\r\n        {\r\n          \"text\": \"Моноліт\",\r\n          \"is_correct\": true\r\n        },\r\n        {\r\n          \"text\": \"Event-driven architecture\",\r\n          \"is_correct\": true\r\n        },\r\n        {\r\n          \"text\": \"Client-side only architecture\",\r\n          \"is_correct\": false\r\n        }\r\n      ]\r\n    },\r\n    {\r\n      \"title\": \"Які протоколи часто використовуються для API?\",\r\n      \"allows_multiple_correct\": true,\r\n      \"options\": [\r\n        {\r\n          \"text\": \"HTTP/HTTPS\",\r\n          \"is_correct\": true\r\n        },\r\n        {\r\n          \"text\": \"gRPC\",\r\n          \"is_correct\": true\r\n        },\r\n        {\r\n          \"text\": \"WebSocket\",\r\n          \"is_correct\": true\r\n        },\r\n        {\r\n          \"text\": \"FTP для REST API\",\r\n          \"is_correct\": false\r\n        }\r\n      ]\r\n    },\r\n    {\r\n      \"title\": \"Які інструменти використовуються для контейнеризації та оркестрації?\",\r\n      \"allows_multiple_correct\": true,\r\n      \"options\": [\r\n        {\r\n          \"text\": \"Docker\",\r\n          \"is_correct\": true\r\n        },\r\n        {\r\n          \"text\": \"Kubernetes\",\r\n          \"is_correct\": true\r\n        },\r\n        {\r\n          \"text\": \"Podman\",\r\n          \"is_correct\": true\r\n        },\r\n        {\r\n          \"text\": \"Apache OpenOffice\",\r\n          \"is_correct\": false\r\n        }\r\n      ]\r\n    },\r\n    {\r\n      \"title\": \"Які патерни застосовуються у backend-розробці?\",\r\n      \"allows_multiple_correct\": true,\r\n      \"options\": [\r\n        {\r\n          \"text\": \"Repository Pattern\",\r\n          \"is_correct\": true\r\n        },\r\n        {\r\n          \"text\": \"Dependency Injection\",\r\n          \"is_correct\": true\r\n        },\r\n        {\r\n          \"text\": \"CQRS\",\r\n          \"is_correct\": true\r\n        },\r\n        {\r\n          \"text\": \"MVC лише для фронтенду\",\r\n          \"is_correct\": false\r\n        }\r\n      ]\r\n    },\r\n    {\r\n      \"title\": \"Які компоненти входять до типової backend-інфраструктури?\",\r\n      \"allows_multiple_correct\": true,\r\n      \"options\": [\r\n        {\r\n          \"text\": \"База даних\",\r\n          \"is_correct\": true\r\n        },\r\n        {\r\n          \"text\": \"Кеш (наприклад Redis)\",\r\n          \"is_correct\": true\r\n        },\r\n        {\r\n          \"text\": \"Message broker\",\r\n          \"is_correct\": true\r\n        },\r\n        {\r\n          \"text\": \"Графічний редактор зображень\",\r\n          \"is_correct\": false\r\n        }\r\n      ]\r\n    }\r\n  ]\r\n}",
+              "raw": "{\r\n  \"title\": \"Робота Redis\",\r\n  \"description\": \"Квіз про структури даних та механізми роботи Redis.\",\r\n  \"questions\": [\r\n    {\r\n      \"title\": \"Які структури даних підтримує Redis?\",\r\n      \"allows_multiple_correct\": true,\r\n      \"options\": [\r\n        {\r\n          \"text\": \"String\",\r\n          \"is_correct\": true\r\n        },\r\n        {\r\n          \"text\": \"Hash\",\r\n          \"is_correct\": true\r\n        },\r\n        {\r\n          \"text\": \"List\",\r\n          \"is_correct\": true\r\n        },\r\n        {\r\n          \"text\": \"Relational Table\",\r\n          \"is_correct\": false\r\n        }\r\n      ]\r\n    },\r\n    {\r\n      \"title\": \"Які механізми збереження даних підтримує Redis?\",\r\n      \"allows_multiple_correct\": true,\r\n      \"options\": [\r\n        {\r\n          \"text\": \"RDB snapshots\",\r\n          \"is_correct\": true\r\n        },\r\n        {\r\n          \"text\": \"AOF (Append Only File)\",\r\n          \"is_correct\": true\r\n        },\r\n        {\r\n          \"text\": \"WAL сегменти PostgreSQL\",\r\n          \"is_correct\": false\r\n        },\r\n        {\r\n          \"text\": \"Hybrid persistence\",\r\n          \"is_correct\": true\r\n        }\r\n      ]\r\n    },\r\n    {\r\n      \"title\": \"Які можливості кластеризації має Redis?\",\r\n      \"allows_multiple_correct\": true,\r\n      \"options\": [\r\n        {\r\n          \"text\": \"Redis Cluster\",\r\n          \"is_correct\": true\r\n        },\r\n        {\r\n          \"text\": \"Replication (master-replica)\",\r\n          \"is_correct\": true\r\n        },\r\n        {\r\n          \"text\": \"Sharding через cluster slots\",\r\n          \"is_correct\": true\r\n        },\r\n        {\r\n          \"text\": \"Built-in SQL joins\",\r\n          \"is_correct\": false\r\n        }\r\n      ]\r\n    },\r\n    {\r\n      \"title\": \"Для чого найчастіше використовується Redis?\",\r\n      \"allows_multiple_correct\": true,\r\n      \"options\": [\r\n        {\r\n          \"text\": \"Кешування\",\r\n          \"is_correct\": true\r\n        },\r\n        {\r\n          \"text\": \"Pub/Sub повідомлення\",\r\n          \"is_correct\": true\r\n        },\r\n        {\r\n          \"text\": \"Черги завдань\",\r\n          \"is_correct\": true\r\n        },\r\n        {\r\n          \"text\": \"OLAP-аналітика великих даних\",\r\n          \"is_correct\": false\r\n        }\r\n      ]\r\n    },\r\n    {\r\n      \"title\": \"Які особливості продуктивності Redis?\",\r\n      \"allows_multiple_correct\": true,\r\n      \"options\": [\r\n        {\r\n          \"text\": \"In-memory зберігання\",\r\n          \"is_correct\": true\r\n        },\r\n        {\r\n          \"text\": \"Однопотокова модель обробки команд\",\r\n          \"is_correct\": true\r\n        },\r\n        {\r\n          \"text\": \"Використання JVM для кожного запиту\",\r\n          \"is_correct\": false\r\n        },\r\n        {\r\n          \"text\": \"Мінімальні затримки (low latency)\",\r\n          \"is_correct\": true\r\n        }\r\n      ]\r\n    }\r\n  ]\r\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -1349,7 +1352,7 @@
             "header": [],
             "body": {
               "mode": "raw",
-              "raw": "{\r\n  \"answers\": [\r\n    {\r\n      \"question_id\": \"079b3cc2-55ed-42ba-a1be-7aa56a92f527\",\r\n      \"selected_option_ids\": [\r\n        \"29e52984-eab0-4e5f-9d25-b54609cef67e\"\r\n      ]\r\n    },\r\n    {\r\n      \"question_id\": \"4dc59f69-05c7-4146-933b-eb7080e9c7bf\",\r\n      \"selected_option_ids\": [\r\n        \"3892869a-1c8e-4163-b86d-d52503770dd5\"\r\n      ]\r\n    },\r\n    {\r\n      \"question_id\": \"f9708b59-486a-46fc-ad27-5d671a3b27ce\",\r\n      \"selected_option_ids\": [\r\n        \"33ed65ae-7bc9-43a1-85ee-501c504487c0\"\r\n      ]\r\n    },\r\n    {\r\n      \"question_id\": \"ae265beb-9058-44ce-8e7a-a9565c3a77d9\",\r\n      \"selected_option_ids\": [\r\n        \"23e0b48f-e5ec-4124-8ec7-2eb59c0a7286\"\r\n      ]\r\n    },\r\n    {\r\n      \"question_id\": \"76a73774-75d1-4bb1-92f4-a56c11feb399\",\r\n      \"selected_option_ids\": [\r\n        \"a750df59-d20d-4078-8ae5-b9773c5b2191\"\r\n      ]\r\n    }\r\n  ]\r\n}",
+              "raw": "{\r\n  \"answers\": [\r\n    {\r\n      \"question_id\": \"85573407-3c1d-4257-aa08-6a9b4fbe6e76\",\r\n      \"selected_option_ids\": [\r\n        \"54ca506a-7012-49cc-91a8-fe5924f5774a\"\r\n      ]\r\n    },\r\n    {\r\n      \"question_id\": \"a00ef23c-bf4f-422a-96bf-134d7d16cd1b\",\r\n      \"selected_option_ids\": [\r\n        \"ff542dc1-2cd6-463c-85a7-437672fb4f29\",\r\n        \"3c2305e2-ad46-49e2-87de-07acb9a9b458\",\r\n        \"2e0d8891-5279-4fa6-8645-8a277414a1f1\"\r\n      ]\r\n    },\r\n    {\r\n      \"question_id\": \"c3b2348c-f91e-44b1-acd9-a9f5d769abea\",\r\n      \"selected_option_ids\": [\r\n        \"d323da99-ae74-44b4-9801-819212b5584e\",\r\n        \"a6478ac3-6cb9-47b0-bd12-155cb94fa7ce\",\r\n        \"53a3b70c-f729-4293-924f-0260d8af3a22\"\r\n      ]\r\n    },\r\n    {\r\n      \"question_id\": \"5cc5bfd0-45b4-41d7-b4ca-d0e85c44cf95\",\r\n      \"selected_option_ids\": [\r\n        \"0416d8f0-4857-41a5-8c46-c0f06998eaa6\",\r\n        \"2a39f62a-c47a-4f4d-922e-0a49e5f70ca4\",\r\n        \"9868a743-ea3a-43b5-bcc4-a2259a02d759\"\r\n      ]\r\n    },\r\n    {\r\n      \"question_id\": \"e62c186f-53df-46d9-b21b-40cab71433df\",\r\n      \"selected_option_ids\": [\r\n        \"5d2323a1-77b7-44f3-8754-6ba9d277e095\",\r\n        \"dfa7df51-1b94-486e-a4c2-b49093d49a19\",\r\n        \"8ee817fc-26ed-4100-ab77-1fb929b04e91\"\r\n      ]\r\n    }\r\n  ]\r\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -1357,7 +1360,7 @@
               }
             },
             "url": {
-              "raw": "http://localhost:8000/quiz-workflow/a5bb832d-46d7-4d10-9cd1-c415caf33db1/c7d6e708-961a-4dfe-ab5a-6f0dc2b3862f/attempt",
+              "raw": "http://localhost:8000/quiz-workflow/company/a5bb832d-46d7-4d10-9cd1-c415caf33db1/quiz/67965f4a-af28-4ff5-987a-2440acf4287c/attempt",
               "protocol": "http",
               "host": [
                 "localhost"
@@ -1365,8 +1368,10 @@
               "port": "8000",
               "path": [
                 "quiz-workflow",
+                "company",
                 "a5bb832d-46d7-4d10-9cd1-c415caf33db1",
-                "c7d6e708-961a-4dfe-ab5a-6f0dc2b3862f",
+                "quiz",
+                "67965f4a-af28-4ff5-987a-2440acf4287c",
                 "attempt"
               ]
             }
@@ -1389,7 +1394,7 @@
             "method": "GET",
             "header": [],
             "url": {
-              "raw": "http://localhost:8000/quiz-workflow/a5bb832d-46d7-4d10-9cd1-c415caf33db1/user/3e64d870-75d0-4e0a-93c4-3714ef7be982/stats",
+              "raw": "http://localhost:8000/quiz-workflow/company/a5bb832d-46d7-4d10-9cd1-c415caf33db1/user/3e64d870-75d0-4e0a-93c4-3714ef7be982/stats",
               "protocol": "http",
               "host": [
                 "localhost"
@@ -1397,6 +1402,7 @@
               "port": "8000",
               "path": [
                 "quiz-workflow",
+                "company",
                 "a5bb832d-46d7-4d10-9cd1-c415caf33db1",
                 "user",
                 "3e64d870-75d0-4e0a-93c4-3714ef7be982",
@@ -1464,7 +1470,7 @@
             "method": "GET",
             "header": [],
             "url": {
-              "raw": "http://localhost:8000/quiz-export/a5bb832d-46d7-4d10-9cd1-c415caf33db1/user/d755e06c-d3a6-4f66-9599-a5a6f3aea738?format=json",
+              "raw": "http://localhost:8000/quiz-export/a5bb832d-46d7-4d10-9cd1-c415caf33db1/user/99410abd-2135-4b2d-9599-45146f061acf?format=json",
               "protocol": "http",
               "host": [
                 "localhost"
@@ -1474,7 +1480,7 @@
                 "quiz-export",
                 "a5bb832d-46d7-4d10-9cd1-c415caf33db1",
                 "user",
-                "d755e06c-d3a6-4f66-9599-a5a6f3aea738"
+                "99410abd-2135-4b2d-9599-45146f061acf"
               ],
               "query": [
                 {
@@ -1556,6 +1562,202 @@
                   "key": "format",
                   "value": "json"
                 }
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Analytics",
+      "item": [
+        {
+          "name": "User Action - get Overall Rating",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{jwt_token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:8000/analytics/me/overall-rating",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8000",
+              "path": [
+                "analytics",
+                "me",
+                "overall-rating"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "User Action - get Average Scores",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{jwt_token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:8000/analytics/me/average-scores",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8000",
+              "path": [
+                "analytics",
+                "me",
+                "average-scores"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "User Action - get Quizzes with timestamps",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{jwt_token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:8000/analytics/me/quizzes",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8000",
+              "path": [
+                "analytics",
+                "me",
+                "quizzes"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Owner/Admin Action - get Average Scores of Members",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{jwt_token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:8000/analytics/company/a5bb832d-46d7-4d10-9cd1-c415caf33db1/average-scores-members",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8000",
+              "path": [
+                "analytics",
+                "company",
+                "a5bb832d-46d7-4d10-9cd1-c415caf33db1",
+                "average-scores-members"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Owner/Admin Action - get Average Scores of Quizzes",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{jwt_token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:8000/analytics/company/a5bb832d-46d7-4d10-9cd1-c415caf33db1/user/d755e06c-d3a6-4f66-9599-a5a6f3aea738/average-scores-quizzes",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8000",
+              "path": [
+                "analytics",
+                "company",
+                "a5bb832d-46d7-4d10-9cd1-c415caf33db1",
+                "user",
+                "d755e06c-d3a6-4f66-9599-a5a6f3aea738",
+                "average-scores-quizzes"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Owner/Admin Action - get Company Users with timestamps",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{jwt_token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:8000/analytics/company/a5bb832d-46d7-4d10-9cd1-c415caf33db1/company-users-timestamps",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8000",
+              "path": [
+                "analytics",
+                "company",
+                "a5bb832d-46d7-4d10-9cd1-c415caf33db1",
+                "company-users-timestamps"
               ]
             }
           },

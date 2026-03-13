@@ -11,12 +11,13 @@ class QuizAttemptRequest(BaseModel):
 
 class QuizAttemptResponse(BaseModel):
   quiz_id: UUID
+  company_id: UUID
   user_id: UUID
   correct_answers: int
   total_questions: int
   score: float
   attempted_at: datetime
-  created_at: datetime
+
   model_config = ConfigDict(from_attributes=True)
 
 class UserQuizStatsResponse(BaseModel):
