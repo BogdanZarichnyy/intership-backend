@@ -1,4 +1,3 @@
-# app/models/company_invitation.py
 import enum
 import uuid
 from sqlalchemy import Enum, DateTime, func, ForeignKey

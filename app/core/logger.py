@@ -11,10 +11,12 @@ def inject_context(record):
 def setup_logger():
   os.makedirs("logs", exist_ok=True)
 
+  # Видаляємо всі старі хендлери
   logger.remove()
 
   logger.configure(patcher=inject_context)
 
+  # Формат логів
   log_format = (
     "{time:YYYY-MM-DD HH:mm:ss} "
     "[{level}] "
@@ -23,15 +25,18 @@ def setup_logger():
     "{name}: {message}"
   )
 
+  # 1. Консольний хендлер для Git Bash / VSCode
   logger.add(
     sys.stdout,
     level="INFO",
     format=log_format,
-    enqueue=True,
+    enqueue=True,   # важливо для Git Bash
+    colorize=True,
     backtrace=True,
     diagnose=True,
   )
 
+  # 2. Файл для логів
   logger.add(
     "logs/app.log",
     level="INFO",
@@ -39,7 +44,7 @@ def setup_logger():
     rotation="5 MB",
     retention="10 days",
     compression="zip",
-    enqueue=True,
+    enqueue=True,   # файли асинхронні
     backtrace=True,
     diagnose=True,
   )
@@ -47,3 +52,6 @@ def setup_logger():
   return logger
 
 logger = setup_logger()
+
+# Тестове повідомлення, щоб перевірити консоль
+logger.info("Logger successfully initialized")

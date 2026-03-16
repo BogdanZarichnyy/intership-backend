@@ -7,11 +7,13 @@ from app.models.user import User
 from app.repositories.user import UserRepository
 from app.repositories.company import CompanyRepository
 from app.repositories.company_member import CompanyMemberRepository
+from app.repositories.company_invitation import CompanyInvitationRepository
 from app.services.user import UserService
 from app.services.auth import AuthService
 from app.services.company import CompanyService
 from app.services.company_member import CompanyMemberService
 from app.services.company_invitation import CompanyInvitationService
+from app.services.company_role import CompanyAdminService
 
 from app.core.log_context import current_user_id_var
 
@@ -37,7 +39,16 @@ async def get_company_member_service(db: AsyncSession = Depends(get_db)) -> Comp
 
 # CompanyInvitationService dependency
 async def get_invitation_service(db: AsyncSession = Depends(get_db)) -> CompanyInvitationService:
-  return CompanyInvitationService(db)
+  invitation_repo = CompanyInvitationRepository(db)
+  member_repo = CompanyMemberRepository(db)
+  company_repo = CompanyRepository(db)
+  return CompanyInvitationService(invitation_repo, member_repo, company_repo)
+
+# CompanyAdminService dependency
+async def get_company_admin_service(db: AsyncSession = Depends(get_db)) -> CompanyAdminService:
+  member_repo = CompanyMemberRepository(db)
+  company_repo = CompanyRepository(db)
+  return CompanyAdminService(member_repo, company_repo)
 
 # Поточний користувач із токена
 async def get_current_user(

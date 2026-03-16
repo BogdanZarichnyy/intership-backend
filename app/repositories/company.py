@@ -1,6 +1,6 @@
 from uuid import UUID
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy import select, func, or_
+from sqlalchemy import select, insert, update, delete, func, or_
 from app.models.company import Company
 
 class CompanyRepository:
@@ -14,7 +14,7 @@ class CompanyRepository:
     limit: int,
     offset: int
   ) -> list[Company]:
-    result = await self.db.execute(
+    query = (
       select(Company)
       .where(
         or_(
@@ -26,13 +26,14 @@ class CompanyRepository:
       .limit(limit)
       .offset(offset)
     )
+    result = await self.db.execute(query)
     return result.scalars().all()
 
   async def count_visible_companies(
     self,
     user_id: UUID
   ) -> int:
-    result = await self.db.execute(
+    query = (
       select(func.count())
       .select_from(Company)
       .where(
@@ -42,6 +43,7 @@ class CompanyRepository:
         )
       )
     )
+    result = await self.db.execute(query)
     return result.scalar_one()
 
   async def get_company_by_id(
@@ -58,26 +60,37 @@ class CompanyRepository:
     self,
     data: dict
   ) -> Company:
-    company = Company(**data)
-    self.db.add(company)
+    query = (
+      insert(Company)
+      .values(**data)
+      .returning(Company)
+    )
+    result = await self.db.execute(query)
     await self.db.commit()
-    await self.db.refresh(company)
-    return company
+    return result.scalar_one()
 
   async def update_company(
     self,
-    company: Company,
+    company_id: UUID,
     new_data: dict
-  ) -> Company:
-    for field, value in new_data.items():
-      setattr(company, field, value)
+  ) -> Company:    
+    # for field, value in new_data.items():   # Цей код робить динамічне оновлення атрибутів об’єкта Company, потрібно передавати тоді не {company_id: UUID}, а {company: Company} як модель
+    #   setattr(company, field, value)        # Це часто використовують у репозиторіях чи сервісах для оновлення моделі через словник, щоб не писати багато company.field = value вручну
+    query = (
+      update(Company)
+      .where(Company.id == company_id)
+      .values(**new_data)
+      .execution_options(synchronize_session="fetch")
+      .returning(Company)
+    )
+    result = await self.db.execute(query)
     await self.db.commit()
-    await self.db.refresh(company)
-    return company
+    return result.scalar_one()
 
   async def delete_company(
     self,
-    company: Company
+    company_id: UUID,
   ) -> None:
-    await self.db.delete(company)
+    query = delete(Company).where(Company.id == company_id)
+    await self.db.execute(query)
     await self.db.commit()

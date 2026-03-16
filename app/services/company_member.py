@@ -1,14 +1,14 @@
 from uuid import UUID
-from app.repositories.company_member import CompanyMemberRepository
-from app.repositories.company import CompanyRepository
-from app.models.user import User
-from app.schemas.company_member import CompanyMemberResponse
+from app.core.logger import logger
 from app.core.exceptions import (
   CompanyOwnerOnly,
   CompanyMembershipForbidden,
   CompanyNotFound
 )
-from app.core.logger import logger
+from app.repositories.company_member import CompanyMemberRepository
+from app.repositories.company import CompanyRepository
+from app.models.user import User
+from app.schemas.company_member import CompanyMemberResponse
 
 class CompanyMemberService:
 
@@ -29,7 +29,7 @@ class CompanyMemberService:
     limit: int = 100, 
     offset: int = 0
   ) -> list[CompanyMemberResponse]:
-    members = await self.member_repo.get_all_members_for_current_company(company_id, limit, offset)
+    members = await self.member_repo.get_all_members_for_current_company(company_id=company_id, limit=limit, offset=offset)
     logger.info(f"Fetched members of company {company_id}, limit={limit}, offset={offset}")
     return [CompanyMemberResponse.model_validate(member) for member in members]
 

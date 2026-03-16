@@ -11,6 +11,7 @@ from app.routers.auth import router as authRouter
 from app.routers.company import router as companyRouter
 from app.routers.company_member import router as companyMemberRouter
 from app.routers.company_invitation import router as companyInvitationRouter
+from app.routers.company_role import router as companyRoleRouter
 
 from app.middleware.cors import setup_middlewares
 from app.middleware.logger_middleware import RequestLoggingMiddleware
@@ -77,6 +78,7 @@ def create_app() -> FastAPI: # Використовуємо factory pattern, щ�
   app.include_router(companyRouter, prefix="/companies")
   app.include_router(companyMemberRouter, prefix="/company-members")
   app.include_router(companyInvitationRouter, prefix="/company-invitations")
+  app.include_router(companyRoleRouter, prefix="/company-role")
 
   return app
 
