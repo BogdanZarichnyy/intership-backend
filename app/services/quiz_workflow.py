@@ -9,20 +9,29 @@ from app.repositories.company_member import CompanyMemberRepository
 from app.schemas.quiz_workflow import QuizAttemptRequest, QuizAttemptResponse, UserQuizStatsResponse
 from app.services.quiz import QuizService
 from app.services.company_member import CompanyMemberService
+from app.services.quiz_workflow_redis_cache import QuizAttemptCacheService
 from app.utils.quiz_workflow_calculator import calculate_quiz_result
 
 class QuizWorkflowService:
-  def __init__(self, quiz_workflow_repo: QuizWorkflowRepository, member_repo: CompanyMemberRepository, quiz_service: QuizService, company_member_service: CompanyMemberService):
+  def __init__(
+    self, 
+    quiz_workflow_repo: QuizWorkflowRepository,
+    member_repo: CompanyMemberRepository, 
+    quiz_service: QuizService, 
+    company_member_service: CompanyMemberService, 
+    cache_redis: QuizAttemptCacheService
+  ):
     self.quiz_workflow_repo = quiz_workflow_repo
     self.member_repo = member_repo
     self.quiz_service = quiz_service
     self.company_member_service = company_member_service
+    self.cache_redis = cache_redis
 
   async def attempt_quiz(
     self,
     company_id: UUID,
     quiz_id: UUID,
-    answers: QuizAttemptRequest,
+    payload: QuizAttemptRequest,
     current_user: User
   ) -> QuizAttemptResponse:
     logger.info(f"User {current_user.id} attempting quiz {quiz_id} in company {company_id}")
@@ -37,7 +46,7 @@ class QuizWorkflowService:
       logger.warning(f"Quiz {quiz_id} does not belong to company {company_id}")
       raise QuizForbidden("Quiz does not belong to this company")
     # Виклик логіки обрахунку
-    result_data = calculate_quiz_result(quiz, answers, current_user.id)
+    result_data = calculate_quiz_result(quiz, payload, current_user.id)
     # Збільшуємо лічильник участі у даному тесті
     await self.quiz_workflow_repo.increment_participation(quiz_id)
     logger.debug(f"Quiz {quiz_id} participation incremented to {quiz.participation_count}")
@@ -58,8 +67,22 @@ class QuizWorkflowService:
     # )
     # if existing:
     #   raise QuizForbidden("You have already attempted this quiz")
+    # Запис результатів в PostgreSQL
     result = await self.quiz_workflow_repo.create_quiz_workflow(quiz_workflow)
     logger.info(f"User {current_user.id} attempt recorded successfully for quiz {quiz_id}")
+    # Запис результатів в Redis
+    await self.cache_redis.save_attempt(
+      attempt_id=result.id,
+      user_id=current_user.id,
+      company_id=company_id,
+      quiz_id=quiz_id,
+      answers=result_data.answers_for_cache,
+      total_questions=result_data.total_questions,
+      correct_answers=result_data.correct_answers,
+      score=result_data.score,
+      attempted_at=result.updated_at  # беремо дату з БД піля додавання quiz_workflow
+    )
+    # Відправка результату на роутер
     return QuizAttemptResponse(
       quiz_id=quiz_id,
       company_id=company_id,

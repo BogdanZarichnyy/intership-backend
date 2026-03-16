@@ -18,6 +18,7 @@ from app.services.company_invitation import CompanyInvitationService
 from app.services.company_role import CompanyAdminService
 from app.services.quiz import QuizService
 from app.services.quiz_workflow import QuizWorkflowService
+from app.services.quiz_workflow_redis_cache import QuizAttemptCacheService
 
 security = HTTPBearer()
 
@@ -60,15 +61,20 @@ async def get_quiz_service(db: AsyncSession = Depends(get_db)) -> QuizService:
   company_member_service = CompanyMemberService(member_repo, company_repo)
   return QuizService(quiz_repo, member_repo, company_repo, company_member_service)
 
+# QuizWorkflowCashRedisService dependency
+def get_quiz_workflow_cache_redis_service() -> QuizAttemptCacheService:
+  return QuizAttemptCacheService()
+
 # QuizWorkflowService dependency
 def get_quiz_workflow_service(
   db: AsyncSession = Depends(get_db),
   quiz_service: QuizService = Depends(get_quiz_service),
-  company_member_service: CompanyMemberService = Depends(get_company_member_service)
+  company_member_service: CompanyMemberService = Depends(get_company_member_service),
+  cache_redis: QuizAttemptCacheService = Depends(get_quiz_workflow_cache_redis_service)
 ) -> QuizWorkflowService:
   quiz_workflow_repo = QuizWorkflowRepository(db)
   member_repo = CompanyMemberRepository(db)
-  return QuizWorkflowService(quiz_workflow_repo, member_repo, quiz_service, company_member_service)
+  return QuizWorkflowService(quiz_workflow_repo, member_repo, quiz_service, company_member_service, cache_redis)
 
 # Поточний користувач із токена
 async def get_current_user(

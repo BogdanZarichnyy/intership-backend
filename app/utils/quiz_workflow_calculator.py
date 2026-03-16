@@ -4,17 +4,24 @@ from app.core.exceptions import QuizForbidden
 from app.models.quiz import Quiz, QuizQuestion, QuizAnswerOption
 from app.schemas.quiz_workflow import QuizAttemptRequest
 
-class QuizResult:
-  def __init__(self, correct_answers: int, total_questions: int, score: float):
+class QuizWorkflowCalculator:
+  def __init__(
+    self,
+    correct_answers: int,
+    total_questions: int,
+    score: float,
+    answers_for_cache: list[dict]
+  ):
     self.correct_answers = correct_answers
     self.total_questions = total_questions
     self.score = score
+    self.answers_for_cache = answers_for_cache
 
 def calculate_quiz_result(
   quiz: Quiz,
-  answers: QuizAttemptRequest,
+  payload: QuizAttemptRequest,
   user_id: UUID
-) -> QuizResult:
+) -> QuizWorkflowCalculator:
   """
   Підрахунок правильних відповідей та оцінки для квіза.
   Всі перевірки на дублі, чужі питання та варіанти відбуваються тут.
@@ -23,7 +30,7 @@ def calculate_quiz_result(
   # мапа питань
   question_map: dict[UUID, QuizQuestion] = {question.id: question for question in questions}
   # 1. Валідація вхідних даних (payload)
-  submitted_question_ids = [answer.question_id for answer in answers.answers]
+  submitted_question_ids = [answer.question_id for answer in payload.answers]
   submitted_question_set = set(submitted_question_ids)
   quiz_question_set = set(question_map.keys())
   logger.debug(f"User {user_id} submitted {len(submitted_question_ids)} answers")
@@ -44,7 +51,8 @@ def calculate_quiz_result(
   logger.debug(f"Question-level validation passed (user={user_id}, quiz={quiz.id})")
   # 5. Підрахунок результатів
   correct_answers = 0
-  for answer in answers.answers:
+  answers_for_cache = []  # формуємо структуру відповідей для Redis
+  for answer in payload.answers:
     question = question_map[answer.question_id]
     options: list[QuizAnswerOption] = question.options
     # мапа валідних опцій
@@ -64,7 +72,18 @@ def calculate_quiz_result(
       logger.warning(f"Invalid option IDs {invalid_options} for question {question.id} (user={user_id})")
       raise QuizForbidden("Answer contains options not belonging to this question")
     # мапа правильних відповідей
-    correct_set = {option.id for option in options if option.is_correct}
+    correct_set = {option.id for option in options if option.is_correct}  # формуємо мапу відповідей для Redis
+    selected_options = []
+    for option_id in selected_set:
+      option_obj = option_map[option_id]
+      selected_options.append({
+        "answer": str(option_id),
+        "is_correct": option_obj.is_correct
+      })
+    answers_for_cache.append({
+      "question_id": str(answer.question_id),
+      "selected_options": selected_options
+    })
     if selected_set == correct_set:
       correct_answers += 1
       logger.debug(f"Question {question.id} answered correctly by user {user_id}")
@@ -73,4 +92,4 @@ def calculate_quiz_result(
   total_questions = len(questions)
   score = correct_answers / total_questions if total_questions else 0.0
   logger.info(f"User {user_id} scored {score:.2f} on quiz {quiz.id}")
-  return QuizResult(correct_answers, total_questions, score)
+  return QuizWorkflowCalculator(correct_answers, total_questions, score, answers_for_cache)

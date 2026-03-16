@@ -32,6 +32,8 @@ class CompanyUpdateRequest(BaseModel):
 
   model_config = ConfigDict(extra="forbid")
 
+  model_config = ConfigDict(extra="forbid")
+
 class CompaniesListResponse(BaseModel):
   """Відповідь API зі списком компаній"""
   companies: list[CompanySchema]
