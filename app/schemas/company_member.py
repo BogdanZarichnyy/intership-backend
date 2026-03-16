@@ -8,7 +8,7 @@ class CompanyMemberBase(BaseModel):
   member_id: UUID
 
 class CompanyMemberResponse(CompanyMemberBase):
-  role: CompanyRole
+  role: CompanyRole               # <- додаємо роль
   created_at: datetime
   updated_at: datetime
 

@@ -5,8 +5,8 @@ from uuid import uuid4
 from datetime import datetime, timezone
 
 from app.main import app
-from app.routers.quiz_result import QuizResultService
-from app.schemas.quiz_result import QuizAttemptRequest, QuizAttemptResponse, UserQuizStatsResponse
+from app.routers.quiz_workflow import QuizResultService
+from app.schemas.quiz_workflow import QuizAttemptRequest, QuizAttemptResponse, UserQuizStatsResponse
 from app.services.quiz import QuizService
 
 @pytest.fixture
