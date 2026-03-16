@@ -1,7 +1,7 @@
 from uuid import UUID
 from datetime import datetime
 from typing import Optional
-from fastapi import APIRouter, Depends, Query, status
+from fastapi import APIRouter, Depends, status
 from app.core.dependencies import get_current_user, get_analytics_service
 from app.models.user import User
 from app.services.analytics import AnalyticsService
@@ -21,10 +21,9 @@ async def get_my_overall_rating(
   current_user: User = Depends(get_current_user),
   service: AnalyticsService = Depends(get_analytics_service)
 ):
-  return {"overall_rating": await service.get_user_overall_rating_service(current_user)}
+  return await service.get_user_overall_rating_service(current_user)
 
-# Список середніх балів для кожного квізу, 
-# пройденого користувачем, з часовими діапазонами
+# Список середніх балів для кожного квізу пройденого користувачем з часовими діапазонами
 @router.get(
   "/me/average-scores", 
   status_code=status.HTTP_200_OK
@@ -62,7 +61,7 @@ async def get_company_members_scores(
   current_user: User = Depends(get_current_user),
   service: AnalyticsService = Depends(get_analytics_service)
 ):
-  return await service.get_company_members_scores(company_id, current_user.id, start_date, end_date)
+  return await service.get_company_members_scores(company_id, current_user, start_date, end_date)
 
 # Список середніх балів для кожного тесту, пройденого вибраним користувачем з часовими діапазонами
 @router.get(
@@ -89,4 +88,4 @@ async def get_company_members_last_attempts(
   current_user: User = Depends(get_current_user),
   service: AnalyticsService = Depends(get_analytics_service)
 ):
-  return await service.get_company_members_last_attempts(company_id, current_user.id)
+  return await service.get_company_members_last_attempts(company_id, current_user)

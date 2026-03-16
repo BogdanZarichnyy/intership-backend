@@ -1,12 +1,11 @@
 from fastapi import APIRouter, Depends, Body, status
 from fastapi.responses import JSONResponse, RedirectResponse
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
-
-from app.services.auth import AuthService
-from app.schemas.user import SignInRequest, UserSchema
+from app.config import settings
 from app.core.dependencies import get_current_user, get_auth_service
 from app.core.exceptions import AuthProviderUnknown
-from app.config import settings
+from app.schemas.user import SignInRequest, UserSchema
+from app.services.auth import AuthService
 
 router = APIRouter(tags=["auth"])
 security = HTTPBearer()

@@ -5,7 +5,7 @@ from uuid import uuid4
 from datetime import datetime, timezone
 from unittest.mock import AsyncMock
 
-from app.services.quiz_export import QuizExportService
+from app.services.quiz_workflow_export import QuizExportService
 
 EXPORT_DIR = Path("app/logs/quiz_export")
 

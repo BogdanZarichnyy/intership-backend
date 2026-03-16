@@ -1,12 +1,13 @@
 from fastapi import Depends
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from sqlalchemy.ext.asyncio import AsyncSession
-
+from app.core.log_context import current_user_id_var
 from app.db.postgres import get_db
 from app.models.user import User
 from app.repositories.user import UserRepository
 from app.repositories.company import CompanyRepository
 from app.repositories.company_member import CompanyMemberRepository
+from app.repositories.company_invitation import CompanyInvitationRepository
 from app.repositories.quiz import QuizRepository
 from app.repositories.quiz_workflow import QuizWorkflowRepository
 from app.repositories.analytics import AnalyticsRepository
@@ -18,64 +19,94 @@ from app.services.company_invitation import CompanyInvitationService
 from app.services.company_role import CompanyAdminService
 from app.services.quiz import QuizService
 from app.services.quiz_workflow import QuizWorkflowService
-from app.services.quiz_export import QuizExportService
+from app.services.quiz_workflow_redis_cache import QuizAttemptCacheService
+from app.services.quiz_workflow_export import QuizExportService
 from app.services.analytics import AnalyticsService
-
-from app.core.log_context import current_user_id_var
 
 security = HTTPBearer()
 
 # UserService dependency
-def get_user_service(db: AsyncSession = Depends(get_db)) -> UserService:
+async def get_user_service(db: AsyncSession = Depends(get_db)) -> UserService:
   return UserService(UserRepository(db))
 
 # AuthService dependency
-def get_auth_service(db: AsyncSession = Depends(get_db)) -> AuthService:
+async def get_auth_service(db: AsyncSession = Depends(get_db)) -> AuthService:
   return AuthService(UserRepository(db))
 
 # CompanyService dependency
-def get_company_service(db: AsyncSession = Depends(get_db)) -> CompanyService:
+async def get_company_service(db: AsyncSession = Depends(get_db)) -> CompanyService:
   return CompanyService(CompanyRepository(db))
 
 # CompanyMemberService dependency
-def get_company_member_service(db: AsyncSession = Depends(get_db)) -> CompanyMemberService:
+async def get_company_member_service(db: AsyncSession = Depends(get_db)) -> CompanyMemberService:
   member_repo = CompanyMemberRepository(db)
   company_repo = CompanyRepository(db)
   return CompanyMemberService(member_repo, company_repo)
 
 # CompanyInvitationService dependency
-def get_invitation_service(db: AsyncSession = Depends(get_db)) -> CompanyInvitationService:
-  return CompanyInvitationService(db)
+async def get_invitation_service(db: AsyncSession = Depends(get_db)) -> CompanyInvitationService:
+  invitation_repo = CompanyInvitationRepository(db)
+  member_repo = CompanyMemberRepository(db)
+  company_repo = CompanyRepository(db)
+  return CompanyInvitationService(invitation_repo, member_repo, company_repo)
 
 # CompanyAdminService dependency
-def get_company_admin_service(db: AsyncSession = Depends(get_db)) -> CompanyAdminService:
-  return CompanyAdminService(db)
+async def get_company_admin_service(db: AsyncSession = Depends(get_db)) -> CompanyAdminService:
+  member_repo = CompanyMemberRepository(db)
+  company_repo = CompanyRepository(db)
+  return CompanyAdminService(member_repo, company_repo)
 
 # QuizService dependency
-def get_quiz_service(db: AsyncSession = Depends(get_db)) -> QuizService:
-  return QuizService(QuizRepository(db), CompanyMemberRepository(db))
+async def get_quiz_service(db: AsyncSession = Depends(get_db)) -> QuizService:
+  quiz_repo = QuizRepository(db)
+  member_repo = CompanyMemberRepository(db)
+  company_repo = CompanyRepository(db)
+  company_member_service = CompanyMemberService(member_repo, company_repo)
+  return QuizService(quiz_repo, member_repo, company_repo, company_member_service)
+
+# QuizWorkflowCashRedisService dependency
+def get_quiz_workflow_cache_redis_service() -> QuizAttemptCacheService:
+  return QuizAttemptCacheService()
 
 # QuizWorkflowService dependency
 def get_quiz_workflow_service(
   db: AsyncSession = Depends(get_db),
-  quiz_service: QuizService = Depends(get_quiz_service)
+  quiz_service: QuizService = Depends(get_quiz_service),
+  company_member_service: CompanyMemberService = Depends(get_company_member_service),
+  redis_cache: QuizAttemptCacheService = Depends(get_quiz_workflow_cache_redis_service)
 ) -> QuizWorkflowService:
+  quiz_workflow_repo = QuizWorkflowRepository(db)
   member_repo = CompanyMemberRepository(db)
-  return QuizWorkflowService(QuizWorkflowRepository(db), quiz_service, member_repo)
+  return QuizWorkflowService(quiz_workflow_repo, member_repo, quiz_service, company_member_service, redis_cache)
 
 # QuizExportService dependency
-def get_quiz_export_service(db: AsyncSession = Depends(get_db)) -> QuizExportService:
-  quiz_service = QuizService(QuizRepository(db), CompanyMemberRepository(db))
+def get_quiz_export_service(
+  db: AsyncSession = Depends(get_db), 
+  company_member_service: CompanyMemberService = Depends(get_company_member_service),
+  redis_cache: QuizAttemptCacheService = Depends(get_quiz_workflow_cache_redis_service)
+) -> QuizExportService:
+  quiz_repo = QuizRepository(db)
   member_repo = CompanyMemberRepository(db)
-  return QuizExportService(quiz_service=quiz_service, member_repo=member_repo)
+  company_repo = CompanyRepository(db)
+  quiz_service = QuizService(
+    quiz_repo=quiz_repo,
+    member_repo=member_repo,
+    company_repo=company_repo,
+    company_member_service=company_member_service
+  )
+  return QuizExportService(
+    quiz_service=quiz_service,
+    company_member_service=company_member_service,
+    redis_cache=redis_cache
+  )
 
 # AnalyticsService dependency
 def get_analytics_service(
   db: AsyncSession = Depends(get_db),
-  quiz_service: QuizService = Depends(get_quiz_service),
+  company_member_service: CompanyMemberService = Depends(get_company_member_service),
 ):
   repo = AnalyticsRepository(db)
-  return AnalyticsService(repo, quiz_service)
+  return AnalyticsService(repo, company_member_service)
 
 # Поточний користувач із токена
 async def get_current_user(

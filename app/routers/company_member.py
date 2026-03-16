@@ -1,6 +1,5 @@
 from uuid import UUID
 from fastapi import APIRouter, Depends, Query, status
-
 from app.core.dependencies import get_current_user, get_company_member_service
 from app.models.user import User
 from app.schemas.company_member import CompanyMemberResponse

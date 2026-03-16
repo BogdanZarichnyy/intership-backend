@@ -1,10 +1,10 @@
 from datetime import datetime
 from uuid import UUID
-from app.core.exceptions import AnalyticsNotFound, AnalyticsForbidden
+from app.core.exceptions import AnalyticsNotFound, AnalyticsForbidden, CompanyNotFound
 from app.core.logger import logger
 from app.models.user import User
 from app.repositories.analytics import AnalyticsRepository
-from app.services.quiz import QuizService
+from app.services.company_member import CompanyMemberService
 from app.schemas.analytics import (
   UserOverallRatingResponse, 
   UserQuizAverageScoreResponse, 
@@ -15,12 +15,16 @@ from app.schemas.analytics import (
   CompanyMemberLastAttempt,
   CompanyMemberLastAttemptsResponse
 )
-from app.utils.timestamps_format import timestamps_format
+from app.utils.normalize_timestamps import normalize_timestamps
 
 class AnalyticsService:
-  def __init__(self, repo: AnalyticsRepository, quiz_service: QuizService):
+  def __init__(
+    self,
+    repo: AnalyticsRepository,
+    company_member_service: CompanyMemberService
+  ):
     self.repo = repo
-    self.quiz_service = quiz_service
+    self.company_member_service = company_member_service
 
   # =============================
   # User analytics
@@ -32,31 +36,24 @@ class AnalyticsService:
     current_user: User
   ) -> UserOverallRatingResponse:
     logger.info(f"Calculating overall score for user {current_user.id}")
-    rating = await self.repo.get_user_overall_rating_repo(current_user.id)
-    if rating is None:
+    result = await self.repo.get_user_overall_rating_repo(current_user.id)
+    if result is None:
       logger.warning(f"No analytics found for user_id={current_user.id}")
       raise AnalyticsNotFound("User analytics not found")
-    return round(float(rating), 2)
+    return UserOverallRatingResponse.model_validate(result)
 
-
-  # Список середніх балів для кожного квізу, 
-  # пройденого користувачем, з часовими діапазонами
+  # Список середніх балів для кожного квізу пройденого користувачем з часовими діапазонами
   async def get_user_average_scores_service(
     self, 
     current_user: User
   ) -> list[UserQuizAverageScoreResponse]:
-    result: list[dict] = await self.repo.get_user_average_scores_repo(current_user.id)
+    result = await self.repo.get_user_average_scores_repo(current_user.id)
     if not result:
       logger.warning(f"No quiz analytics found for user_id={current_user.id}")
       raise AnalyticsNotFound("User quiz analytics not found")
     logger.info(f"Fetching per-quiz scores for user {current_user.id}")
     return [
-      UserQuizAverageScoreResponse(
-        quiz_id=row["id"],
-        title=row["title"],
-        average_score=round(float(row["average_score"] or 0.0), 2),
-        last_attempt=row["last_attempt"]
-      )
+      UserQuizAverageScoreResponse.model_validate(row)
       for row in result
     ]
 
@@ -66,13 +63,12 @@ class AnalyticsService:
     current_user: User
   ) -> list[UserQuizLastAttemptResponse]:
     logger.info(f"Fetching last quizzes attempts for user {current_user.id}")
-    result: list[dict] = await self.repo.get_user_quizzes_with_timestamps()
+    result = await self.repo.get_user_quizzes_with_timestamps(current_user.id)
+    if not result:
+      logger.warning(f"No quiz analytics found for user_id={current_user.id}")
+      raise AnalyticsNotFound("User quiz analytics not found")
     return [
-      UserQuizLastAttemptResponse(
-        id=row["id"],
-        title=row["title"],
-        updated_at=row["updated_at"]
-      )
+      UserQuizLastAttemptResponse.model_validate(row)
       for row in result
     ]
 
@@ -84,26 +80,21 @@ class AnalyticsService:
   async def get_company_members_scores(
     self, 
     company_id: UUID, 
-    user_id: UUID, 
+    current_user: User,
     start_date: datetime, 
     end_date: datetime
   ) -> list[CompanyMemberAverageScore]:
     # Якщо користувач не передав дати — беремо поточний тиждень
-    start_date, end_date = timestamps_format(start_date, end_date)
-    logger.info(f"Fetching company members scores for company {company_id} by user {user_id}")
-    await self.quiz_service.check_owner_or_admin(company_id, user_id)
-    result: list[dict] = await self.repo.get_company_members_scores(company_id, start_date, end_date)
+    start_date, end_date = normalize_timestamps(start_date, end_date)
+    logger.info(f"Fetching company members scores for company {company_id} by user {current_user.id}")
+    await self.company_member_service.check_owner_or_admin(company_id, current_user.id)
+    result = await self.repo.get_company_members_scores(company_id, start_date, end_date)
     if not result:
-      logger.warning(f"No quiz timestamps found")
+      logger.warning(f"No quiz timestamps found for company {company_id} between {start_date} and {end_date}")
       raise AnalyticsNotFound("Quiz timestamps not found")
     # Перетворюємо у список Pydantic-моделей
     return [
-      CompanyMemberAverageScore(
-        user_id=row["id"],
-        username=row["username"],
-        average_score=round(float(row["average_score"] or 0.0), 2),
-        last_attempt=row["last_attempt"]
-      )
+      CompanyMemberAverageScore.model_validate(row)
       for row in result
     ]
 
@@ -117,45 +108,41 @@ class AnalyticsService:
     end_date: datetime
   ) -> CompanyQuizAverageScore:
     # Якщо користувач не передав дати — беремо поточний тиждень
-    start_date, end_date = timestamps_format(start_date, end_date)
+    start_date, end_date = normalize_timestamps(start_date, end_date)
     logger.info(f"Fetching detailed quiz scores for user {target_user_id} in company {company_id}")
-    await self.quiz_service.check_owner_or_admin(company_id, current_user.id)
+    await self.company_member_service.check_owner_or_admin(company_id, current_user.id)
     result = await self.repo.get_company_average_scores_quizzes(company_id, target_user_id, start_date, end_date)
     if not result:
-      logger.warning(f"Forbidden analytics access company_id={company_id} user_id={target_user_id}")
+      logger.warning(f"No quiz timestamps found for company {company_id} for user_id={target_user_id} between {start_date} and {end_date}")
       raise AnalyticsForbidden("Access denied to company analytics")
-    # Перетворюємо у список Pydantic-моделей
-    if not result:
-      return CompanyQuizAverageScore(
-        user_id=target_user_id,
-        username="",
-        average_scores_quizzes=[]
-      )
-    return CompanyQuizAverageScore(
-      user_id=result["user_id"],
-      username=result["username"],
-      average_scores_quizzes=[
-        QuizAverageScore(**quiz) for quiz in result["average_scores_quizzes"]
+    # формуємо Pydantic-модель із всіх рядків
+    user_data = {
+      "user_id": result[0]["user_id"],
+      "username": result[0]["username"],
+      "average_scores_quizzes": [
+        QuizAverageScore.model_validate(row) for row in result
       ]
-    )
+    }
+    return CompanyQuizAverageScore.model_validate(user_data)
 
   # Список всіх користувачів компанії та позначки часу їхньої останньої спроби пройти тест
   async def get_company_members_last_attempts(
     self, 
     company_id: UUID, 
-    user_id: UUID
+    current_user: User
   ) -> CompanyMemberLastAttemptsResponse:
     logger.info(f"Fetching last quiz attempts for all members of company {company_id}")
-    await self.quiz_service.check_owner_or_admin(company_id, user_id)
-    result = await self.repo.get_company_members_last_attempts(company_id)
-    if not result:
-      logger.warning(f"Forbidden analytics access company_id={company_id}")
-      raise AnalyticsForbidden("Access denied to company analytics")
-    return CompanyMemberLastAttemptsResponse(
-      id=result["id"],
-      name=result["name"],
-      description=result["description"],
-      list_company_members=[
-        CompanyMemberLastAttempt(**member) for member in result["list_company_members"]
+    await self.company_member_service.check_owner_or_admin(company_id, current_user.id)
+    company, members_rows = await self.repo.get_company_members_last_attempts(company_id)
+    if not company:
+      logger.warning(f"Company not found company_id={company_id}")
+      raise CompanyNotFound()
+    company_data = {
+      "company_id": company["company_id"],
+      "name": company["name"],
+      "description": company["description"],
+      "list_company_members": [
+        CompanyMemberLastAttempt.model_validate(row) for row in members_rows
       ]
-    )
+    }
+    return CompanyMemberLastAttemptsResponse.model_validate(company_data)

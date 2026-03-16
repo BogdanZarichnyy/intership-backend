@@ -14,9 +14,9 @@ class QuizWorkflow(Base):
       "quiz_id",
       name="uq_user_company_quiz"
     ),
+    Index("idx_quiz_workflow_company_time", "company_id", "updated_at"),  # Додаємо індекс для company_id - це пришвидшить пошук та обрахунок аналітичних запитів
+    Index("idx_quiz_workflow_user_time", "user_id", "updated_at"),        # Додаємо індекс для user_id - це пришвидшить пошук та обрахунок аналітичних запитів
   )
-  Index("idx_quiz_workflow_company_time", "company_id", "updated_at"),  # Додаємо індекс для company_id - це пришвидшить пошук та обрахунок аналітичних запитів
-  Index("idx_quiz_workflow_user_time", "user_id", "updated_at"),        # Додаємо індекс для user_id - це пришвидшить пошук та обрахунок аналітичних запитів
 
   id: Mapped[UUID] = mapped_column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4, index=True)
   user_id: Mapped[UUID] = mapped_column(UUID(as_uuid=True), ForeignKey("users.id", ondelete="CASCADE"), nullable=False, index=True)

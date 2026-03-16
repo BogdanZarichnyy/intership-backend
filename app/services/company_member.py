@@ -1,14 +1,15 @@
 from uuid import UUID
-from app.repositories.company_member import CompanyMemberRepository
-from app.repositories.company import CompanyRepository
-from app.models.user import User
-from app.schemas.company_member import CompanyMemberResponse
+from app.core.logger import logger
 from app.core.exceptions import (
   CompanyOwnerOnly,
   CompanyMembershipForbidden,
   CompanyNotFound
 )
-from app.core.logger import logger
+from app.models.company_member import CompanyRole
+from app.repositories.company_member import CompanyMemberRepository
+from app.repositories.company import CompanyRepository
+from app.models.user import User
+from app.schemas.company_member import CompanyMemberResponse
 
 class CompanyMemberService:
 
@@ -90,3 +91,28 @@ class CompanyMemberService:
     # Видаляємо тільки самого себе
     await self.member_repo.remove_member(company_id, member_id)
     logger.info(f"User {member_id} left company {company_id}")
+
+  # ===================================================================================
+  # Перевірка прав доступу - користувач являється власником чи адміністратором компанії
+  # ===================================================================================
+  async def check_owner_or_admin(
+    self,
+    company_id: UUID,
+    user_id: UUID
+  ) -> None:
+    company = await self.company_repo.get_company_by_id(company_id)
+    if not company:
+      logger.warning(f"Company {company_id} not found during owner/admin check")
+      raise CompanyNotFound()
+    # owner має повний доступ
+    if company.owner_id == user_id:
+      logger.info(f"User {user_id} is owner of company {company_id}")
+      return
+    member = await self.member_repo.get_member_of_company(company_id, user_id)
+    # admin має повний доступ
+    if member and member.role == CompanyRole.admin:
+      logger.info(f"User {user_id} is admin of company {company_id}")
+      return
+    # якщо користувач не являється owner або admin - доступу немає
+    logger.warning(f"User {user_id} has no admin or owner rights in company {company_id}")
+    raise CompanyMembershipForbidden("User must be admin or owner to perform this action")
