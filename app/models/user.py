@@ -2,7 +2,6 @@ import uuid
 from sqlalchemy import String, Boolean, DateTime, func, UniqueConstraint
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from sqlalchemy.dialects.postgresql import UUID
-
 from app.db.postgres import Base
 
 class User(Base):
