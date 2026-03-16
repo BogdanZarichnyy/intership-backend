@@ -203,7 +203,7 @@ Endpoints маршрути: http://localhost:8000/docs
 ## Запуск міграцій:
   ```bash
   uvicorn app.main:app --reload  # зупинений бекенд
-  python -m alembic revision --autogenerate -m "create table"  # створення міграції
+  python -m alembic revision --autogenerate -m "create users table"  # створення міграції
   python -m alembic revision --autogenerate -m "create company table"  # створення міграції
   python -m alembic revision --autogenerate -m "create company actions tables"  # створення міграції
   python -m alembic revision --autogenerate -m "add roles for members"  # створення міграції
