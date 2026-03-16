@@ -19,13 +19,13 @@ class QuizWorkflowService:
     member_repo: CompanyMemberRepository, 
     quiz_service: QuizService, 
     company_member_service: CompanyMemberService, 
-    cache_redis: QuizAttemptCacheService
+    redis_cache: QuizAttemptCacheService
   ):
     self.quiz_workflow_repo = quiz_workflow_repo
     self.member_repo = member_repo
     self.quiz_service = quiz_service
     self.company_member_service = company_member_service
-    self.cache_redis = cache_redis
+    self.redis_cache = redis_cache
 
   async def attempt_quiz(
     self,
@@ -71,7 +71,7 @@ class QuizWorkflowService:
     result = await self.quiz_workflow_repo.create_quiz_workflow(quiz_workflow)
     logger.info(f"User {current_user.id} attempt recorded successfully for quiz {quiz_id}")
     # Запис результатів в Redis
-    await self.cache_redis.save_attempt(
+    await self.redis_cache.save_attempt(
       attempt_id=result.id,
       user_id=current_user.id,
       company_id=company_id,

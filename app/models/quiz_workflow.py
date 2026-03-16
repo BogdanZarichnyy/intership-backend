@@ -1,5 +1,5 @@
 import uuid
-from sqlalchemy import ForeignKey, DateTime, func
+from sqlalchemy import ForeignKey, DateTime, func, UniqueConstraint
 from sqlalchemy.orm import relationship, Mapped, mapped_column
 from sqlalchemy.dialects.postgresql import UUID
 from datetime import datetime
@@ -7,6 +7,14 @@ from app.db.postgres import Base
 
 class QuizWorkflow(Base):
   __tablename__ = "quiz_workflow"
+  __table_args__ = (
+    UniqueConstraint(
+      "user_id",
+      "company_id",
+      "quiz_id",
+      name="uq_user_company_quiz"
+    ),
+  )
 
   id: Mapped[UUID] = mapped_column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4, index=True)
   user_id: Mapped[UUID] = mapped_column(UUID(as_uuid=True), ForeignKey("users.id", ondelete="CASCADE"), nullable=False, index=True)

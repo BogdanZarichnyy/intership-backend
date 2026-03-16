@@ -19,6 +19,9 @@ from app.services.company_role import CompanyAdminService
 from app.services.quiz import QuizService
 from app.services.quiz_workflow import QuizWorkflowService
 from app.services.quiz_workflow_redis_cache import QuizAttemptCacheService
+from app.services.quiz_workflow_export import QuizExportService
+
+from app.core.log_context import current_user_id_var
 
 security = HTTPBearer()
 
@@ -70,11 +73,32 @@ def get_quiz_workflow_service(
   db: AsyncSession = Depends(get_db),
   quiz_service: QuizService = Depends(get_quiz_service),
   company_member_service: CompanyMemberService = Depends(get_company_member_service),
-  cache_redis: QuizAttemptCacheService = Depends(get_quiz_workflow_cache_redis_service)
+  redis_cache: QuizAttemptCacheService = Depends(get_quiz_workflow_cache_redis_service)
 ) -> QuizWorkflowService:
   quiz_workflow_repo = QuizWorkflowRepository(db)
   member_repo = CompanyMemberRepository(db)
-  return QuizWorkflowService(quiz_workflow_repo, member_repo, quiz_service, company_member_service, cache_redis)
+  return QuizWorkflowService(quiz_workflow_repo, member_repo, quiz_service, company_member_service, redis_cache)
+
+# QuizExportService dependency
+def get_quiz_export_service(
+  db: AsyncSession = Depends(get_db), 
+  company_member_service: CompanyMemberService = Depends(get_company_member_service),
+  redis_cache: QuizAttemptCacheService = Depends(get_quiz_workflow_cache_redis_service)
+) -> QuizExportService:
+  quiz_repo = QuizRepository(db)
+  member_repo = CompanyMemberRepository(db)
+  company_repo = CompanyRepository(db)
+  quiz_service = QuizService(
+    quiz_repo=quiz_repo,
+    member_repo=member_repo,
+    company_repo=company_repo,
+    company_member_service=company_member_service
+  )
+  return QuizExportService(
+    quiz_service=quiz_service,
+    company_member_service=company_member_service,
+    redis_cache=redis_cache
+  )
 
 # Поточний користувач із токена
 async def get_current_user(

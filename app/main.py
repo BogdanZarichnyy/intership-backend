@@ -14,6 +14,7 @@ from app.routers.company_invitation import router as companyInvitationRouter
 from app.routers.company_role import router as companyRoleRouter
 from app.routers.quiz import router as quizRouter
 from app.routers.quiz_workflow import router as quizResultsRouter
+from app.routers.quiz_workflow_export import router as quizExportResultsRouter
 
 from app.middleware.cors import setup_middlewares
 from app.middleware.logger_middleware import RequestLoggingMiddleware
@@ -45,6 +46,8 @@ async def wait_for_redis():
     try:
       await redis_client.ping()
       logger.info("Redis connected")
+      info = await redis_client.info("server")
+      logger.info(f"Backend connected to Redis run_id={info['run_id']}")
       return
     except Exception as e:
       retries += 1
@@ -83,6 +86,7 @@ def create_app() -> FastAPI: # Використовуємо factory pattern, щ�
   app.include_router(companyRoleRouter, prefix="/company-role")
   app.include_router(quizRouter, prefix="/quizzes")
   app.include_router(quizResultsRouter, prefix="/quiz-workflow")
+  app.include_router(quizExportResultsRouter, prefix="/quiz-export")
 
   return app
 
