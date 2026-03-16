@@ -58,7 +58,7 @@
             "header": [],
             "body": {
               "mode": "raw",
-              "raw": "{\r\n    \"email\": \"test@test.email\",\r\n    \"username\": \"Test\",\r\n    \"password\": \"123\"\r\n}",
+              "raw": "{\r\n    \"email\": \"keyvin@test.email\",\r\n    \"username\": \"Key Vin\",\r\n    \"password\": \"123\"\r\n}",
               "options": {
                 "raw": {
                   "language": "json"
