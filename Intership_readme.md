@@ -207,6 +207,7 @@ http://localhost:8000/docs
   python -m alembic revision --autogenerate -m "create companies table"  # створення міграції
   python -m alembic revision --autogenerate -m "create company actions tables"  # створення міграції
   python -m alembic revision --autogenerate -m "add roles for members"  # створення міграції
+  python -m alembic revision --autogenerate -m "create quizzes table"  # створення міграції
   python -m alembic upgrade head  # запис міграції в БД для Windows
   alembic upgrade head  # запис міграції в БД для UNIX
   alembic -x db_url=postgresql+asyncpg://postgres:postgres@localhost:5433/internship_test_db upgrade head # для тестової БД

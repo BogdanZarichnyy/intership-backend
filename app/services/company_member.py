@@ -5,6 +5,7 @@ from app.core.exceptions import (
   CompanyMembershipForbidden,
   CompanyNotFound
 )
+from app.models.company_member import CompanyRole
 from app.repositories.company_member import CompanyMemberRepository
 from app.repositories.company import CompanyRepository
 from app.models.user import User
@@ -90,3 +91,24 @@ class CompanyMemberService:
     # Видаляємо тільки самого себе
     await self.member_repo.remove_member(company_id, member_id)
     logger.info(f"User {member_id} left company {company_id}")
+
+  # ===================================================================================
+  # Перевірка прав доступу - користувач являється власником чи адміністратором компанії
+  # ===================================================================================
+  async def check_owner_or_admin(
+    self,
+    company_id: UUID,
+    user_id: UUID
+  ) -> None:
+    member = await self.member_repo.get_member_of_company(company_id, user_id)
+    if not member or member.role != CompanyRole.admin:
+      logger.info(f"User {user_id} passed owner/admin check for company {company_id} (admin)")
+      return
+    company = await self.company_repo.get_company_by_id(company_id)
+    if not company:
+      logger.warning(f"Company {company_id} not found during owner/admin check")
+      raise CompanyNotFound()
+    if company.owner_id != user_id:
+      logger.warning(f"User {user_id} is neither admin nor owner of company {company_id}")
+      raise CompanyMembershipForbidden("User must be admin or owner to perform this action")
+    logger.info(f"User {user_id} is company owner of {company_id}")

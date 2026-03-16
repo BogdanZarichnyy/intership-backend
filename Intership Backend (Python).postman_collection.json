@@ -140,7 +140,7 @@
           "response": []
         },
         {
-          "name": "User Edit Details",
+          "name": "Update User Details",
           "request": {
             "auth": {
               "type": "bearer",
@@ -544,7 +544,7 @@
           "response": []
         },
         {
-          "name": "Company Edit Details",
+          "name": "Update Company Details",
           "request": {
             "auth": {
               "type": "bearer",
@@ -1146,6 +1146,182 @@
                 "a5bb832d-46d7-4d10-9cd1-c415caf33db1",
                 "remove",
                 "8ba956a1-4ad0-4d4c-b4c2-dc3a31675c8d"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Quizzes",
+      "item": [
+        {
+          "name": "Create Quiz",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{jwt_token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"title\": \"Архітектура сучасного бекенду\",\r\n  \"description\": \"Квіз про підходи, патерни та інфраструктуру сучасних backend-систем.\",\r\n  \"questions\": [\r\n    {\r\n      \"title\": \"Які архітектурні стилі використовуються у сучасному бекенді?\",\r\n      \"allows_multiple_correct\": true,\r\n      \"options\": [\r\n        {\r\n          \"text\": \"Мікросервісна архітектура\",\r\n          \"is_correct\": true\r\n        },\r\n        {\r\n          \"text\": \"Моноліт\",\r\n          \"is_correct\": true\r\n        },\r\n        {\r\n          \"text\": \"Event-driven architecture\",\r\n          \"is_correct\": true\r\n        },\r\n        {\r\n          \"text\": \"Client-side only architecture\",\r\n          \"is_correct\": false\r\n        }\r\n      ]\r\n    },\r\n    {\r\n      \"title\": \"Які протоколи часто використовуються для API?\",\r\n      \"allows_multiple_correct\": true,\r\n      \"options\": [\r\n        {\r\n          \"text\": \"HTTP/HTTPS\",\r\n          \"is_correct\": true\r\n        },\r\n        {\r\n          \"text\": \"gRPC\",\r\n          \"is_correct\": true\r\n        },\r\n        {\r\n          \"text\": \"WebSocket\",\r\n          \"is_correct\": true\r\n        },\r\n        {\r\n          \"text\": \"FTP для REST API\",\r\n          \"is_correct\": false\r\n        }\r\n      ]\r\n    },\r\n    {\r\n      \"title\": \"Які інструменти використовуються для контейнеризації та оркестрації?\",\r\n      \"allows_multiple_correct\": true,\r\n      \"options\": [\r\n        {\r\n          \"text\": \"Docker\",\r\n          \"is_correct\": true\r\n        },\r\n        {\r\n          \"text\": \"Kubernetes\",\r\n          \"is_correct\": true\r\n        },\r\n        {\r\n          \"text\": \"Podman\",\r\n          \"is_correct\": true\r\n        },\r\n        {\r\n          \"text\": \"Apache OpenOffice\",\r\n          \"is_correct\": false\r\n        }\r\n      ]\r\n    },\r\n    {\r\n      \"title\": \"Які патерни застосовуються у backend-розробці?\",\r\n      \"allows_multiple_correct\": true,\r\n      \"options\": [\r\n        {\r\n          \"text\": \"Repository Pattern\",\r\n          \"is_correct\": true\r\n        },\r\n        {\r\n          \"text\": \"Dependency Injection\",\r\n          \"is_correct\": true\r\n        },\r\n        {\r\n          \"text\": \"CQRS\",\r\n          \"is_correct\": true\r\n        },\r\n        {\r\n          \"text\": \"MVC лише для фронтенду\",\r\n          \"is_correct\": false\r\n        }\r\n      ]\r\n    },\r\n    {\r\n      \"title\": \"Які компоненти входять до типової backend-інфраструктури?\",\r\n      \"allows_multiple_correct\": true,\r\n      \"options\": [\r\n        {\r\n          \"text\": \"База даних\",\r\n          \"is_correct\": true\r\n        },\r\n        {\r\n          \"text\": \"Кеш (наприклад Redis)\",\r\n          \"is_correct\": true\r\n        },\r\n        {\r\n          \"text\": \"Message broker\",\r\n          \"is_correct\": true\r\n        },\r\n        {\r\n          \"text\": \"Графічний редактор зображень\",\r\n          \"is_correct\": false\r\n        }\r\n      ]\r\n    }\r\n  ]\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://localhost:8000/quizzes/a5bb832d-46d7-4d10-9cd1-c415caf33db1",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8000",
+              "path": [
+                "quizzes",
+                "a5bb832d-46d7-4d10-9cd1-c415caf33db1"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "All Quizzes",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{jwt_token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:8000/quizzes/a5bb832d-46d7-4d10-9cd1-c415caf33db1",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8000",
+              "path": [
+                "quizzes",
+                "a5bb832d-46d7-4d10-9cd1-c415caf33db1"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Quiz by ID",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{jwt_token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:8000/quizzes/detail/77d71159-9830-47c5-81b8-51266e7d638c",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8000",
+              "path": [
+                "quizzes",
+                "detail",
+                "77d71159-9830-47c5-81b8-51266e7d638c"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Update Quiz Details",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{jwt_token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "PATCH",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"title\": \"Архітектура сучасного бекенду\",\r\n  \"description\": \"Квіз про підходи, патерни та інфраструктуру сучасних backend-систем.\",\r\n  \"questions\": [\r\n    {\r\n      \"title\": \"Які архітектурні стилі використовуються у сучасному бекенді?\",\r\n      \"allows_multiple_correct\": true,\r\n      \"options\": [\r\n        {\r\n          \"text\": \"Мікросервісна архітектура\",\r\n          \"is_correct\": true\r\n        },\r\n        {\r\n          \"text\": \"Моноліт\",\r\n          \"is_correct\": true\r\n        },\r\n        {\r\n          \"text\": \"Event-driven architecture\",\r\n          \"is_correct\": true\r\n        },\r\n        {\r\n          \"text\": \"Client-side only architecture\",\r\n          \"is_correct\": false\r\n        }\r\n      ]\r\n    },\r\n    {\r\n      \"title\": \"Які протоколи часто використовуються для API?\",\r\n      \"allows_multiple_correct\": true,\r\n      \"options\": [\r\n        {\r\n          \"text\": \"HTTP/HTTPS\",\r\n          \"is_correct\": true\r\n        },\r\n        {\r\n          \"text\": \"gRPC\",\r\n          \"is_correct\": true\r\n        },\r\n        {\r\n          \"text\": \"WebSocket\",\r\n          \"is_correct\": true\r\n        },\r\n        {\r\n          \"text\": \"FTP для REST API\",\r\n          \"is_correct\": false\r\n        }\r\n      ]\r\n    },\r\n    {\r\n      \"title\": \"Які інструменти використовуються для контейнеризації та оркестрації?\",\r\n      \"allows_multiple_correct\": true,\r\n      \"options\": [\r\n        {\r\n          \"text\": \"Docker\",\r\n          \"is_correct\": true\r\n        },\r\n        {\r\n          \"text\": \"Kubernetes\",\r\n          \"is_correct\": true\r\n        },\r\n        {\r\n          \"text\": \"Podman\",\r\n          \"is_correct\": true\r\n        },\r\n        {\r\n          \"text\": \"Apache OpenOffice\",\r\n          \"is_correct\": false\r\n        }\r\n      ]\r\n    },\r\n    {\r\n      \"title\": \"Які патерни застосовуються у backend-розробці?\",\r\n      \"allows_multiple_correct\": true,\r\n      \"options\": [\r\n        {\r\n          \"text\": \"Repository Pattern\",\r\n          \"is_correct\": true\r\n        },\r\n        {\r\n          \"text\": \"Dependency Injection\",\r\n          \"is_correct\": true\r\n        },\r\n        {\r\n          \"text\": \"CQRS\",\r\n          \"is_correct\": true\r\n        },\r\n        {\r\n          \"text\": \"MVC лише для фронтенду\",\r\n          \"is_correct\": false\r\n        }\r\n      ]\r\n    },\r\n    {\r\n      \"title\": \"Які компоненти входять до типової backend-інфраструктури?\",\r\n      \"allows_multiple_correct\": true,\r\n      \"options\": [\r\n        {\r\n          \"text\": \"База даних\",\r\n          \"is_correct\": true\r\n        },\r\n        {\r\n          \"text\": \"Кеш (наприклад Redis)\",\r\n          \"is_correct\": true\r\n        },\r\n        {\r\n          \"text\": \"Message broker\",\r\n          \"is_correct\": true\r\n        },\r\n        {\r\n          \"text\": \"Графічний редактор зображень\",\r\n          \"is_correct\": false\r\n        }\r\n      ]\r\n    }\r\n  ]\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://localhost:8000/quizzes/detail/77d71159-9830-47c5-81b8-51266e7d638c",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8000",
+              "path": [
+                "quizzes",
+                "detail",
+                "77d71159-9830-47c5-81b8-51266e7d638c"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Delete Quiz",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{jwt_token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:8000/quizzes/detail/77d71159-9830-47c5-81b8-51266e7d638c",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8000",
+              "path": [
+                "quizzes",
+                "detail",
+                "77d71159-9830-47c5-81b8-51266e7d638c"
               ]
             }
           },

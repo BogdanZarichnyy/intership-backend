@@ -4,8 +4,8 @@ from app.core.exceptions import (
   CompanyNotFound,
   CompanyForbidden
 )
-from app.models.company import Company
 from app.models.user import User
+from app.models.company import Company
 from app.repositories.company import CompanyRepository
 from app.schemas.company import CompanySchema, CompanyCreateRequest, CompanyUpdateRequest, CompaniesListResponse
 

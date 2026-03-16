@@ -120,13 +120,28 @@ class CompanyMembershipForbidden(Forbidden):
 # Company invitation
 # =======================
 class InvitationNotFound(NotFound):
-  def __init__(self, detail="Invitation not found"):
+  def __init__(self, detail: str = "Invitation not found"):
     super().__init__(detail)
 
 class InvitationAlreadyProcessed(Forbidden):
-  def __init__(self, detail="Invitation already processed"):
+  def __init__(self, detail: str = "Invitation already processed"):
     super().__init__(detail)
 
 class InvitationForbidden(Forbidden):
-  def __init__(self, detail="Action not allowed for this invitation"):
+  def __init__(self, detail: str = "Action not allowed for this invitation"):
+    super().__init__(detail)
+
+# =======================
+# Quizzes
+# =======================
+class QuizNotFound(NotFound):
+  def __init__(self, detail: str = "Quiz not found"):
+    super().__init__(detail)
+
+class QuizForbidden(Forbidden):
+  def __init__(self, detail: str):
+    super().__init__(detail)
+
+class QuizWorkflowNotFound(NotFound):
+  def __init__(self, detail: str):
     super().__init__(detail)
