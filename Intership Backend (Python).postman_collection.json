@@ -1330,6 +1330,85 @@
       ]
     },
     {
+      "name": "Quiz Workflow",
+      "item": [
+        {
+          "name": "Create Attempt Quiz",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{jwt_token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://localhost:8000/quiz-workflow/a5bb832d-46d7-4d10-9cd1-c415caf33db1/3e64d870-75d0-4e0a-93c4-3714ef7be982/attempt",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8000",
+              "path": [
+                "quiz-workflow",
+                "a5bb832d-46d7-4d10-9cd1-c415caf33db1",
+                "3e64d870-75d0-4e0a-93c4-3714ef7be982",
+                "attempt"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Member Statistics in the Quiz",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{jwt_token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:8000/quiz-workflow/a5bb832d-46d7-4d10-9cd1-c415caf33db1/user/3e64d870-75d0-4e0a-93c4-3714ef7be982/stats",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8000",
+              "path": [
+                "quiz-workflow",
+                "a5bb832d-46d7-4d10-9cd1-c415caf33db1",
+                "user",
+                "3e64d870-75d0-4e0a-93c4-3714ef7be982",
+                "stats"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
       "name": "Check Health Server",
       "request": {
         "auth": {

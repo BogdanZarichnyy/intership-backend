@@ -2,6 +2,7 @@ import uuid
 from sqlalchemy import String, Boolean, DateTime, func, UniqueConstraint
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from sqlalchemy.dialects.postgresql import UUID
+from datetime import datetime
 from app.db.postgres import Base
 
 class User(Base):
@@ -17,9 +18,10 @@ class User(Base):
   provider: Mapped[str] = mapped_column(String(50), nullable=False, default="local", index=True)
   provider_id: Mapped[str | None] = mapped_column(String(255), unique=True, nullable=True, index=True)
   is_active: Mapped[bool] = mapped_column(Boolean, nullable=False, default=True)
-  created_at: Mapped[DateTime] = mapped_column(DateTime, server_default=func.now())
-  updated_at: Mapped[DateTime] = mapped_column(DateTime, server_default=func.now(), onupdate=func.now())
+  created_at: Mapped[datetime] = mapped_column(DateTime, server_default=func.now())
+  updated_at: Mapped[datetime] = mapped_column(DateTime, server_default=func.now(), onupdate=func.now())
 
   companies = relationship("Company", back_populates="owner", cascade="all, delete-orphan")
   member_companies = relationship("CompanyMember", back_populates="member", cascade="all, delete-orphan")
   invitations_sent = relationship("CompanyInvitation", back_populates="invited_by_user", foreign_keys="CompanyInvitation.invited_by")
+  quiz_workflow = relationship("QuizWorkflow", back_populates="user", cascade="all, delete-orphan")

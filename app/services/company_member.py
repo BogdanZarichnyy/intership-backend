@@ -100,14 +100,16 @@ class CompanyMemberService:
     company_id: UUID,
     user_id: UUID
   ) -> None:
-    member = await self.member_repo.get_member_of_company(company_id, user_id)
-    if not member or member.role != CompanyRole.admin:
-      logger.info(f"User {user_id} passed owner/admin check for company {company_id} (admin)")
-      return
     company = await self.company_repo.get_company_by_id(company_id)
     if not company:
       logger.warning(f"Company {company_id} not found during owner/admin check")
       raise CompanyNotFound()
+    member = await self.member_repo.get_member_of_company(company_id, user_id)
+    if member and member.role != CompanyRole.admin:
+      logger.info(f"User {user_id} is admin of company {company_id}")
+    else:
+      logger.info(f"User {user_id} passed owner/admin check for company {company_id} (admin)")
+      return
     if company.owner_id != user_id:
       logger.warning(f"User {user_id} is neither admin nor owner of company {company_id}")
       raise CompanyMembershipForbidden("User must be admin or owner to perform this action")

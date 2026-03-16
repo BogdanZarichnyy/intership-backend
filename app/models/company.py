@@ -20,3 +20,4 @@ class Company(Base):
   members = relationship("CompanyMember", back_populates="company", cascade="all, delete-orphan")
   invitations = relationship("CompanyInvitation", back_populates="company", cascade="all, delete-orphan")
   quizzes = relationship("Quiz", back_populates="company", cascade="all, delete-orphan")
+  quiz_workflow = relationship("QuizWorkflow", back_populates="company", cascade="all, delete-orphan")

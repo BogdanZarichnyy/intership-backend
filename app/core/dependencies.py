@@ -9,6 +9,7 @@ from app.repositories.company import CompanyRepository
 from app.repositories.company_member import CompanyMemberRepository
 from app.repositories.company_invitation import CompanyInvitationRepository
 from app.repositories.quiz import QuizRepository
+from app.repositories.quiz_workflow import QuizWorkflowRepository
 from app.services.user import UserService
 from app.services.auth import AuthService
 from app.services.company import CompanyService
@@ -16,6 +17,7 @@ from app.services.company_member import CompanyMemberService
 from app.services.company_invitation import CompanyInvitationService
 from app.services.company_role import CompanyAdminService
 from app.services.quiz import QuizService
+from app.services.quiz_workflow import QuizWorkflowService
 
 security = HTTPBearer()
 
@@ -57,6 +59,16 @@ async def get_quiz_service(db: AsyncSession = Depends(get_db)) -> QuizService:
   company_repo = CompanyRepository(db)
   company_member_service = CompanyMemberService(member_repo, company_repo)
   return QuizService(quiz_repo, member_repo, company_repo, company_member_service)
+
+# QuizWorkflowService dependency
+def get_quiz_workflow_service(
+  db: AsyncSession = Depends(get_db),
+  quiz_service: QuizService = Depends(get_quiz_service),
+  company_member_service: CompanyMemberService = Depends(get_company_member_service)
+) -> QuizWorkflowService:
+  quiz_workflow_repo = QuizWorkflowRepository(db)
+  member_repo = CompanyMemberRepository(db)
+  return QuizWorkflowService(quiz_workflow_repo, member_repo, quiz_service, company_member_service)
 
 # Поточний користувач із токена
 async def get_current_user(
