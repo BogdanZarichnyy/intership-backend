@@ -1176,7 +1176,7 @@
             "header": [],
             "body": {
               "mode": "raw",
-              "raw": "{\r\n  \"title\": \"Робота Redis\",\r\n  \"description\": \"Квіз про структури даних та механізми роботи Redis.\",\r\n  \"questions\": [\r\n    {\r\n      \"title\": \"Які структури даних підтримує Redis?\",\r\n      \"allows_multiple_correct\": true,\r\n      \"options\": [\r\n        {\r\n          \"text\": \"String\",\r\n          \"is_correct\": true\r\n        },\r\n        {\r\n          \"text\": \"Hash\",\r\n          \"is_correct\": true\r\n        },\r\n        {\r\n          \"text\": \"List\",\r\n          \"is_correct\": true\r\n        },\r\n        {\r\n          \"text\": \"Relational Table\",\r\n          \"is_correct\": false\r\n        }\r\n      ]\r\n    },\r\n    {\r\n      \"title\": \"Які механізми збереження даних підтримує Redis?\",\r\n      \"allows_multiple_correct\": true,\r\n      \"options\": [\r\n        {\r\n          \"text\": \"RDB snapshots\",\r\n          \"is_correct\": true\r\n        },\r\n        {\r\n          \"text\": \"AOF (Append Only File)\",\r\n          \"is_correct\": true\r\n        },\r\n        {\r\n          \"text\": \"WAL сегменти PostgreSQL\",\r\n          \"is_correct\": false\r\n        },\r\n        {\r\n          \"text\": \"Hybrid persistence\",\r\n          \"is_correct\": true\r\n        }\r\n      ]\r\n    },\r\n    {\r\n      \"title\": \"Які можливості кластеризації має Redis?\",\r\n      \"allows_multiple_correct\": true,\r\n      \"options\": [\r\n        {\r\n          \"text\": \"Redis Cluster\",\r\n          \"is_correct\": true\r\n        },\r\n        {\r\n          \"text\": \"Replication (master-replica)\",\r\n          \"is_correct\": true\r\n        },\r\n        {\r\n          \"text\": \"Sharding через cluster slots\",\r\n          \"is_correct\": true\r\n        },\r\n        {\r\n          \"text\": \"Built-in SQL joins\",\r\n          \"is_correct\": false\r\n        }\r\n      ]\r\n    },\r\n    {\r\n      \"title\": \"Для чого найчастіше використовується Redis?\",\r\n      \"allows_multiple_correct\": true,\r\n      \"options\": [\r\n        {\r\n          \"text\": \"Кешування\",\r\n          \"is_correct\": true\r\n        },\r\n        {\r\n          \"text\": \"Pub/Sub повідомлення\",\r\n          \"is_correct\": true\r\n        },\r\n        {\r\n          \"text\": \"Черги завдань\",\r\n          \"is_correct\": true\r\n        },\r\n        {\r\n          \"text\": \"OLAP-аналітика великих даних\",\r\n          \"is_correct\": false\r\n        }\r\n      ]\r\n    },\r\n    {\r\n      \"title\": \"Які особливості продуктивності Redis?\",\r\n      \"allows_multiple_correct\": true,\r\n      \"options\": [\r\n        {\r\n          \"text\": \"In-memory зберігання\",\r\n          \"is_correct\": true\r\n        },\r\n        {\r\n          \"text\": \"Однопотокова модель обробки команд\",\r\n          \"is_correct\": true\r\n        },\r\n        {\r\n          \"text\": \"Використання JVM для кожного запиту\",\r\n          \"is_correct\": false\r\n        },\r\n        {\r\n          \"text\": \"Мінімальні затримки (low latency)\",\r\n          \"is_correct\": true\r\n        }\r\n      ]\r\n    }\r\n  ]\r\n}",
+              "raw": "{\r\n  \"title\": \"Робота Redis Test\",\r\n  \"description\": \"Квіз про структури даних та механізми роботи Redis.\",\r\n  \"questions\": [\r\n    {\r\n      \"title\": \"Які структури даних підтримує Redis?\",\r\n      \"allows_multiple_correct\": true,\r\n      \"options\": [\r\n        {\r\n          \"text\": \"String\",\r\n          \"is_correct\": true\r\n        },\r\n        {\r\n          \"text\": \"Hash\",\r\n          \"is_correct\": true\r\n        },\r\n        {\r\n          \"text\": \"List\",\r\n          \"is_correct\": true\r\n        },\r\n        {\r\n          \"text\": \"Relational Table\",\r\n          \"is_correct\": false\r\n        }\r\n      ]\r\n    },\r\n    {\r\n      \"title\": \"Які механізми збереження даних підтримує Redis?\",\r\n      \"allows_multiple_correct\": true,\r\n      \"options\": [\r\n        {\r\n          \"text\": \"RDB snapshots\",\r\n          \"is_correct\": true\r\n        },\r\n        {\r\n          \"text\": \"AOF (Append Only File)\",\r\n          \"is_correct\": true\r\n        },\r\n        {\r\n          \"text\": \"WAL сегменти PostgreSQL\",\r\n          \"is_correct\": false\r\n        },\r\n        {\r\n          \"text\": \"Hybrid persistence\",\r\n          \"is_correct\": true\r\n        }\r\n      ]\r\n    },\r\n    {\r\n      \"title\": \"Які можливості кластеризації має Redis?\",\r\n      \"allows_multiple_correct\": true,\r\n      \"options\": [\r\n        {\r\n          \"text\": \"Redis Cluster\",\r\n          \"is_correct\": true\r\n        },\r\n        {\r\n          \"text\": \"Replication (master-replica)\",\r\n          \"is_correct\": true\r\n        },\r\n        {\r\n          \"text\": \"Sharding через cluster slots\",\r\n          \"is_correct\": true\r\n        },\r\n        {\r\n          \"text\": \"Built-in SQL joins\",\r\n          \"is_correct\": false\r\n        }\r\n      ]\r\n    },\r\n    {\r\n      \"title\": \"Для чого найчастіше використовується Redis?\",\r\n      \"allows_multiple_correct\": true,\r\n      \"options\": [\r\n        {\r\n          \"text\": \"Кешування\",\r\n          \"is_correct\": true\r\n        },\r\n        {\r\n          \"text\": \"Pub/Sub повідомлення\",\r\n          \"is_correct\": true\r\n        },\r\n        {\r\n          \"text\": \"Черги завдань\",\r\n          \"is_correct\": true\r\n        },\r\n        {\r\n          \"text\": \"OLAP-аналітика великих даних\",\r\n          \"is_correct\": false\r\n        }\r\n      ]\r\n    },\r\n    {\r\n      \"title\": \"Які особливості продуктивності Redis?\",\r\n      \"allows_multiple_correct\": true,\r\n      \"options\": [\r\n        {\r\n          \"text\": \"In-memory зберігання\",\r\n          \"is_correct\": true\r\n        },\r\n        {\r\n          \"text\": \"Однопотокова модель обробки команд\",\r\n          \"is_correct\": true\r\n        },\r\n        {\r\n          \"text\": \"Використання JVM для кожного запиту\",\r\n          \"is_correct\": false\r\n        },\r\n        {\r\n          \"text\": \"Мінімальні затримки (low latency)\",\r\n          \"is_correct\": true\r\n        }\r\n      ]\r\n    }\r\n  ]\r\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -1184,7 +1184,7 @@
               }
             },
             "url": {
-              "raw": "http://localhost:8000/quizzes/a5bb832d-46d7-4d10-9cd1-c415caf33db1",
+              "raw": "http://localhost:8000/quizzes/company/a5bb832d-46d7-4d10-9cd1-c415caf33db1",
               "protocol": "http",
               "host": [
                 "localhost"
@@ -1192,6 +1192,7 @@
               "port": "8000",
               "path": [
                 "quizzes",
+                "company",
                 "a5bb832d-46d7-4d10-9cd1-c415caf33db1"
               ]
             }
@@ -1214,7 +1215,7 @@
             "method": "GET",
             "header": [],
             "url": {
-              "raw": "http://localhost:8000/quizzes/a5bb832d-46d7-4d10-9cd1-c415caf33db1",
+              "raw": "http://localhost:8000/quizzes/company/a5bb832d-46d7-4d10-9cd1-c415caf33db1",
               "protocol": "http",
               "host": [
                 "localhost"
@@ -1222,6 +1223,7 @@
               "port": "8000",
               "path": [
                 "quizzes",
+                "company",
                 "a5bb832d-46d7-4d10-9cd1-c415caf33db1"
               ]
             }
@@ -1244,7 +1246,7 @@
             "method": "GET",
             "header": [],
             "url": {
-              "raw": "http://localhost:8000/quizzes/detail/77d71159-9830-47c5-81b8-51266e7d638c",
+              "raw": "http://localhost:8000/quizzes/company/a5bb832d-46d7-4d10-9cd1-c415caf33db1/quiz-detail/bac0355c-4241-41ea-8a80-a87a8c792b97",
               "protocol": "http",
               "host": [
                 "localhost"
@@ -1252,8 +1254,10 @@
               "port": "8000",
               "path": [
                 "quizzes",
-                "detail",
-                "77d71159-9830-47c5-81b8-51266e7d638c"
+                "company",
+                "a5bb832d-46d7-4d10-9cd1-c415caf33db1",
+                "quiz-detail",
+                "bac0355c-4241-41ea-8a80-a87a8c792b97"
               ]
             }
           },
@@ -1276,7 +1280,7 @@
             "header": [],
             "body": {
               "mode": "raw",
-              "raw": "{\r\n  \"title\": \"Архітектура сучасного бекенду\",\r\n  \"description\": \"Квіз про підходи, патерни та інфраструктуру сучасних backend-систем.\",\r\n  \"questions\": [\r\n    {\r\n      \"title\": \"Які архітектурні стилі використовуються у сучасному бекенді?\",\r\n      \"allows_multiple_correct\": true,\r\n      \"options\": [\r\n        {\r\n          \"text\": \"Мікросервісна архітектура\",\r\n          \"is_correct\": true\r\n        },\r\n        {\r\n          \"text\": \"Моноліт\",\r\n          \"is_correct\": true\r\n        },\r\n        {\r\n          \"text\": \"Event-driven architecture\",\r\n          \"is_correct\": true\r\n        },\r\n        {\r\n          \"text\": \"Client-side only architecture\",\r\n          \"is_correct\": false\r\n        }\r\n      ]\r\n    },\r\n    {\r\n      \"title\": \"Які протоколи часто використовуються для API?\",\r\n      \"allows_multiple_correct\": true,\r\n      \"options\": [\r\n        {\r\n          \"text\": \"HTTP/HTTPS\",\r\n          \"is_correct\": true\r\n        },\r\n        {\r\n          \"text\": \"gRPC\",\r\n          \"is_correct\": true\r\n        },\r\n        {\r\n          \"text\": \"WebSocket\",\r\n          \"is_correct\": true\r\n        },\r\n        {\r\n          \"text\": \"FTP для REST API\",\r\n          \"is_correct\": false\r\n        }\r\n      ]\r\n    },\r\n    {\r\n      \"title\": \"Які інструменти використовуються для контейнеризації та оркестрації?\",\r\n      \"allows_multiple_correct\": true,\r\n      \"options\": [\r\n        {\r\n          \"text\": \"Docker\",\r\n          \"is_correct\": true\r\n        },\r\n        {\r\n          \"text\": \"Kubernetes\",\r\n          \"is_correct\": true\r\n        },\r\n        {\r\n          \"text\": \"Podman\",\r\n          \"is_correct\": true\r\n        },\r\n        {\r\n          \"text\": \"Apache OpenOffice\",\r\n          \"is_correct\": false\r\n        }\r\n      ]\r\n    },\r\n    {\r\n      \"title\": \"Які патерни застосовуються у backend-розробці?\",\r\n      \"allows_multiple_correct\": true,\r\n      \"options\": [\r\n        {\r\n          \"text\": \"Repository Pattern\",\r\n          \"is_correct\": true\r\n        },\r\n        {\r\n          \"text\": \"Dependency Injection\",\r\n          \"is_correct\": true\r\n        },\r\n        {\r\n          \"text\": \"CQRS\",\r\n          \"is_correct\": true\r\n        },\r\n        {\r\n          \"text\": \"MVC лише для фронтенду\",\r\n          \"is_correct\": false\r\n        }\r\n      ]\r\n    },\r\n    {\r\n      \"title\": \"Які компоненти входять до типової backend-інфраструктури?\",\r\n      \"allows_multiple_correct\": true,\r\n      \"options\": [\r\n        {\r\n          \"text\": \"База даних\",\r\n          \"is_correct\": true\r\n        },\r\n        {\r\n          \"text\": \"Кеш (наприклад Redis)\",\r\n          \"is_correct\": true\r\n        },\r\n        {\r\n          \"text\": \"Message broker\",\r\n          \"is_correct\": true\r\n        },\r\n        {\r\n          \"text\": \"Графічний редактор зображень\",\r\n          \"is_correct\": false\r\n        }\r\n      ]\r\n    }\r\n  ]\r\n}",
+              "raw": "{\r\n  \"title\": \"Робота Redis Test Update\",\r\n  \"description\": \"Квіз про структури даних та механізми роботи Redis.\",\r\n  \"questions\": [\r\n    {\r\n      \"title\": \"Які структури даних підтримує Redis40000000000000000000000006?\",\r\n      \"allows_multiple_correct\": true,\r\n      \"options\": [\r\n        {\r\n          \"text\": \"String56475467456754765\",\r\n          \"is_correct\": true\r\n        },\r\n        {\r\n          \"text\": \"Hash\",\r\n          \"is_correct\": true\r\n        },\r\n        {\r\n          \"text\": \"List\",\r\n          \"is_correct\": true\r\n        },\r\n        {\r\n          \"text\": \"Relational Table\",\r\n          \"is_correct\": false\r\n        }\r\n      ]\r\n    },\r\n    {\r\n      \"title\": \"Які механізми збереження даних підтримує Redis?\",\r\n      \"allows_multiple_correct\": true,\r\n      \"options\": [\r\n        {\r\n          \"text\": \"RDB snapshots\",\r\n          \"is_correct\": true\r\n        },\r\n        {\r\n          \"text\": \"AOF (Append Only File)\",\r\n          \"is_correct\": true\r\n        },\r\n        {\r\n          \"text\": \"WAL сегменти PostgreSQL\",\r\n          \"is_correct\": false\r\n        },\r\n        {\r\n          \"text\": \"Hybrid persistence\",\r\n          \"is_correct\": true\r\n        }\r\n      ]\r\n    },\r\n    {\r\n      \"title\": \"Які можливості кластеризації має Redis?\",\r\n      \"allows_multiple_correct\": true,\r\n      \"options\": [\r\n        {\r\n          \"text\": \"Redis Cluster\",\r\n          \"is_correct\": true\r\n        },\r\n        {\r\n          \"text\": \"Replication (master-replica)\",\r\n          \"is_correct\": true\r\n        },\r\n        {\r\n          \"text\": \"Sharding через cluster slots\",\r\n          \"is_correct\": true\r\n        },\r\n        {\r\n          \"text\": \"Built-in SQL joins\",\r\n          \"is_correct\": false\r\n        }\r\n      ]\r\n    },\r\n    {\r\n      \"title\": \"Для чого найчастіше використовується Redis?\",\r\n      \"allows_multiple_correct\": true,\r\n      \"options\": [\r\n        {\r\n          \"text\": \"Кешування\",\r\n          \"is_correct\": true\r\n        },\r\n        {\r\n          \"text\": \"Pub/Sub повідомлення\",\r\n          \"is_correct\": true\r\n        },\r\n        {\r\n          \"text\": \"Черги завдань\",\r\n          \"is_correct\": true\r\n        },\r\n        {\r\n          \"text\": \"OLAP-аналітика великих даних\",\r\n          \"is_correct\": false\r\n        }\r\n      ]\r\n    },\r\n    {\r\n      \"title\": \"Які особливості продуктивності Redis?\",\r\n      \"allows_multiple_correct\": true,\r\n      \"options\": [\r\n        {\r\n          \"text\": \"In-memory зберігання\",\r\n          \"is_correct\": true\r\n        },\r\n        {\r\n          \"text\": \"Однопотокова модель обробки команд\",\r\n          \"is_correct\": true\r\n        },\r\n        {\r\n          \"text\": \"Використання JVM для кожного запиту\",\r\n          \"is_correct\": false\r\n        },\r\n        {\r\n          \"text\": \"Мінімальні затримки (low latency)\",\r\n          \"is_correct\": true\r\n        }\r\n      ]\r\n    }\r\n  ]\r\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -1284,7 +1288,7 @@
               }
             },
             "url": {
-              "raw": "http://localhost:8000/quizzes/detail/77d71159-9830-47c5-81b8-51266e7d638c",
+              "raw": "http://localhost:8000/quizzes/company/a5bb832d-46d7-4d10-9cd1-c415caf33db1/quiz-detail/bac0355c-4241-41ea-8a80-a87a8c792b97",
               "protocol": "http",
               "host": [
                 "localhost"
@@ -1292,8 +1296,10 @@
               "port": "8000",
               "path": [
                 "quizzes",
-                "detail",
-                "77d71159-9830-47c5-81b8-51266e7d638c"
+                "company",
+                "a5bb832d-46d7-4d10-9cd1-c415caf33db1",
+                "quiz-detail",
+                "bac0355c-4241-41ea-8a80-a87a8c792b97"
               ]
             }
           },
@@ -1315,7 +1321,7 @@
             "method": "DELETE",
             "header": [],
             "url": {
-              "raw": "http://localhost:8000/quizzes/detail/77d71159-9830-47c5-81b8-51266e7d638c",
+              "raw": "http://localhost:8000/quizzes/company/a5bb832d-46d7-4d10-9cd1-c415caf33db1/quiz-detail/bac0355c-4241-41ea-8a80-a87a8c792b97",
               "protocol": "http",
               "host": [
                 "localhost"
@@ -1323,8 +1329,10 @@
               "port": "8000",
               "path": [
                 "quizzes",
-                "detail",
-                "77d71159-9830-47c5-81b8-51266e7d638c"
+                "company",
+                "a5bb832d-46d7-4d10-9cd1-c415caf33db1",
+                "quiz-detail",
+                "bac0355c-4241-41ea-8a80-a87a8c792b97"
               ]
             }
           },
