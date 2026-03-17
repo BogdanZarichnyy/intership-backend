@@ -1,7 +1,7 @@
 from uuid import UUID
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select, insert, update, delete, func
-from sqlalchemy.orm import selectinload, joinedload
+# from sqlalchemy.orm import selectinload, joinedload
 from app.models.quiz import Quiz, QuizQuestion, QuizAnswerOption
 
 class QuizRepository:
@@ -54,46 +54,47 @@ class QuizRepository:
     self,
     quiz_id: UUID
   ) -> Quiz | None:
-    result = await self.db.execute(
-      select(Quiz)
-      .options(
-        joinedload(Quiz.questions)
-        .joinedload(QuizQuestion.options)
-      )
-      .where(Quiz.id == quiz_id)
-    )
-    return result.unique().scalar_one_or_none()
-    # # Без використання орм метода joinedload() запит виглядатиме так
-    # # Збираємо join між quiz -> questions -> options
-    # q = (
-    #   select(
-    #     Quiz,
-    #     QuizQuestion,
-    #     QuizAnswerOption
+    # result = await self.db.execute(
+    #   select(Quiz)
+    #   .options(
+    #     joinedload(Quiz.questions)
+    #     .joinedload(QuizQuestion.options)
     #   )
-    #   .join(QuizQuestion, Quiz.id == QuizQuestion.quiz_id, isouter=True)
-    #   .join(QuizAnswerOption, QuizQuestion.id == QuizAnswerOption.question_id, isouter=True)
     #   .where(Quiz.id == quiz_id)
     # )
-    # result = await self.db.execute(q)
-    # rows = result.all()
-    # if not rows:
-    #   return None
-    # # Агрегуємо питання та опції під квіз
-    # quiz_obj = None
-    # questions_map = {}
-    # for quiz_row, question_row, option_row in rows:
-    #   if quiz_obj is None:
-    #     quiz_obj = quiz_row
-    #   if question_row:
-    #     q_id = question_row.id
-    #     if q_id not in questions_map:
-    #       questions_map[q_id] = question_row
-    #       questions_map[q_id].options = []
-    #     if option_row:
-    #       questions_map[q_id].options.append(option_row)
-    # quiz_obj.questions = list(questions_map.values())
-    # return quiz_obj
+    # return result.unique().scalar_one_or_none()
+  
+    # Без використання орм метода joinedload() запит виглядатиме так
+    # Збираємо join між quiz -> questions -> options
+    query = (
+      select(
+        Quiz,
+        QuizQuestion,
+        QuizAnswerOption
+      )
+      .join(QuizQuestion, Quiz.id == QuizQuestion.quiz_id, isouter=True)
+      .join(QuizAnswerOption, QuizQuestion.id == QuizAnswerOption.question_id, isouter=True)
+      .where(Quiz.id == quiz_id)
+    )
+    result = await self.db.execute(query)
+    rows = result.all()
+    if not rows:
+      return None
+    # Агрегуємо питання та опції під квіз
+    quiz_obj = None
+    questions_map = {}
+    for quiz_row, question_row, option_row in rows:
+      if quiz_obj is None:
+        quiz_obj = quiz_row
+      if question_row:
+        q_id = question_row.id
+        if q_id not in questions_map:
+          questions_map[q_id] = question_row
+          questions_map[q_id].options = []
+        if option_row:
+          questions_map[q_id].options.append(option_row)
+    quiz_obj.questions = list(questions_map.values())
+    return quiz_obj
 
   # ==========================
   # Get Quizzes for company
@@ -104,53 +105,54 @@ class QuizRepository:
     limit: int,
     offset: int
   ):
-    result = await self.db.execute(
-      select(Quiz)
-      .options(
-        selectinload(Quiz.questions)
-        .selectinload(QuizQuestion.options)
-      )
-      .where(Quiz.company_id == company_id)
-      .order_by(Quiz.created_at.desc())
-      .limit(limit)
-      .offset(offset)
-    )
-    return result.scalars().all()
-    # # Без використання орм метода selectinload() запит виглядатиме так
-    # q = (
-    #   select(
-    #     Quiz,
-    #     QuizQuestion,
-    #     QuizAnswerOption
+    # result = await self.db.execute(
+    #   select(Quiz)
+    #   .options(
+    #     selectinload(Quiz.questions)
+    #     .selectinload(QuizQuestion.options)
     #   )
-    #   .join(QuizQuestion, Quiz.id == QuizQuestion.quiz_id, isouter=True)
-    #   .join(QuizAnswerOption, QuizQuestion.id == QuizAnswerOption.question_id, isouter=True)
     #   .where(Quiz.company_id == company_id)
     #   .order_by(Quiz.created_at.desc())
     #   .limit(limit)
     #   .offset(offset)
     # )
-    # result = await self.db.execute(q)
-    # rows = result.all()
-    # if not rows:
-    #   return []
-    # # Агрегуємо
-    # quizzes_map = {}
-    # questions_map = {}
-    # for quiz_row, question_row, option_row in rows:
-    #   q_id = quiz_row.id
-    #   if q_id not in quizzes_map:
-    #     quizzes_map[q_id] = quiz_row
-    #     quizzes_map[q_id].questions = []
-    #   if question_row:
-    #     ques_id = question_row.id
-    #     if ques_id not in questions_map:
-    #       questions_map[ques_id] = question_row
-    #       questions_map[ques_id].options = []
-    #       quizzes_map[q_id].questions.append(questions_map[ques_id])
-    #     if option_row:
-    #       questions_map[ques_id].options.append(option_row)
-    # return list(quizzes_map.values())
+    # return result.scalars().all()
+
+    # # Без використання орм метода selectinload() запит виглядатиме так
+    query = (
+      select(
+        Quiz,
+        QuizQuestion,
+        QuizAnswerOption
+      )
+      .join(QuizQuestion, Quiz.id == QuizQuestion.quiz_id, isouter=True)
+      .join(QuizAnswerOption, QuizQuestion.id == QuizAnswerOption.question_id, isouter=True)
+      .where(Quiz.company_id == company_id)
+      .order_by(Quiz.created_at.desc())
+      .limit(limit)
+      .offset(offset)
+    )
+    result = await self.db.execute(query)
+    rows = result.all()
+    if not rows:
+      return []
+    # Агрегуємо
+    quizzes_map = {}
+    questions_map = {}
+    for quiz_row, question_row, option_row in rows:
+      q_id = quiz_row.id
+      if q_id not in quizzes_map:
+        quizzes_map[q_id] = quiz_row
+        quizzes_map[q_id].questions = []
+      if question_row:
+        ques_id = question_row.id
+        if ques_id not in questions_map:
+          questions_map[ques_id] = question_row
+          questions_map[ques_id].options = []
+          quizzes_map[q_id].questions.append(questions_map[ques_id])
+        if option_row:
+          questions_map[ques_id].options.append(option_row)
+    return list(quizzes_map.values())
 
   # ==========================
   # Count quizzes

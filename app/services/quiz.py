@@ -1,6 +1,6 @@
 from uuid import UUID
 from app.core.logger import logger
-from app.core.exceptions import QuizNotFound, QuizForbidden, CompanyMembershipForbidden
+from app.core.exceptions import QuizNotFound, QuizForbidden, CompanyMembershipForbidden, CompanyNotFound
 from app.models.user import User
 from app.repositories.quiz import QuizRepository
 from app.repositories.company_member import CompanyMemberRepository
@@ -31,9 +31,17 @@ class QuizService:
     current_user: User,
     quiz_data: QuizCreateRequest
   ) -> QuizSchema:
+    company = await self.company_repo.get_company_by_id(company_id)
+    if not company:
+      logger.warning(f"Company not found company_id={company_id}")
+      raise CompanyNotFound()
     await self.company_member_service.check_owner_or_admin(company_id, current_user.id)
+    # Валідація через Pydantic
+    quiz_data.model_validate(quiz_data)
+    # Перевірка бізнес-логіки: мінімум 2 питання
     if len(quiz_data.questions) < 2:
       raise QuizForbidden("Quiz must have at least 2 questions")
+    # Перевірка питань і опцій
     questions_data = []
     for question in quiz_data.questions:
       if not (2 <= len(question.options) <= 4):
@@ -66,13 +74,16 @@ class QuizService:
     limit: int = 10,
     offset: int = 0
   ) -> dict:
+    company = await self.company_repo.get_company_by_id(company_id)
+    if not company:
+      logger.warning(f"Company not found company_id={company_id}")
+      raise CompanyNotFound()
     # Перевіряємо, чи користувач являється членом компанії
     member = await self.member_repo.get_member_of_company(company_id, current_user.id)
-    if not member:
-      # Якщо не член, перевіряємо чи власник
-      company = await self.company_repo.get_company_by_id(company_id)
-      if not company or company.owner_id != current_user.id:
-        raise CompanyMembershipForbidden("User must be a company member or owner to view quizzes")
+    # Якщо не член, перевіряємо чи власник
+    if not member and company.owner_id != current_user.id:
+      logger.warning(f"User user_id={current_user.id} must be a company member or owner to view quizzes company_id={company_id}")
+      raise CompanyMembershipForbidden("User must be a company member or owner to view quizzes")
     # Якщо пройшли перевірку — отримуємо квізи
     quizzes = await self.quiz_repo.get_quizzes_for_company(company_id, limit, offset)
     total = await self.quiz_repo.count_quizzes_for_company(company_id)
@@ -83,22 +94,25 @@ class QuizService:
   # ================================
   async def get_quiz(
     self,
+    company_id: UUID,
     quiz_id: UUID,
     current_user: User,
   ) -> QuizSchema:
+    company = await self.company_repo.get_company_by_id(company_id)
+    if not company:
+      logger.warning(f"Company not found company_id={company_id}")
+      raise CompanyNotFound()
+    # Перевіряємо, чи користувач являється членом компанії
+    member = await self.member_repo.get_member_of_company(company_id, current_user.id)
+    # Якщо не член, перевіряємо чи власник
+    if not member and company.owner_id != current_user.id:
+      logger.warning(f"User {current_user.id} is not allowed to access quiz {quiz_id}")
+      raise CompanyMembershipForbidden("User must be a company member or owner to view this quiz")
     # Отримуємо квіз
     quiz = await self.quiz_repo.get_quiz_by_id(quiz_id)
     if not quiz:
       logger.warning(f"Quiz {quiz_id} not found")
       raise QuizNotFound()
-    # Перевіряємо, чи користувач являється членом компанії
-    member = await self.member_repo.get_member_of_company(quiz.company_id, current_user.id)
-    if not member:
-      # Якщо не член, перевіряємо чи власник
-      company = await self.company_repo.get_company_by_id(quiz.company_id)
-      if not company or company.owner_id != current_user.id:
-        logger.warning(f"User {current_user.id} is not allowed to access quiz {quiz_id}")
-        raise CompanyMembershipForbidden("User must be a company member or owner to view this quiz")
     logger.info(f"Fetched quiz {quiz_id}")
     return quiz_to_schema(quiz)
 
@@ -107,15 +121,16 @@ class QuizService:
   # ================================
   async def update_quiz(
     self,
+    company_id: UUID,
     quiz_id: UUID,
     current_user: User,
     update_data: QuizUpdateRequest
   ) -> QuizSchema:
+    await self.company_member_service.check_owner_or_admin(company_id, current_user.id)
     quiz = await self.quiz_repo.get_quiz_by_id(quiz_id)
     if not quiz:
       logger.warning(f"Tried to update non-existent quiz {quiz_id}")
       raise QuizNotFound()
-    await self.company_member_service.check_owner_or_admin(quiz.company_id, current_user.id)
     data = update_data.model_dump(exclude_unset=True)
     questions_data = None
     if "questions" in data:
@@ -145,16 +160,17 @@ class QuizService:
   # ================================
   async def delete_quiz(
     self,
+    company_id: UUID,
     quiz_id: UUID,
     current_user: User
   ) -> None:
+    # Перевірка доступу: власник або адмін компанії
+    await self.company_member_service.check_owner_or_admin(company_id, current_user.id)
     # Отримуємо квіз
     quiz = await self.quiz_repo.get_quiz_by_id(quiz_id)
     if not quiz:
       logger.warning(f"Tried to delete non-existent quiz {quiz_id}")
       raise QuizNotFound()
-    # Перевірка доступу: власник або адмін компанії
-    await self.company_member_service.check_owner_or_admin(quiz.company_id, current_user.id)
     # Видалення квіза
     await self.quiz_repo.delete_quiz(quiz_id)
     logger.info(f"Deleted quiz {quiz_id} for company {quiz.company_id} by user {current_user.id}")
