@@ -5,7 +5,7 @@ from app.models.user import User
 from app.services.quiz_workflow_export import QuizExportService
 from app.utils.quiz_workflow_export import export_response
 
-router = APIRouter(tags=["quiz-export"])
+router = APIRouter(tags=["quiz-workflow-export"])
 
 # =====================================
 # Отримати власний quiz

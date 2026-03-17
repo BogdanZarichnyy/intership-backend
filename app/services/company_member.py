@@ -104,13 +104,15 @@ class CompanyMemberService:
     if not company:
       logger.warning(f"Company {company_id} not found during owner/admin check")
       raise CompanyNotFound()
-    member = await self.member_repo.get_member_of_company(company_id, user_id)
-    if member and member.role != CompanyRole.admin:
-      logger.info(f"User {user_id} is admin of company {company_id}")
-    else:
-      logger.info(f"User {user_id} passed owner/admin check for company {company_id} (admin)")
+    # owner має повний доступ
+    if company.owner_id == user_id:
+      logger.info(f"User {user_id} is owner of company {company_id}")
       return
-    if company.owner_id != user_id:
-      logger.warning(f"User {user_id} is neither admin nor owner of company {company_id}")
-      raise CompanyMembershipForbidden("User must be admin or owner to perform this action")
-    logger.info(f"User {user_id} is company owner of {company_id}")
+    member = await self.member_repo.get_member_of_company(company_id, user_id)
+    # admin має повний доступ
+    if member and member.role == CompanyRole.admin:
+      logger.info(f"User {user_id} is admin of company {company_id}")
+      return
+    # якщо користувач не являється owner або admin - доступу немає
+    logger.warning(f"User {user_id} has no admin or owner rights in company {company_id}")
+    raise CompanyMembershipForbidden("User must be admin or owner to perform this action")

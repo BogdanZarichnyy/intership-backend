@@ -2,7 +2,7 @@
 
 ТЗ: https://flash-people-437.notion.site/Tasks-Back-End-15-eng-version-2bca27416b388197bf4bf195775eaf30#2bca27416b388118b66cca861cdeec57
 Backend-сервіс, побудований за допомогою **FastAPI**
-http://localhost:8000/docs
+Endpoints маршрути: http://localhost:8000/docs
 
 ## ⚠️ Windows, VSCode + Bash:
 
@@ -203,12 +203,13 @@ http://localhost:8000/docs
 ## Запуск міграцій:
   ```bash
   uvicorn app.main:app --reload  # зупинений бекенд
-  python -m alembic revision --autogenerate -m "create tables"  # створення міграції
-  python -m alembic revision --autogenerate -m "create companies table"  # створення міграції
+  python -m alembic revision --autogenerate -m "create users table"  # створення міграції
+  python -m alembic revision --autogenerate -m "create company table"  # створення міграції
   python -m alembic revision --autogenerate -m "create company actions tables"  # створення міграції
   python -m alembic revision --autogenerate -m "add roles for members"  # створення міграції
   python -m alembic revision --autogenerate -m "create quizzes table"  # створення міграції
   python -m alembic revision --autogenerate -m "create quiz workflow table"  # створення міграції
+  python -m alembic revision --autogenerate -m "create indexes for analytics"  # створення міграції
   python -m alembic upgrade head  # запис міграції в БД для Windows
   alembic upgrade head  # запис міграції в БД для UNIX
   alembic -x db_url=postgresql+asyncpg://postgres:postgres@localhost:5433/internship_test_db upgrade head # для тестової БД

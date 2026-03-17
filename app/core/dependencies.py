@@ -10,6 +10,7 @@ from app.repositories.company_member import CompanyMemberRepository
 from app.repositories.company_invitation import CompanyInvitationRepository
 from app.repositories.quiz import QuizRepository
 from app.repositories.quiz_workflow import QuizWorkflowRepository
+from app.repositories.analytics import AnalyticsRepository
 from app.services.user import UserService
 from app.services.auth import AuthService
 from app.services.company import CompanyService
@@ -20,8 +21,7 @@ from app.services.quiz import QuizService
 from app.services.quiz_workflow import QuizWorkflowService
 from app.services.quiz_workflow_redis_cache import QuizAttemptCacheService
 from app.services.quiz_workflow_export import QuizExportService
-
-from app.core.log_context import current_user_id_var
+from app.services.analytics import AnalyticsService
 
 security = HTTPBearer()
 
@@ -99,6 +99,14 @@ def get_quiz_export_service(
     company_member_service=company_member_service,
     redis_cache=redis_cache
   )
+
+# AnalyticsService dependency
+def get_analytics_service(
+  db: AsyncSession = Depends(get_db),
+  company_member_service: CompanyMemberService = Depends(get_company_member_service),
+):
+  repo = AnalyticsRepository(db)
+  return AnalyticsService(repo, company_member_service)
 
 # Поточний користувач із токена
 async def get_current_user(
