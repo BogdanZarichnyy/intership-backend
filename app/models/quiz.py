@@ -19,6 +19,7 @@ class Quiz(Base):
   questions = relationship("QuizQuestion", back_populates="quiz", cascade="all, delete-orphan", lazy="selectin")
   company = relationship("Company", back_populates="quizzes")
   quiz_workflow = relationship("QuizWorkflow", back_populates="quiz", cascade="all, delete-orphan")
+  notifications = relationship("Notification", back_populates="quiz", cascade="all, delete-orphan", passive_deletes=True)
 
 class QuizQuestion(Base):
   __tablename__ = "quiz_questions"

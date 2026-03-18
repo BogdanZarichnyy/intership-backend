@@ -8,6 +8,7 @@ from app.repositories.company import CompanyRepository
 from app.schemas.quiz import QuizSchema, QuizCreateRequest, QuizUpdateRequest
 from app.schemas.quiz_dto import quiz_to_schema, quizzes_to_list_schema
 from app.services.company_member import CompanyMemberService
+from app.services.notification import NotificationService
 
 class QuizService:
   def __init__(
@@ -15,12 +16,14 @@ class QuizService:
     quiz_repo: QuizRepository,
     member_repo: CompanyMemberRepository,
     company_repo: CompanyRepository,
-    company_member_service: CompanyMemberService
+    company_member_service: CompanyMemberService,
+    notification_service: NotificationService
   ):
     self.quiz_repo = quiz_repo
     self.member_repo = member_repo
     self.company_repo = company_repo
     self.company_member_service = company_member_service
+    self.notification_service = notification_service
 
   # ================================
   # Створення нового квізу
@@ -61,6 +64,9 @@ class QuizService:
     if not quiz:
       logger.info("Failed to fetch created quiz")
       raise QuizNotFound()
+    message = f"New quiz '{quiz.title}' has been created. Participate now!"
+    # Створюємо сповіщення про наявність нового тесту/квіза в компанії
+    await self.notification_service.create_notification_quiz(company_id, quiz.id, message)
     logger.info(f"Created quiz {quiz.id} for company {company_id} by user {current_user.id}")
     return quiz_to_schema(quiz)
 

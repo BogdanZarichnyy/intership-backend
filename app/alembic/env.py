@@ -20,6 +20,7 @@ from app.models.company_member import CompanyMember
 from app.models.company_invitation import CompanyInvitation
 from app.models.quiz import Quiz, QuizAnswerOption, QuizQuestion
 from app.models.quiz_workflow import QuizWorkflow
+from app.models.notification import Notification
 
 config = context.config
 config.set_main_option("sqlalchemy.url", settings.database_url)

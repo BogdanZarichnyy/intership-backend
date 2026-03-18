@@ -16,6 +16,7 @@ from app.routers.quiz import router as quizRouter
 from app.routers.quiz_workflow import router as quizResultsRouter
 from app.routers.quiz_workflow_export import router as quizWorkflowExportRouter
 from app.routers.analytics import router as analyticsRouter
+from app.routers.notification import router as notificationsRouter
 
 from app.middleware.cors import setup_middlewares
 from app.middleware.logger_middleware import RequestLoggingMiddleware
@@ -89,6 +90,7 @@ def create_app() -> FastAPI: # Використовуємо factory pattern, щ�
   app.include_router(quizResultsRouter, prefix="/quiz-workflow")
   app.include_router(quizWorkflowExportRouter, prefix="/quiz-workflow-export")
   app.include_router(analyticsRouter, prefix="/analytics")
+  app.include_router(notificationsRouter, prefix="/notifications")
 
   return app
 

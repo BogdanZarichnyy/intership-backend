@@ -186,3 +186,14 @@ class AnalyticsForbidden(Forbidden):
 class AnalyticsNotFound(NotFound):
   def __init__(self, detail: str = "Analytics data not found"):
     super().__init__(detail)
+
+# =======================
+# Notifications
+# =======================
+class NotificationNotFound(NotFound):
+  def __init__(self, detail: str = "Notification not found"):
+    super().__init__(detail)
+
+class NotificationForbidden(Forbidden):
+  def __init__(self, detail: str = "You are not allowed to access this notification"):
+    super().__init__(detail)

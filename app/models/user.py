@@ -25,3 +25,4 @@ class User(Base):
   member_companies = relationship("CompanyMember", back_populates="member", cascade="all, delete-orphan")
   invitations_sent = relationship("CompanyInvitation", back_populates="invited_by_user", foreign_keys="CompanyInvitation.invited_by")
   quiz_workflow = relationship("QuizWorkflow", back_populates="user", cascade="all, delete-orphan")
+  notifications = relationship("Notification", back_populates="user", cascade="all, delete-orphan")
