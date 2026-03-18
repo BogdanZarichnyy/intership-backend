@@ -11,6 +11,7 @@ from app.repositories.company_invitation import CompanyInvitationRepository
 from app.repositories.quiz import QuizRepository
 from app.repositories.quiz_workflow import QuizWorkflowRepository
 from app.repositories.analytics import AnalyticsRepository
+from app.repositories.notification import NotificationRepository
 from app.services.user import UserService
 from app.services.auth import AuthService
 from app.services.company import CompanyService
@@ -22,6 +23,7 @@ from app.services.quiz_workflow import QuizWorkflowService
 from app.services.quiz_workflow_redis_cache import QuizAttemptCacheService
 from app.services.quiz_workflow_export import QuizExportService
 from app.services.analytics import AnalyticsService
+from app.services.notification import NotificationService
 
 security = HTTPBearer()
 
@@ -32,6 +34,15 @@ async def get_user_service(db: AsyncSession = Depends(get_db)) -> UserService:
 # AuthService dependency
 async def get_auth_service(db: AsyncSession = Depends(get_db)) -> AuthService:
   return AuthService(UserRepository(db))
+
+# Поточний користувач із токена
+async def get_current_user(
+  credentials: HTTPAuthorizationCredentials = Depends(security),
+  service: AuthService = Depends(get_auth_service),
+)-> User:
+  user = await service.get_current_user_from_token(credentials.credentials)
+  current_user_id_var.set(str(user.id))  # ← додаємо це для логування, щоб бачити хто авторизований
+  return user
 
 # CompanyService dependency
 async def get_company_service(db: AsyncSession = Depends(get_db)) -> CompanyService:
@@ -56,13 +67,23 @@ async def get_company_admin_service(db: AsyncSession = Depends(get_db)) -> Compa
   company_repo = CompanyRepository(db)
   return CompanyAdminService(member_repo, company_repo)
 
+# NotificationService dependency
+async def get_notification_service(db: AsyncSession = Depends(get_db)) -> NotificationService:
+  notification_repo = NotificationRepository(db)
+  company_repo = CompanyRepository(db)
+  member_repo = CompanyMemberRepository(db)
+  return NotificationService(notification_repo, company_repo, member_repo)
+
 # QuizService dependency
-async def get_quiz_service(db: AsyncSession = Depends(get_db)) -> QuizService:
+async def get_quiz_service(
+  db: AsyncSession = Depends(get_db),
+  notification_service: NotificationService = Depends(get_notification_service)
+) -> QuizService:
   quiz_repo = QuizRepository(db)
   member_repo = CompanyMemberRepository(db)
   company_repo = CompanyRepository(db)
   company_member_service = CompanyMemberService(member_repo, company_repo)
-  return QuizService(quiz_repo, member_repo, company_repo, company_member_service)
+  return QuizService(quiz_repo, member_repo, company_repo, company_member_service, notification_service)
 
 # QuizWorkflowCashRedisService dependency
 def get_quiz_workflow_cache_redis_service() -> QuizAttemptCacheService:
@@ -107,12 +128,3 @@ def get_analytics_service(
 ):
   repo = AnalyticsRepository(db)
   return AnalyticsService(repo, company_member_service)
-
-# Поточний користувач із токена
-async def get_current_user(
-  credentials: HTTPAuthorizationCredentials = Depends(security),
-  service: AuthService = Depends(get_auth_service),
-)-> User:
-  user = await service.get_current_user_from_token(credentials.credentials)
-  current_user_id_var.set(str(user.id))  # ← додаємо це для логування, щоб бачити хто авторизований
-  return user
