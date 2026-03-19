@@ -3,6 +3,7 @@ from app.core.logger import logger
 from app.core.exceptions import QuizNotFound, QuizForbidden, CompanyMembershipForbidden, CompanyNotFound
 from app.models.user import User
 from app.repositories.quiz import QuizRepository
+from app.repositories.quiz_workflow import QuizWorkflowRepository
 from app.repositories.company_member import CompanyMemberRepository
 from app.repositories.company import CompanyRepository
 from app.schemas.quiz import QuizSchema, QuizCreateRequest, QuizUpdateRequest
@@ -14,12 +15,14 @@ class QuizService:
   def __init__(
     self,
     quiz_repo: QuizRepository,
+    quiz_workflow_repo: QuizWorkflowRepository,
     member_repo: CompanyMemberRepository,
     company_repo: CompanyRepository,
     company_member_service: CompanyMemberService,
     notification_service: NotificationService
   ):
     self.quiz_repo = quiz_repo
+    self.quiz_workflow_repo = quiz_workflow_repo
     self.member_repo = member_repo
     self.company_repo = company_repo
     self.company_member_service = company_member_service
@@ -64,7 +67,7 @@ class QuizService:
     if not quiz:
       logger.info("Failed to fetch created quiz")
       raise QuizNotFound()
-    message = f"New quiz '{quiz.title}' has been created. Participate now!"
+    message = f"Додано нову вікторину '{quiz.title}'. Беріть участь зараз!"
     # Створюємо сповіщення про наявність нового тесту/квіза в компанії
     await self.notification_service.create_notification_quiz(company_id, quiz.id, message)
     logger.info(f"Created quiz {quiz.id} for company {company_id} by user {current_user.id}")
@@ -153,6 +156,10 @@ class QuizService:
           raise QuizForbidden("Question must have exactly one correct answer")
         questions_data.append(question)
     await self.quiz_repo.update_quiz(quiz_id, data, questions_data)
+    # ВАЖЛИВО: чистимо всі старі проходження цього квіза, щоб члени компанії пройшли його наново
+    await self.quiz_workflow_repo.delete_by_quiz_id(quiz_id)
+    # ВАЖЛИВО: скидаємо всі старі сповіщення для цього квіза в статус False для scheduler скрипта
+    await self.notification_service.notification_repo.reset_notifications_for_quiz(quiz_id)
     # Повторно отримуємо quiz з усіма відношеннями
     quiz = await self.quiz_repo.get_quiz_by_id(quiz.id)
     if not quiz:

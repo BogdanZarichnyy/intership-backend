@@ -232,3 +232,17 @@ class QuizRepository:
   ):
     await self.db.execute(delete(Quiz).where(Quiz.id == quiz_id))
     await self.db.commit()
+
+  # =============================
+  # Notification scheduler script
+  # =============================
+  async def get_quizzes_of_company_for_notifications(
+    self,
+    company_id: UUID
+  ) -> list[Quiz]:
+    query = (
+      select(Quiz)
+      .where(Quiz.company_id == company_id)
+    )
+    result = await self.db.execute(query)
+    return result.scalars().all()

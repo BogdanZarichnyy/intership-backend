@@ -1,9 +1,18 @@
-from contextlib import asynccontextmanager
 from fastapi import FastAPI
 import asyncio
 import uvicorn
+from contextlib import asynccontextmanager
+
+from app.config import settings
 
 from app.core.logger import logger
+
+from app.db.postgres import engine
+from app.db.redis import redis_client
+
+from app.middleware.cors import setup_middlewares
+from app.middleware.logger_middleware import RequestLoggingMiddleware
+from app.middleware.exception_handler import setup_exception_handlers
 
 from app.routers.health import router as healthRouter
 from app.routers.user import router as userRouter
@@ -18,14 +27,7 @@ from app.routers.quiz_workflow_export import router as quizWorkflowExportRouter
 from app.routers.analytics import router as analyticsRouter
 from app.routers.notification import router as notificationsRouter
 
-from app.middleware.cors import setup_middlewares
-from app.middleware.logger_middleware import RequestLoggingMiddleware
-from app.middleware.exception_handler import setup_exception_handlers
-
-from app.config import settings
-
-from app.db.postgres import engine
-from app.db.redis import redis_client
+from app.utils.notification_scheduler import start_scheduler
 
 async def wait_for_postgres():
   retries = 0
@@ -63,6 +65,8 @@ async def lifespan(app: FastAPI):
   # startup
   await wait_for_postgres()
   await wait_for_redis()
+  # запускаємо APScheduler у вже існуючому asyncio loop для запуску сценарію кожні 24 години опівночі
+  start_scheduler(hour=00, minute=00)  # для тесту можна змінити час
   yield
 
   # shutdown

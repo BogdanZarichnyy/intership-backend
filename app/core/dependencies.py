@@ -24,6 +24,7 @@ from app.services.quiz_workflow_redis_cache import QuizAttemptCacheService
 from app.services.quiz_workflow_export import QuizExportService
 from app.services.analytics import AnalyticsService
 from app.services.notification import NotificationService
+from app.services.notification_scheduler import QuizReminderService
 
 security = HTTPBearer()
 
@@ -80,10 +81,11 @@ async def get_quiz_service(
   notification_service: NotificationService = Depends(get_notification_service)
 ) -> QuizService:
   quiz_repo = QuizRepository(db)
+  quiz_workflow_repo = QuizWorkflowRepository(db)
   member_repo = CompanyMemberRepository(db)
   company_repo = CompanyRepository(db)
   company_member_service = CompanyMemberService(member_repo, company_repo)
-  return QuizService(quiz_repo, member_repo, company_repo, company_member_service, notification_service)
+  return QuizService(quiz_repo, quiz_workflow_repo, member_repo, company_repo, company_member_service, notification_service)
 
 # QuizWorkflowCashRedisService dependency
 def get_quiz_workflow_cache_redis_service() -> QuizAttemptCacheService:
@@ -128,3 +130,13 @@ def get_analytics_service(
 ):
   repo = AnalyticsRepository(db)
   return AnalyticsService(repo, company_member_service)
+
+# QuizReminderService dependency
+async def get_quiz_reminder_service(
+  db: AsyncSession = Depends(get_db)
+) -> QuizReminderService:
+  member_repo = CompanyMemberRepository(db)
+  quiz_repo = QuizRepository(db)
+  quiz_workflow_repo = QuizWorkflowRepository(db)
+  notification_repo = NotificationRepository(db)
+  return QuizReminderService(member_repo, quiz_repo, quiz_workflow_repo, notification_repo)

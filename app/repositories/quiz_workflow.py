@@ -1,6 +1,6 @@
 from uuid import UUID
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy import select, insert, update, func, case
+from sqlalchemy import select, insert, update, delete, func, case
 from app.models.quiz import Quiz, QuizQuestion, QuizAnswerOption
 from app.models.quiz_workflow import QuizWorkflow
 
@@ -127,3 +127,31 @@ class QuizWorkflowRepository:
     res = await self.db.execute(query)
     correct_sum, total_sum = res.one()
     return float(correct_sum) / float(total_sum) if total_sum else 0.0
+
+  # =============================
+  # Delete all results for quiz
+  # =============================
+  async def delete_by_quiz_id(
+    self,
+    quiz_id: UUID
+  ) -> None:
+    query = (
+      delete(QuizWorkflow)
+      .where(QuizWorkflow.quiz_id == quiz_id)
+    )
+    await self.db.execute(query)
+    await self.db.commit()
+
+  # =======================================
+  # Get company workflows for notifications
+  # =======================================
+  async def get_company_workflows(
+    self, 
+    company_id: UUID
+  ):
+    query = (
+      select(QuizWorkflow)
+      .where(QuizWorkflow.company_id == company_id)
+    )
+    result = await self.db.execute(query)
+    return result.scalars().all()

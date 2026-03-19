@@ -58,7 +58,7 @@
             "header": [],
             "body": {
               "mode": "raw",
-              "raw": "{\r\n    \"email\": \"keyvin@test.email\",\r\n    \"username\": \"Key Vin\",\r\n    \"password\": \"123\"\r\n}",
+              "raw": "{\r\n    \"email\": \"test@test.email\",\r\n    \"username\": \"Test\",\r\n    \"password\": \"123\"\r\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -1798,6 +1798,75 @@
                   "key": "end_date",
                   "value": "2026-03-16T23:59:59"
                 }
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Notifications",
+      "item": [
+        {
+          "name": "Member Action - All My Notifications",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{jwt_token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:8000/notifications/company/a5bb832d-46d7-4d10-9cd1-c415caf33db1/me",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8000",
+              "path": [
+                "notifications",
+                "company",
+                "a5bb832d-46d7-4d10-9cd1-c415caf33db1",
+                "me"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Member Action - Mark Notification as Read",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{jwt_token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "PATCH",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:8000/notifications/mark/abf297cc-1949-464d-b253-72a81fa82e7b/as-read",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8000",
+              "path": [
+                "notifications",
+                "mark",
+                "abf297cc-1949-464d-b253-72a81fa82e7b",
+                "as-read"
               ]
             }
           },

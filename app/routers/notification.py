@@ -1,14 +1,15 @@
-from fastapi import APIRouter, Depends
 from uuid import UUID
-from app.services.notification import NotificationService
+from fastapi import APIRouter, Depends, status
+from app.core.dependencies import get_current_user, get_notification_service
 from app.models.user import User
 from app.schemas.notification import NotificationSchema
-from app.core.dependencies import get_current_user, get_notification_service
+from app.services.notification import NotificationService
 
 router = APIRouter(tags=["Notifications"])
 
 @router.get(
   "/company/{company_id}/me", 
+  status_code=status.HTTP_200_OK,
   response_model=list[NotificationSchema]
 )
 async def list_notifications(
@@ -20,6 +21,7 @@ async def list_notifications(
 
 @router.patch(
   "/mark/{notification_id}/as-read",
+  status_code=status.HTTP_200_OK,
   response_model=NotificationSchema
 )
 async def mark_notification(
