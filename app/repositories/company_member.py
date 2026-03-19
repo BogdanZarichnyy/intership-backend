@@ -71,17 +71,6 @@ class CompanyMemberRepository:
     result = await self.db.execute(query)
     return result.scalars().all()
 
-  async def get_all_members_for_notifications(
-    self,
-    company_id: UUID,
-  ) -> list[CompanyMember]:
-    query = (
-      select(CompanyMember)
-      .where(CompanyMember.company_id == company_id)
-    )
-    result = await self.db.execute(query)
-    return result.scalars().all()
-
   async def set_role(
     self, 
     company_id: UUID, 
@@ -100,3 +89,21 @@ class CompanyMemberRepository:
     )
     result = await self.db.execute(query)
     return result.scalar_one_or_none()
+
+  async def get_all_members_for_notifications(
+    self,
+    company_id: UUID,
+  ) -> list[CompanyMember]:
+    query = (
+      select(CompanyMember)
+      .where(CompanyMember.company_id == company_id)
+    )
+    result = await self.db.execute(query)
+    return result.scalars().all()
+  
+  async def get_all_members_for_notifications_for_all_companies(
+    self,
+  ) -> list[CompanyMember]:
+    query = select(CompanyMember)
+    result = await self.db.execute(query)
+    return result.scalars().all()

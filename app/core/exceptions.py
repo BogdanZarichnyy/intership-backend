@@ -1,5 +1,4 @@
-from app.middleware.exception_handler import (
-  APIException,
+from app.core.exceptions_base import (
   BadRequest,
   Unauthorized,
   Forbidden,
@@ -157,7 +156,7 @@ class QuizCacheForbidden(Forbidden):
   def __init__(self, detail: str = "Operation not allowed on quiz cache"):
     super().__init__(detail)
 
-class QuizCacheError(APIException):
+class QuizCacheError(InternalServerError):
   def __init__(self, detail: str = "Redis error occurred while handling quiz cache"):
     super().__init__(detail)
 
@@ -172,7 +171,7 @@ class QuizExportNotFound(NotFound):
   def __init__(self, detail: str = "No quiz attempts found to export"):
     super().__init__(detail)
 
-class QuizExportCacheError(APIException):
+class QuizExportCacheError(InternalServerError):
   def __init__(self, detail: str = "Error occurred while fetching data from Redis for export"):
     super().__init__(detail)
 
