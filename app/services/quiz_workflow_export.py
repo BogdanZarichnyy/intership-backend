@@ -2,18 +2,21 @@ from uuid import UUID
 from app.core.logger import logger
 from app.core.exceptions import QuizExportNotFound, CompanyNotFound, CompanyOwnerOnly
 from app.models.user import User
+from app.repositories.company import CompanyRepository
+from app.repositories.company_member import CompanyMemberRepository
 from app.services.company_member import CompanyMemberService
-from app.services.quiz import QuizService
 from app.services.quiz_workflow_redis_cache import QuizAttemptCacheService
 
 class QuizExportService:
   def __init__(
     self,
-    quiz_service: QuizService,
+    member_repo: CompanyMemberRepository,
+    company_repo: CompanyRepository,
     company_member_service: CompanyMemberService,
     redis_cache: QuizAttemptCacheService
   ):
-    self.quiz_service = quiz_service
+    self.member_repo = member_repo
+    self.company_repo = company_repo
     self.company_member_service = company_member_service
     self.redis_cache = redis_cache
 
@@ -39,11 +42,11 @@ class QuizExportService:
     user_id: UUID | None = None,
   ) -> list[dict]:
     await self.company_member_service.check_owner_or_admin(company_id, current_user.id)
-    company = await self.company_member_service.company_repo.get_company_by_id(company_id)
+    company = await self.company_repo.get_company_by_id(company_id)
     if not company:
       logger.warning(f"Company {company_id} not found during owner/admin check")
       raise CompanyNotFound()
-    member = await self.quiz_service.member_repo.get_member_of_company(company_id, user_id)
+    member = await self.member_repo.get_member_of_company(company_id, user_id)
     if not member:
       logger.info(f"User {current_user.id} is not member of company {company_id}")
       raise CompanyOwnerOnly()
@@ -62,7 +65,7 @@ class QuizExportService:
   ) -> list[dict]:
     logger.info(f"User {current_user.id} requesting all users' attempts for company {company_id}") 
     await self.company_member_service.check_owner_or_admin(company_id, current_user.id)
-    company = await self.company_member_service.company_repo.get_company_by_id(company_id)
+    company = await self.company_repo.get_company_by_id(company_id)
     if not company:
       logger.warning(f"Company {company_id} not found during owner/admin check")
       raise CompanyNotFound()
@@ -82,7 +85,7 @@ class QuizExportService:
   ) -> list[dict]:
     logger.info(f"User {current_user.id} requesting attempts for quiz {quiz_id}")
     await self.company_member_service.check_owner_or_admin(company_id, current_user.id)
-    company = await self.company_member_service.company_repo.get_company_by_id(company_id)
+    company = await self.company_repo.get_company_by_id(company_id)
     if not company:
       logger.warning(f"Company {company_id} not found during owner/admin check")
       raise CompanyNotFound()

@@ -29,20 +29,20 @@ class QuizWorkflowRepository:
     return result.scalar_one()
   
   # Перевірка на унікальність запису в БД. Наразі в таблиці задіяний UniqueConstraint()
-  # async def get_by_user_company_quiz(
-  #   self, 
-  #   user_id: UUID, 
-  #   company_id: UUID, 
-  #   quiz_id: UUID
-  # ) -> QuizWorkflow | None:
-  #   result = await self.db.execute(
-  #     select(QuizWorkflow).where(
-  #       QuizWorkflow.user_id == user_id,
-  #       QuizWorkflow.company_id == company_id,
-  #       QuizWorkflow.quiz_id == quiz_id
-  #     )
-  #   )
-  #   return result.scalar_one_or_none()
+  async def get_by_user_company_quiz(
+    self, 
+    user_id: UUID, 
+    company_id: UUID, 
+    quiz_id: UUID
+  ) -> QuizWorkflow | None:
+    result = await self.db.execute(
+      select(QuizWorkflow).where(
+        QuizWorkflow.user_id == user_id,
+        QuizWorkflow.company_id == company_id,
+        QuizWorkflow.quiz_id == quiz_id
+      )
+    )
+    return result.scalar_one_or_none()
 
   # =====================================
   # Increment participation count in Quiz
