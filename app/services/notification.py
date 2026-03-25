@@ -78,5 +78,3 @@ class NotificationService:
     notification = await self.notification_repo.update_notification_status(notification_id, current_user.id, is_read=True)
     logger.info(f"User {current_user.id} marked notification {notification_id} as read")
     return NotificationSchema.model_validate(notification)
-
-

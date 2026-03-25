@@ -4,7 +4,7 @@ from fastapi.responses import JSONResponse
 from fastapi.encoders import jsonable_encoder
 from fastapi.exceptions import RequestValidationError
 from starlette.exceptions import HTTPException as StarletteHTTPException
-from fastapi.exception_handlers import http_exception_handler as default_http_handler
+from fastapi.exception_handlers import http_exception_handler
 from app.core.logger import logger
 from app.core.exceptions_base import APIException
 
@@ -16,7 +16,10 @@ ExceptionHandler = Callable[[Request, Exception], Awaitable[JSONResponse]]
 # =======================
 async def http_exception_handler(request: Request, exc: StarletteHTTPException) -> JSONResponse:
   logger.error(f"HTTPException {exc.status_code} on {request.url.path}: {exc.detail}")
-  return await default_http_handler(request, exc)
+  return JSONResponse(
+    status_code=exc.status_code,
+    content={"detail": exc.detail}
+  )
 
 # =======================
 # RequestValidationError
