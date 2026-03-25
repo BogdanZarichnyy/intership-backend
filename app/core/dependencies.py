@@ -25,6 +25,7 @@ from app.services.quiz_workflow_export import QuizExportService
 from app.services.analytics import AnalyticsService
 from app.services.notification import NotificationService
 from app.services.notification_scheduler import QuizReminderService
+from app.services.quiz_import import QuizImportService
 
 security = HTTPBearer()
 
@@ -134,3 +135,13 @@ async def get_quiz_reminder_service(
   quiz_workflow_repo = QuizWorkflowRepository(db)
   notification_repo = NotificationRepository(db)
   return QuizReminderService(member_repo, quiz_repo, quiz_workflow_repo, notification_repo)
+
+# QuizImportService dependency
+async def get_quiz_import_service(
+  db: AsyncSession = Depends(get_db),
+  company_member_service: CompanyMemberService = Depends(get_company_member_service),
+  quiz_service: QuizService = Depends(get_quiz_service)
+) -> QuizImportService:
+  company_repo = CompanyRepository(db)
+  quiz_repo = QuizRepository(db)
+  return QuizImportService(company_repo, company_member_service, quiz_repo, quiz_service)

@@ -1,9 +1,10 @@
 from uuid import UUID
-from fastapi import APIRouter, Depends, Query, status
-from app.core.dependencies import get_current_user, get_quiz_service
+from fastapi import APIRouter, Depends, Query, status, UploadFile, File
+from app.core.dependencies import get_current_user, get_quiz_service, get_quiz_import_service
 from app.models.user import User
 from app.schemas.quiz import QuizCreateRequest, QuizUpdateRequest, QuizSchema, QuizListResponse
 from app.services.quiz import QuizService
+from app.services.quiz_import import QuizImportService
 
 router = APIRouter(tags=["quizzes"])
 
@@ -72,3 +73,15 @@ async def delete_quiz(
   service: QuizService = Depends(get_quiz_service)
 ):
   await service.delete_quiz(company_id, quiz_id, current_user)
+
+@router.post(
+  "/company/{company_id}/import-excel",
+  status_code=status.HTTP_200_OK
+)
+async def import_quiz_excel(
+  company_id: UUID,
+  current_user: User = Depends(get_current_user),
+  file: UploadFile = File(...),
+  service: QuizImportService = Depends(get_quiz_import_service)
+):
+  return await service.import_excel(company_id, current_user, file.file)

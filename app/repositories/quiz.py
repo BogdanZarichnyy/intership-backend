@@ -246,3 +246,20 @@ class QuizRepository:
     )
     result = await self.db.execute(query)
     return result.scalars().all()
+
+  # =============================
+  # for Import Excel Quiz
+  # =============================
+  async def get_by_title_and_company(
+    self,
+    title: str,
+    company_id: UUID
+  ) -> Quiz | None:
+    result = await self.db.execute(
+      select(Quiz)
+      .where(
+        Quiz.title == title,
+        Quiz.company_id == company_id
+      )
+    )
+    return result.scalar_one_or_none()
