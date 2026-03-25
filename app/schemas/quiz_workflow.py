@@ -4,7 +4,7 @@ from datetime import datetime
 
 class QuizAttemptAnswerSchema(BaseModel):
   question_id: UUID
-  selected_option_ids: list[UUID] = Field(..., min_items=1)
+  selected_option_ids: list[UUID] = Field(..., min_length=1)
 
 class QuizAttemptRequest(BaseModel):
   answers: list[QuizAttemptAnswerSchema]

@@ -124,7 +124,8 @@ Endpoints маршрути: http://localhost:8000/docs
 Альтернативні варіанти запустку тестів для UNIX систем:
   ```bash
   python -m pytest tests/
-  python -m pytest -v
+  python -m pytest -v               # режим для дебагу з виводом деталей
+  python -m pytest tests/test_current.py   # конкретний тест
   pytest --rootdir=. tests/
   pytest tests/
   ```
