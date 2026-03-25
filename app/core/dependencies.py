@@ -108,17 +108,11 @@ def get_quiz_export_service(
   company_member_service: CompanyMemberService = Depends(get_company_member_service),
   redis_cache: QuizAttemptCacheService = Depends(get_quiz_workflow_cache_redis_service)
 ) -> QuizExportService:
-  quiz_repo = QuizRepository(db)
   member_repo = CompanyMemberRepository(db)
   company_repo = CompanyRepository(db)
-  quiz_service = QuizService(
-    quiz_repo=quiz_repo,
+  return QuizExportService(
     member_repo=member_repo,
     company_repo=company_repo,
-    company_member_service=company_member_service
-  )
-  return QuizExportService(
-    quiz_service=quiz_service,
     company_member_service=company_member_service,
     redis_cache=redis_cache
   )

@@ -1,6 +1,6 @@
 from uuid import UUID
 from app.core.logger import logger
-from app.core.exceptions import QuizNotFound, QuizForbidden
+from app.core.exceptions import QuizNotFound, QuizForbidden, QuizDuplicate
 from app.models.user import User
 from app.models.quiz import Quiz
 from app.models.quiz_workflow import QuizWorkflow
@@ -60,13 +60,13 @@ class QuizWorkflowService:
       score=result_data.score
     )
     # Перевірка на унікальність запису в БД. Наразі в таблиці задіяний UniqueConstraint()
-    # existing = await self.quiz_workflow_repo.get_by_user_company_quiz(
-    #   user_id=current_user.id,
-    #   company_id=company_id,
-    #   quiz_id=quiz_id
-    # )
-    # if existing:
-    #   raise QuizForbidden("You have already attempted this quiz")
+    existing = await self.quiz_workflow_repo.get_by_user_company_quiz(
+      user_id=current_user.id,
+      company_id=company_id,
+      quiz_id=quiz_id
+    )
+    if existing:
+      raise QuizDuplicate("You have already attempted this quiz")
     # Запис результатів в PostgreSQL
     result = await self.quiz_workflow_repo.create_quiz_workflow(quiz_workflow)
     logger.info(f"User {current_user.id} attempt recorded successfully for quiz {quiz_id}")
